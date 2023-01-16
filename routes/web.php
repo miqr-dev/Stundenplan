@@ -30,5 +30,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
+Route::get('/settings', function () {
+    return Inertia::render('Settings/Index');
+})->middleware(['auth', 'verified'])->name('settings');
+
+
 Route::resource('city', CityController::class);
 require __DIR__.'/auth.php';

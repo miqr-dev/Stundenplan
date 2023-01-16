@@ -14,7 +14,7 @@ class CityController extends Controller
      */
     public function index()
     {
-        return inertia('Cities/Index',[
+        return inertia('Settings/Cities/Index',[
           'cities' => City::all()->map(function($city){
             return [
                 'id' => $city->id,
@@ -31,7 +31,7 @@ class CityController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('Settings/Cities/Create');
     }
 
     /**
@@ -42,7 +42,14 @@ class CityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $attributes = $request->validate([
+        'name' => 'required|min:3',
+      ]);
+      
+      City::create($attributes);
+
+      return redirect()->route('city.index');
+
     }
 
     /**
@@ -64,7 +71,9 @@ class CityController extends Controller
      */
     public function edit(City $city)
     {
-        //
+        return inertia('Settings/Cities/Edit', [
+          'city' => $city
+        ]);
     }
 
     /**
@@ -76,7 +85,7 @@ class CityController extends Controller
      */
     public function update(Request $request, City $city)
     {
-        //
+        return ('success');
     }
 
     /**
