@@ -1,6 +1,6 @@
 <script setup>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue';
-import { Head } from '@inertiajs/inertia-vue3';
+import { Head } from '@inertiajs/vue3'
 import SettingsSubMenu from '@/Components/SettingsSubMenu.vue';
 
 </script>

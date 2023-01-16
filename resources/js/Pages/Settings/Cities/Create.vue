@@ -1,8 +1,8 @@
 <script setup>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue';
-import { Head, useForm } from '@inertiajs/inertia-vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import SettingsSubMenu from '@/Components/SettingsSubMenu.vue';
-import { Link } from '@inertiajs/inertia-vue3';
+import { Link } from '@inertiajs/vue3';
 
 let form = useForm({
   name: ''

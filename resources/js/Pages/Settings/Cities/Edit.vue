@@ -1,26 +1,26 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Head, useForm } from "@inertiajs/inertia-vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     city: Object,
 });
 
 let form = useForm({
-    _method: "put",
     name: props.city.name,
     id: props.city.id,
 });
 
 let update = () => {
-    form.post(`/city/${props.city.id}`, {});
+    form.patch(`/city/${props.city.id}`);
 };
 
 let destroy = () => {
   if (confirm('Are you sure you want to delete this user?')) {
-    form.post(`/city/${props.city.id}`)
+    form.delete(`/city/${props.city.id}`)
+    console.log(`/city/${props.city.id}`)
   }
 }
 </script>
@@ -90,7 +90,7 @@ let destroy = () => {
                                         type="button"
                                         @click="destroy"
                                     >
-                                        Delete User
+                                        Delete City
                                     </button>
                                 </div>
                             </form>
