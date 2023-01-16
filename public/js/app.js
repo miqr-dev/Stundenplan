@@ -20704,17 +20704,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   __name: 'Edit',
   props: {
-    city: {}
+    city: Object
   },
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
     var props = __props;
     var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)({
-      name: props.city.name
+      _method: "put",
+      name: props.city.name,
+      id: props.city.id
     });
     var update = function update() {
-      form.patch("/city/".concat(props.city.id), {});
+      form.post("/city/".concat(props.city.id), {});
+    };
+    var destroy = function destroy() {
+      if (confirm('Are you sure you want to delete this user?')) {
+        form.post("/city/".concat(props.city.id));
+      }
     };
     var __returned__ = {
       props: props,
@@ -20729,6 +20736,12 @@ __webpack_require__.r(__webpack_exports__);
       },
       set update(v) {
         update = v;
+      },
+      get destroy() {
+        return destroy;
+      },
+      set destroy(v) {
+        destroy = v;
       },
       BreezeAuthenticatedLayout: _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
       get Head() {
@@ -22120,7 +22133,7 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, " Name ", -1 /* HOISTED */);
 var _hoisted_12 = ["textContent"];
 var _hoisted_13 = {
-  "class": "mb-1"
+  "class": "mb-1 flex justify-between"
 };
 var _hoisted_14 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -22137,7 +22150,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-        onSubmit: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $setup.update && $setup.update.apply($setup, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [_hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -22158,7 +22171,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           'cursor-not-allowed': $setup.form.processing
         }]),
         disabled: $setup.form.processing
-      }, " Submit ", 10 /* CLASS, PROPS */, _hoisted_14)])], 32 /* HYDRATE_EVENTS */)])])])])])];
+      }, " Submit ", 10 /* CLASS, PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "text-red-600 hover:underline",
+        tabindex: "-1",
+        type: "button",
+        onClick: _cache[1] || (_cache[1] = function () {
+          return $setup.destroy && $setup.destroy.apply($setup, arguments);
+        })
+      }, " Delete User ")])], 32 /* HYDRATE_EVENTS */)])])])])])];
     }),
 
     _: 1 /* STABLE */

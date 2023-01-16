@@ -85,7 +85,13 @@ class CityController extends Controller
      */
     public function update(Request $request, City $city)
     {
-        return ('success');
+        $attributes = $request->validate([
+        'name' => 'required|min:3',
+      ]);
+      
+        $city->update($attributes);
+
+      return redirect()->route('city.index');
     }
 
     /**
@@ -96,6 +102,6 @@ class CityController extends Controller
      */
     public function destroy(City $city)
     {
-        //
+        return ('deleted successfully');
     }
 }
