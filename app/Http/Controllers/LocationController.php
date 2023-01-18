@@ -2,84 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\Location;
+use App\Models\Rooms;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+         return inertia('Settings/Locations/Index',[
+          'locations' => City::with('locations')->get()
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        return inertia('Settings/Locations/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        return $request;
+        $attributes = $request->validate([
+        'name' => 'required|min:3',
+      ]);
+      Location::create($attributes);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Location  $location
-     * @return \Illuminate\Http\Response
-     */
     public function show(Location $location)
     {
-        //
+        return inertia('Settings/Rooms/Show',[
+          'location' => $location->load('rooms')
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Location  $location
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Location $location)
     {
-        //
+          return inertia('Settings/Locations/Edit', [
+          'location' => $location
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Location  $location
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Location $location)
     {
-        //
+      $attributes = $request->validate([
+        'name' => 'required|min:3',
+      ]);
+
+      $location->update($attributes);
+      return redirect()->route('location.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Location  $location
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Location $location)
     {
-        //
+      $location->delete();
+      return redirect()->route('location.index');
     }
 }

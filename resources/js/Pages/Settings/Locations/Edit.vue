@@ -5,22 +5,22 @@ import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
-    city: Object,
+    location: Object,
 });
 
 let form = useForm({
-    name: props.city.name,
-    id: props.city.id,
+    name: props.location.name,
+    id: props.location.id,
 });
 
 let update = () => {
-    form.patch(`/city/${props.city.id}`);
+    form.patch(`/location/${props.location.id}`);
 };
 
 let destroy = () => {
   if (confirm('Are you sure you want to delete this user?')) {
-    form.delete(`/city/${props.city.id}`)
-    console.log(`/city/${props.city.id}`)
+    form.delete(`/location/${props.location.id}`)
+    console.log(`/location/${props.location.id}`)
   }
 }
 </script>
@@ -41,9 +41,9 @@ let destroy = () => {
                         class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
                     >
                         <div class="flex justify-between">
-                            <h2 class="text-h2">Edit the city name</h2>
+                            <h2 class="text-h2">Edit the location name</h2>
                             <Link
-                                :href="route('city.index')"
+                                :href="route('location.index')"
                                 class="text-blue-500 text-p"
                                 >X</Link
                             >

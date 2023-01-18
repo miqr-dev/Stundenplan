@@ -1,12 +1,15 @@
 <script setup>
-import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Head } from "@inertiajs/vue3";
-import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
-import { Link } from "@inertiajs/vue3";
+import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue';
+import { Head } from '@inertiajs/vue3'
+import SettingsSubMenu from '@/Components/SettingsSubMenu.vue';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-  cities: {},
+  city: {}
 });
+
+
+
 </script>
 
 <template>
@@ -34,9 +37,9 @@ const props = defineProps({
             "
           >
             <div class="sm:flex justify-between">
-              <h2 class="text-h2">Cities</h2>
-              <Link :href="route('city.create')" class="text-blue-500 text-p"
-                >Add a city</Link
+              <h2 class="text-h2">Locations in {{ city.name }}</h2>
+              <Link :href="route('location.create')" class="text-blue-500 text-p"
+                >Add a Location</Link
               >
             </div>
             <div class="flex flex-col mt-4">
@@ -61,13 +64,13 @@ const props = defineProps({
                   >
                     <table class="min-w-full divide-y divide-gray-200">
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(city, key) in cities" :key="city.id">
+                        <tr v-for="(location, key) in city.locations" :key="location.id">
                           <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                               <div>
                                 <div class="text-sm font-medium text-gray-900">
-                                  <Link method="get" :href="`/city/${city.id}`">
-                                    {{ city.name }}</Link
+                                  <Link method="get" :href="`/location/${location.id}`">
+                                    {{ location.name }}</Link
                                   >
                                 </div>
                               </div>
@@ -83,7 +86,7 @@ const props = defineProps({
                             "
                           >
                             <Link
-                              :href="`/city/${city.id}/edit`"
+                              :href="`/location/${location.id}/edit`"
                               class="text-blue-600 hover:text-blue-900"
                             >
                               Edit

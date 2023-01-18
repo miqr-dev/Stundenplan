@@ -17,8 +17,9 @@ class CreateRoomsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('location_id');
             $table->string('name');
-            $table->string('altrname');
+            $table->string('room_number');
             $table->string('floor');
+            $table->integer('capacity')->nullable()->default(0);
             $table->timestamps();
             $table->foreign('location_id')->references('id')->on('locations');
         });

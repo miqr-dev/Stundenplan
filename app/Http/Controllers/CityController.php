@@ -60,7 +60,9 @@ class CityController extends Controller
      */
     public function show(City $city)
     {
-        //
+        return inertia('Settings/Locations/Show',[
+          'city' => $city->load('locations')
+        ]);
     }
 
     /**
