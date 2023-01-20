@@ -10,6 +10,9 @@
             <div class="flex">
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <BreezeNavLink :href="route('subject.index')" :active="route().current('subject.index')">
+                        Subjects
+                    </BreezeNavLink>
                     <BreezeNavLink :href="route('city.index')" :active="route().current('city.index')">
                         Cities
                     </BreezeNavLink>

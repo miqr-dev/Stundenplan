@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\LocationController;
 
 /*
@@ -40,4 +41,5 @@ Route::get('/settings', function () {
 Route::resource('city', CityController::class);
 Route::resource('location', LocationController::class);
 Route::resource('room', RoomController::class);
+Route::resource('subject', SubjectController::class);
 require __DIR__.'/auth.php';

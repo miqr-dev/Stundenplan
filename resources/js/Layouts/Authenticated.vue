@@ -31,7 +31,7 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </BreezeNavLink>
                                 <BreezeNavLink :href="route('settings')" :active="route().current('settings')
-                                || route().current('city.*') || route().current('location.*')">
+                                || route().current('city.*') || route().current('location.*') || route().current('subject.*')">
                                     Settings
                                 </BreezeNavLink>
                             </div>

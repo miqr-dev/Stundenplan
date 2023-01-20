@@ -18,6 +18,7 @@ class CreateLocationsTable extends Migration
             $table->unsignedBigInteger('city_id');
             $table->string('name');
             $table->timestamps();
+            $table->softDeletes();
             $table->foreign('city_id')->references('id')->on('cities');
         });
     }

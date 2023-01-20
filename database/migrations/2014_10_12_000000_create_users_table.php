@@ -30,6 +30,7 @@ class CreateUsersTable extends Migration
             $table->string('email_privat')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
