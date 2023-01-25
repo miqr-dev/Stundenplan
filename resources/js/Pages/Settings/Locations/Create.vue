@@ -12,6 +12,7 @@ let submit = () => {
   form.post('/location');
 };
 
+
 </script>
 
 <template>

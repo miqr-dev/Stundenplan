@@ -23,7 +23,6 @@ class LocationController extends Controller
 
     public function store(Request $request)
     {
-        return $request;
         $attributes = $request->validate([
         'name' => 'required|min:3',
       ]);

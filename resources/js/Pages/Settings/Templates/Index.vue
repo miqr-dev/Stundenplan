@@ -5,12 +5,12 @@ import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 
 const props = defineProps({
-  cities: {},
+  templates: {},
 });
 </script>
 
 <template>
-  <Head title="Cities" />
+  <Head title="templates" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -34,9 +34,9 @@ const props = defineProps({
             "
           >
             <div class="sm:flex justify-between">
-              <h2 class="text-h2">Cities</h2>
-              <Link :href="route('city.create')" class="text-blue-500 text-p"
-                >Add a city</Link
+              <h2 class="text-h2">templates</h2>
+              <Link :href="route('template.create')" class="text-blue-500 text-p"
+                >Add a template</Link
               >
             </div>
             <div class="flex flex-col mt-4">
@@ -61,13 +61,13 @@ const props = defineProps({
                   >
                     <table class="min-w-full divide-y divide-gray-200">
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(city, key) in cities" :key="city.id">
+                        <tr v-for="(template, key) in templates" :key="template.id">
                           <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                               <div>
                                 <div class="text-sm font-medium text-gray-900">
-                                  <Link method="get" :href="`/city/${city.id}`">
-                                    {{ city.name }}</Link
+                                  <Link method="get" :href="`/template/${template.id}`">
+                                    {{ template.name }}</Link
                                   >
                                 </div>
                               </div>
@@ -83,7 +83,7 @@ const props = defineProps({
                             "
                           >
                             <Link
-                              :href="`/city/${city.id}/edit`"
+                              :href="`/template/${template.id}/edit`"
                               class="text-blue-600 hover:text-blue-900"
                             >
                               Edit

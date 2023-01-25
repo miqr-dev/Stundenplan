@@ -7,6 +7,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\TemplateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,4 +43,5 @@ Route::resource('city', CityController::class);
 Route::resource('location', LocationController::class);
 Route::resource('room', RoomController::class);
 Route::resource('subject', SubjectController::class);
+Route::resource('template', TemplateController::class);
 require __DIR__.'/auth.php';

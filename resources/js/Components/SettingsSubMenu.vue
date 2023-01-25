@@ -19,6 +19,9 @@
                     <BreezeNavLink :href="route('location.index')" :active="route().current('location.index')">
                         Locations
                     </BreezeNavLink>
+                    <BreezeNavLink :href="route('template.index')" :active="route().current('template.index')">
+                        Template
+                    </BreezeNavLink>
                 </div>
             </div>
         </div>

@@ -33,7 +33,7 @@ const props = defineProps({
                               <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full min-w-full mx-auto">
                                 <div class="flex justify-between">
                                   <h2 class="text-h2">{{ location.name }}</h2>
-                                  <Link :href="route(`location.create`)"  class="text-blue-500 text-2xl">+</Link>
+                                  <p :href="route('location.create')" class="text-blue-500 text-2xl">+</p>
                                 </div>
                                 <div class="flex flex-col mt-4">
                                   <table class="min-w-full divide-y divide-gray-200">
