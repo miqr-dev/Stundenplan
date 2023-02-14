@@ -1,0 +1,38 @@
+package from 
+https://github.com/wobsoriano/vue3-swatches
+
+
+Example
+Install as a global plugin (Optional)
+// main.js
+import { createApp } from 'vue'
+import VSwatches from 'vue3-swatches'
+import 'vue3-swatches/dist/style.css'
+
+const app = createApp(App)
+app.use(VSwatches)
+Or: Import it locally
+<script setup>
+  import { ref } from 'vue'
+  import { VSwatches } from 'vue3-swatches'
+  import 'vue3-swatches/dist/style.css'
+
+  const color = ref("#1FBC9C")
+</script>
+
+<template>
+  <VSwatches v-model="color" />
+</template>
+Using a Custom Trigger
+<template>
+  <VSwatches v-model="color">
+    <template #trigger>
+      <input :value="color" readonly />
+    </template>
+  </VSwatches>
+</template>
+
+Head over to https://saintplay.github.io/vue-swatches/ for the complete documentation.
+
+License
+MIT

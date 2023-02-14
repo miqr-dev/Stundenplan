@@ -10,7 +10,7 @@ class Location extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name','city_id'];
 
     public function city() {
       return $this->belongsTo(City::class);
@@ -19,4 +19,5 @@ class Location extends Model
     public function rooms() {
       return $this->hasMany(Room::class);
     }
+
 }

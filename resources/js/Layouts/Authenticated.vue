@@ -31,7 +31,9 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </BreezeNavLink>
                                 <BreezeNavLink :href="route('settings')" :active="route().current('settings')
-                                || route().current('city.*') || route().current('location.*') || route().current('subject.*')">
+                                || route().current('city.*') || route().current('location.*') || route().current('subject.*') || route().current('template.*')
+                                || route().current('teacher.*') || route().current('course.*') || route().current('teacher-not-available.*')"
+                                >
                                     Settings
                                 </BreezeNavLink>
                             </div>
@@ -40,7 +42,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">
-                                <BreezeDropdown align="right" width="48">
+                                <BreezeDropdown align="left" width="48">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
                                             <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -53,7 +55,7 @@ const showingNavigationDropdown = ref(false);
                                         </span>
                                     </template>
 
-                                    <template #content>
+                                    <template #content align="left" width="48">
                                         <BreezeDropdownLink :href="route('logout')" method="post" as="button">
                                             Log Out
                                         </BreezeDropdownLink>

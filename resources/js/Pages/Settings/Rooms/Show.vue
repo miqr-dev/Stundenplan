@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <Head title="Cities" />
+  <Head title="Rooms" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -38,7 +38,7 @@ const props = defineProps({
           >
             <div class="sm:flex justify-between">
               <h2 class="text-h2">{{ location.name }}</h2>
-              <Link :href="route('room.create')" class="text-blue-500 text-p"
+              <Link :href="route('room.create',{location:location.id})" class="text-blue-500 text-p"
                 >Add a Room</Link
               >
             </div>

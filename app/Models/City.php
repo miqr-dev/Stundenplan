@@ -16,4 +16,14 @@ class City extends Model
   {
     return $this->hasMany(Location::class);
   }
+
+  public function teachers()
+  {
+    return $this->belongsToMany(Teacher::class, 'city_teacher');
+  }
+
+  public function courses()
+  {
+    return $this->hasMany(Course::class);
+  }
 }

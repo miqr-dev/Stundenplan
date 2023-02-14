@@ -1,11 +1,9 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router, Link } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Link } from "@inertiajs/vue3";
 import { ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
 
 
@@ -83,7 +81,7 @@ watch(search, debounce(function (value) {
                             <div class="flex items-center">
                               <div>
                                 <div class="text-sm font-medium text-gray-900">
-                                  <Link method="get" :href="`/subject/${subject.id}`">
+                                  <Link :href="route('subject.show', { subject: subject.id })">
                                     {{ subject.name }}</Link
                                   >
                                 </div>

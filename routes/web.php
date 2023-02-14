@@ -1,24 +1,17 @@
 <?php
 
 use Inertia\Inertia;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TemplateController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Http\Controllers\TeacherNotAvailableController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -29,9 +22,15 @@ Route::get('/', function () {
     ]);
 });
 
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return Inertia::render('Dashboard', [
+        'subjects' => Subject::all()
+    ]);
+    })->middleware(['auth', 'verified'])->name('dashboard');
 
 
 Route::get('/settings', function () {
@@ -44,4 +43,14 @@ Route::resource('location', LocationController::class);
 Route::resource('room', RoomController::class);
 Route::resource('subject', SubjectController::class);
 Route::resource('template', TemplateController::class);
+Route::resource('course', CourseController::class);
+Route::resource('teacher', TeacherController::class);
+Route::resource('teacher-not-available', TeacherNotAvailableController::class);
+
+// custom creates 
+Route::get('city/{city}/location/create', [LocationController::class, 'create'])->name('location.create');
+Route::get('location/{location}/room/create', [RoomController::class, 'create'])->name('room.create');
+Route::get('teacher/{teacher}/not-available/create', [TeacherNotAvailableController::class, 'teacher_create'])->name('teacher.not-available.create');
+
+
 require __DIR__.'/auth.php';

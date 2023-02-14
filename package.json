@@ -22,6 +22,9 @@
         "vue-loader": "^17.0.0"
     },
     "dependencies": {
-        "@inertiajs/vue3": "^1.0.0"
+        "@inertiajs/vue3": "^1.0.0",
+        "@vuepic/vue-datepicker": "^3.6.7",
+        "moment": "^2.29.4",
+        "vue3-swatches": "^1.2.3"
     }
 }

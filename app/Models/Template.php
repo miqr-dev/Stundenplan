@@ -8,12 +8,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Template extends Model
 {
-    use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name'];
+  protected $fillable = ['name'];
 
-     public function subjects()
-    {
-        return $this->belongsToMany(Subject::class);
-    }
+  public function subjects()
+  {
+    return $this->belongsToMany(Subject::class);
+  }
+
+  public function courses()
+  {
+    return $this->hasMany(Course::class);
+  }
 }

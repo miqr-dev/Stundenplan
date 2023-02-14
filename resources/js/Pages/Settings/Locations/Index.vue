@@ -5,7 +5,7 @@ import SettingsSubMenu from '@/Components/SettingsSubMenu.vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-  locations: {}
+  cities: {}
 });
 </script>
 
@@ -28,29 +28,29 @@ const props = defineProps({
                       </div>
 
                         <div class="grid grid-cols-3 gap-1">
-                          <div class="p-5" v-for="(location, key) in locations" :key="location.id">                             
+                          <div class="p-5" v-for="(city, key) in cities" :key="city.id">                             
                             <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
                               <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full min-w-full mx-auto">
                                 <div class="flex justify-between">
-                                  <h2 class="text-h2">{{ location.name }}</h2>
-                                  <p :href="route('location.create')" class="text-blue-500 text-2xl">+</p>
+                                  <h2 class="text-h2">{{ city.name }}</h2>
+                                  <Link :href="route('location.create',{city: city.id})" class="text-blue-500 text-2xl">+</Link>
                                 </div>
                                 <div class="flex flex-col mt-4">
                                   <table class="min-w-full divide-y divide-gray-200">
                                     <tbody class="bg-white divide-y divide-gray-200">
-                                      <tr v-for="(address, key) in location.locations" :key="address.id">
+                                      <tr v-for="(location, key) in city.locations" :key="location.id">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                           <div class="flex items-center">
                                             <div>
                                               <div class="text-sm font-medium text-gray-900">
-                                               <Link :href="`/location/${address.id}`"> {{ address.name }}</Link>
+                                               <Link :href="`/location/${location.id}`"> {{ location.name }}</Link>
                                               </div>
                                             </div>
                                           </div>
                                         </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                          <Link :href="`/location/${address.id}/edit`" class="text-indigo-600 hover:text-indigo-900">
+                                          <Link :href="`/location/${location.id}/edit`" class="text-indigo-600 hover:text-indigo-900">
                                             Edit
                                           </Link>
                                         </td>

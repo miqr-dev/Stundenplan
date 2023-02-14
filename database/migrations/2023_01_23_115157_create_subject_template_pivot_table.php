@@ -13,7 +13,7 @@ class CreateSubjectTemplatePivotTable extends Migration
      */
     public function up()
     {
-        Schema::create('subject_template_pivot', function (Blueprint $table) {
+        Schema::create('subject_template', function (Blueprint $table) {
             $table->unsignedBigInteger('subject_id');
             $table->unsignedBigInteger('template_id');
             $table->unique(['subject_id', 'template_id']);

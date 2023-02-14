@@ -1,8 +1,9 @@
-
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import { Link, router, Head, useForm } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
+import { VSwatches } from "vue3-swatches";
+import 'vue3-swatches/dist/style.css'
 
 const props = defineProps({
   templates: {},
@@ -14,20 +15,10 @@ const form = useForm({
   templates: [],
 });
 
-const computed = {
-  templates() {
-    return JSON.parse(JSON.stringify(route("subject.create").props.templates));
-  },
-};
-
-const submit = async () => {
-  await router.post(route("subject.store"), form);
-  route.push(route("subject.index"));
-};
 </script>
 
 <template>
-  <Head title="Cities" />
+  <Head title="Subjects" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
       <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -35,20 +26,10 @@ const submit = async () => {
       </div>
     </header>
     <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+      <div class="max-w-14xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
           <div
-            class="
-              p-6
-              bg-gray-100
-              text-h2
-              font-bold
-              text-p-gray
-              h-full
-              w-1/2
-              shadow-md
-              mx-auto
-            "
+            class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
           >
             <div class="flex justify-between">
               <h2 class="text-h2">Add a new Subject</h2>
@@ -57,86 +38,59 @@ const submit = async () => {
               >
             </div>
             <div
-              class="
-                bg-gray-200
-                p-5
-                rounded-xl
-                mx-auto
-                text-p
-                font-bold
-                space-y-2
-                mt-5
-                shadow-sm
-                sm:rounded-lg
-              "
+              class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
-              <form @submit.prevent="submit">
-                <div class="mb-6">
-                  <label
-                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                    for="name"
-                  >
-                    Name
-                  </label>
-                  <input
+              <form @submit.prevent="form.post('/subject')">
+ <div class="mb-6">
+                  <SimpleInput
                     v-model="form.name"
-                    class="w-full p-2 border border-gray-400 rounded"
+                    label="Name"
                     type="text"
-                    id="name"
-                    name="name"
+                    :error="form.errors.name"
                   />
-                  <div
-                    v-if="form.errors.name"
-                    v-text="form.errors.name"
-                    class="text-red-500 text-sm mt-1"
-                  ></div>
                 </div>
                 <div class="mb-6">
                   <label
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                    for="color"
+                    for="maxhourweek"
                   >
                     Color
                   </label>
-                  <input
-                    v-model="form.color"
-                    class="w-full p-2 border border-gray-400 rounded"
-                    type="text"
-                    id="color"
-                    name="color"
-                  />
+                    <VSwatches v-model="form.color" class="m-0 p-0"/>
                   <div
                     v-if="form.errors.color"
                     v-text="form.errors.color"
                     class="text-red-500 text-sm mt-1"
                   ></div>
                 </div>
-
-                <label>
-                  Templates:
-                  <select v-model="form.templates" multiple>
-                    <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
-                  </select>
-                </label>
-
-                <div class="mb-1">
-                  <button
-                    type="submit"
-                    class="
-                      bg-gray-400
-                      text-white
-                      rounded
-                      py-2
-                      px-2
-                      hover:bg-gray-500
-                    "
-                    :class="{
-                      'cursor-not-allowed': form.processing,
-                    }"
-                    :disabled="form.processing"
+                <div class="mb-6">
+                  <label
+                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                    for="subject"
                   >
+                    Templates
+                  </label>
+                  <div v-for="template in templates" :key="template.id">
+                    <label
+                      >{{ template.name }}
+                      <input
+                        type="checkbox"
+                        :value="template.id"
+                        v-model="form.templates"
+                      />
+                    </label>
+                  </div>
+                  <div
+                    v-if="form.errors.templates"
+                    v-text="form.errors.templates"
+                    class="text-red-500 text-sm mt-1"
+                  ></div>
+                </div>
+
+                <div class="mb-1 text-right">
+                  <SimpleSubmit :processing="form.processing"
                     Submit
-                  </button>
+                  />
                 </div>
               </form>
             </div>
@@ -146,7 +100,3 @@ const submit = async () => {
     </div>
   </BreezeAuthenticatedLayout>
 </template>
-
-
-
-

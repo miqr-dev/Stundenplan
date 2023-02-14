@@ -11,7 +11,7 @@ class Room extends Model
     use HasFactory, SoftDeletes;
 
 
-    protected $fillable= ['name', 'room_number','floor','capacity'];
+    protected $fillable= ['name', 'room_number','floor','capacity','location_id'];
 
     public function location()
     {
