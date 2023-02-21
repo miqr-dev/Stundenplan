@@ -6,6 +6,7 @@ import moment from 'moment/moment';
 import SimpleInput from "@/Components/SimpleInput.vue";
 import SimpleSubmit from "@/Components/SimpleSubmit.vue";
 import SimpleDelete from '@/Components/SimpleDelete.vue';
+
 require('moment/locale/de')
 
 

@@ -66,7 +66,17 @@ class CourseController extends Controller
 
   public function show(Course $course)
   {
-    $course = $course->load(['template.subjects.teachers.cities']);
+    // $course = $course->load(['template.subjects.teachers.cities']);
+    // return Inertia::render('Settings/Courses/Show', [
+    //   'course' => $course
+    // ]);
+
+    $course = $course->load(['template.subjects.teachers' => function ($query) use ($course) {
+      $query->whereHas('cities', function ($query) use ($course) {
+        $query->where('id', $course->city_id);
+      });
+    }]);
+
     return Inertia::render('Settings/Courses/Show', [
       'course' => $course
     ]);
