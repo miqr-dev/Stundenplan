@@ -68,6 +68,14 @@ const showSubjects = ref(false);
                     readonly="readonly"
                   />
                 </div>
+                <div class="mb-6">
+                  <SimpleInput
+                    v-model="teacher.cities.name"
+                    label="Cities"
+                    type="text"
+                    readonly="readonly"
+                  />
+                </div>
               <div class="mb-2">
                 <div class="container mx-auto">
                   <div class="py-2">

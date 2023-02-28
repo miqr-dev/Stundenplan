@@ -26,7 +26,7 @@ class RoomController extends Controller
     $attributes = $request->validate([
       'location_id' => 'required',
       'name' => 'required|min:3',
-      'room_number' => 'required|min:3',
+      'room_number' => 'required|min:2',
       'floor' => 'required|min:2',
       'capacity' => 'required',
     ]);
@@ -51,7 +51,7 @@ class RoomController extends Controller
     $attributes = $request->validate([
       'name' => 'required|min:3',
       'room_number' => 'required|min:2',
-      'floor' => 'required|min:3',
+      'floor' => 'required|min:2',
       'capacity' => 'required|integer|between:1,99',
     ]);
 

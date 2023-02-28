@@ -22,8 +22,11 @@
         "vue-loader": "^17.0.0"
     },
     "dependencies": {
+        "@heroicons/vue": "^2.0.16",
         "@inertiajs/vue3": "^1.0.0",
         "@vuepic/vue-datepicker": "^3.6.7",
+        "class-variance-authority": "^0.4.0",
+        "floating-vue": "^2.0.0-beta.20",
         "moment": "^2.29.4",
         "vue3-swatches": "^1.2.3"
     }

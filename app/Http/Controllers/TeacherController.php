@@ -14,7 +14,6 @@ class TeacherController extends Controller
 
   public function index(Request $request)
   {
-    $teachers = Teacher::with(['teacherNotAvailable', 'cities', 'subjects'])->get();
     return Inertia::render('Settings/Teacher/Index', [
       'teachers' => Teacher::query()
         ->with(['teacherNotAvailable', 'cities', 'subjects'])

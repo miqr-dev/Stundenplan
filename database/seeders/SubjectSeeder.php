@@ -15,17 +15,17 @@ class SubjectSeeder extends Seeder
     public function run()
     {
     Subject::insert([
-      ["id"=>1,"name"=>"Bürowirtschaft & Informationsmanagement IBO/OSI I"],
-      ["id"=>2,"name"=>"Rechnungswesen & Buchführung IBO/OSI I"],
-      ["id"=>3,"name"=>"Materialwirtschaft & Lagerhaltung IBO/OSI I"],
-      ["id"=>4,"name"=>"Berufliches Anwendungstraining IBO/OSI I"],
-      ["id"=>5,"name"=>"Personalwesen IBO/OSI I"],
-      ["id"=>6,"name"=>"Kommunikations- & Bewerbungsschulung IBO/OSI I"],
-      ["id"=>7,"name"=>"Lehr- & Lerndidaktik IBO/OSI I"],
-      ["id"=>8,"name"=>"Wirtschaftsprozesse & betriebliche Grundlagen IBO/OSI I"],
-      ["id"=>9,"name"=>"Wirtschaftsrecht IBO/OSI I"],
-      ["id"=>10,"name"=>"Wirtschaftsenglisch IBO/OSI I"],
-      ["id"=>11,"name"=>"Betriebliches Gesundheitsmanagement IBO/OSI I"]
+      ["id"=>1,"name"=>"Bürowirtschaft & Informationsmanagement"],
+      ["id"=>2,"name"=>"Rechnungswesen & Buchführung"],
+      ["id"=>3,"name"=>"Materialwirtschaft & Lagerhaltung"],
+      ["id"=>4,"name"=>"Berufliches Anwendungstraining"],
+      ["id"=>5,"name"=>"Personalwesen"],
+      ["id"=>6,"name"=>"Kommunikations- & Bewerbungsschulung"],
+      ["id"=>7,"name"=>"Lehr- & Lerndidaktik"],
+      ["id"=>8,"name"=>"Wirtschaftsprozesse & betriebliche Grundlagen"],
+      ["id"=>9,"name"=>"Wirtschaftsrecht"],
+      ["id"=>10,"name"=>"Wirtschaftsenglisch"],
+      ["id"=>11,"name"=>"Betriebliches Gesundheitsmanagement"]
     ]);
     }
 }

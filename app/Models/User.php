@@ -45,4 +45,9 @@ class User extends Authenticatable implements LdapAuthenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function grids()
+    {
+      return $this->hasMany(Grid::class);
+    }
 }

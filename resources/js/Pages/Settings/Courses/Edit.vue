@@ -2,7 +2,6 @@
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
-import SimpleSelect from "@/Components/SimpleSelect.vue";
 import { ref } from "vue";
 
 const props = defineProps({

@@ -41,6 +41,12 @@ import BreezeNavLink from "@/Components/NavLink.vue";
               Cities
             </BreezeNavLink>
             <BreezeNavLink
+              :href="route('grid.index')"
+              :active="route().current('grid.*')"
+            >
+              Grid
+            </BreezeNavLink>
+            <BreezeNavLink
               :href="route('teacher.index')"
               :active="route().current('teacher.*')"
             >

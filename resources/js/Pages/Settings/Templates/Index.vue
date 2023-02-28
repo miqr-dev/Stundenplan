@@ -1,6 +1,5 @@
 <script setup>
-import { Head } from "@inertiajs/vue3";
-import { Link } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 
@@ -66,7 +65,7 @@ const props = defineProps({
                             <div class="flex items-center">
                               <div>
                                 <div class="text-sm font-medium text-gray-900">
-                                  <Link method="get" :href="`/template/${template.id}`">
+                                  <Link :href="`/template/${template.id}`">
                                     {{ template.name }}</Link
                                   >
                                 </div>

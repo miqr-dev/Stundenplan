@@ -3,6 +3,12 @@ import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import { Link, Head } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 import { ref } from "vue";
+import moment from "moment";
+import { VSwatches } from "vue3-swatches";
+import "vue3-swatches/dist/style.css";
+import { CheckBadgeIcon, XCircleIcon } from "@heroicons/vue/20/solid";
+import { VTooltip } from "floating-vue";
+import "floating-vue/dist/style.css";
 
 const props = defineProps({
   course: {},
@@ -26,9 +32,30 @@ const showSubjects = ref(false);
             class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
           >
             <div class="flex justify-between">
-              <h2>
-                {{ course.name }}
-              </h2>
+              <div class="flex items-stretch">
+                <div>
+                  <h2>
+                    {{ course.name }}
+                  </h2>
+                </div>
+                <div class="self-center">
+                  <span
+                    class="inline-block animate-pulse rounded-full text-white text-sm ml-3"
+                    :class="course.active ? 'bg-green-600' : 'bg-red-400'"
+                  >
+                    <CheckBadgeIcon
+                      v-if="course.active"
+                      v-tooltip="'Active'"
+                      class="h-6 w-6"
+                    />
+                    <XCircleIcon
+                      v-tooltip="'Inactive'"
+                      v-if="!course.active"
+                      class="h-6 w-6"
+                    />
+                  </span>
+                </div>
+              </div>
               <Link :href="route('course.index')" class="text-blue-500 text-p"
                 >X</Link
               >
@@ -36,33 +63,83 @@ const showSubjects = ref(false);
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
-            <div class="flex space-x-3 mb-6">
-                          <div class="w-1/3">
-                <SimpleInput
-                  v-model="course.name"
-                  label="Name"
-                  type="text"
-                  :readonly="true"
-                />
+              <div class="flex space-x-3 mb-6">
+                <div class="w-1/3">
+                  <label
+                    class="block mb-1 text-xs font-bold text-green-600 uppercase"
+                    for="label"
+                  >
+                    Start on
+                  </label>
+                  <div class="flex items-stretch">
+                    <div class="whitespace-no-wrap text-p-gray">
+                      {{ moment(course.start_date).format("LL") }}
+                    </div>
+                    <div class="text-p-gray text-xs self-start ml-1">
+                      ( {{ moment(course.start_Date).week() }}. KW )
+                    </div>
+                  </div>
+                </div>
+                <div class="w-1/3">
+                  <label
+                    class="block mb-2 text-xs font-bold text-orange-600 uppercase"
+                    for="label"
+                  >
+                    Finish on
+                  </label>
+                  <div class="flex items-stretch">
+                    <div class="whitespace-no-wrap text-p-gray">
+                      {{ moment(course.end_date).format("LL") }}
+                    </div>
+                    <div class="text-p-gray text-xs self-start ml-1">
+                      ( {{ moment(course.end_Date).week() }}. KW )
+                    </div>
+                  </div>
+                </div>
+                <div class="w-1/3">
+                  <label
+                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                    for="label"
+                  >
+                    Color
+                  </label>
+                  <VSwatches
+                    v-model="course.color"
+                    swatches="text-advanced"
+                    row-length="12"
+                    show-border
+                    popover-x="button"
+                    :disabled="true"
+                  ></VSwatches>
+                </div>
               </div>
-              <div class="w-1/3">
-                <SimpleInput
-                  v-model="course.lbrn"
-                  label="LBRN"
-                  type="text"
-                  :readonly="true"
-                />
+              <div class="flex space-x-3 mb-6">
+                <div class="w-1/3">
+                  <SimpleInput
+                    v-model="course.name"
+                    label="Name"
+                    type="text"
+                    :readonly="true"
+                  />
+                </div>
+                <div class="w-1/3">
+                  <SimpleInput
+                    v-model="course.lbrn"
+                    label="LBRN"
+                    type="text"
+                    :readonly="true"
+                  />
+                </div>
+                <div class="w-1/3">
+                  <SimpleInput
+                    v-model="course.type"
+                    label="Type"
+                    type="text"
+                    :readonly="true"
+                  />
+                </div>
               </div>
-              <div class="w-1/3">
-                <SimpleInput
-                  v-model="course.type"
-                  label="Type"
-                  type="text"
-                  :readonly="true"
-                />
-              </div>
-            </div>
-                          <div class="mb-2">
+              <div class="mb-2">
                 <div class="container mx-auto">
                   <div class="py-2">
                     <div class="flex justify-between">
@@ -77,7 +154,6 @@ const showSubjects = ref(false);
                           >({{ course.template.subjects.length }})</span
                         >
                       </div>
-
                       <!-- <Link
                         :href="
                           route('teacher.not-available.create', {
@@ -86,19 +162,22 @@ const showSubjects = ref(false);
                         "
                         class="text-blue-500 text-p"
                         >Add Leave</Link> -->
-                      
                     </div>
+                    <p>
+                      This course is using
+                      <span class="text-blue-500"
+                        ><Link :href="`/template/${course.template.id}`">{{
+                          course.template.name
+                        }}</Link></span
+                      >
+                      Template
+                    </p>
                     <div
                       class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto"
                       v-show="showSubjects"
                     >
-                      <div
-                        class="inline-block min-w-full shadow-md rounded-lg "
-                      >
-                        <table
-                          class="min-w-full leading-normal table"
-                          
-                        >
+                      <div class="inline-block min-w-full shadow-md rounded-lg">
+                        <table class="min-w-full leading-normal table">
                           <thead>
                             <tr>
                               <th
@@ -121,10 +200,12 @@ const showSubjects = ref(false);
                               <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
                               >
-                                <p class="text-gray-900 whitespace-no-wrap">
-
-                                   {{ subject.name }}
-
+                                <p
+                                  class="text-gray-900 whitespace-no-wrap hover:underline underline-offset-4"
+                                >
+                                  <Link :href="`/subject/${subject.id}`">{{
+                                    subject.name
+                                  }}</Link>
                                 </p>
                                 <!-- <p class="text-gray-600 whitespace-no-wrap">
                                   {{ moment(subject.awaystartdate).week() }}
@@ -134,17 +215,26 @@ const showSubjects = ref(false);
                               <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
                               >
-                              <ul v-for="teacher in subject.teachers"
-                              :key="teacher.id">
-                              
-                              <li>{{ teacher.name }}, {{ teacher.surname }}
-                                <ul v-for="city in teacher.cities" :key="city.id" class="text-sm text-gray-400">
-                                  <li>{{ city.name }}</li>
+                                <ul
+                                  v-for="teacher in subject.teachers"
+                                  :key="teacher.id"
+                                >
+                                  <li>
+                                    <Link
+                                      class="text-gray-700 whitespace-no-wrap hover:underline underline-offset-4"
+                                      :href="`/teacher/${teacher.id}`"
+                                      >{{ teacher.name }},
+                                      {{ teacher.surname }}</Link
+                                    >
+                                    <ul
+                                      v-for="city in teacher.cities"
+                                      :key="city.id"
+                                      class="text-sm text-gray-400"
+                                    >
+                                      <li>{{ city.name }}</li>
+                                    </ul>
+                                  </li>
                                 </ul>
-                              </li>
-                              </ul>
-
-
                               </td>
                               <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right"

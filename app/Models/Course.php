@@ -8,17 +8,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Course extends Model
 {
-    use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name','type','lbrn','city_id','template_id'];
+  protected $dates = [
+    'created_at',
+    'updated_at',
+    'deleted_at',
+    'start_date',
+    'end_date'
+  ];
 
-    public function city()
-    {
-      return $this->belongsTo(City::class);
-    }
+  protected $guarded = [];
 
-    public function template()
-    {
-      return $this->belongsTo(Template::class);
-    }
+  public function city()
+  {
+    return $this->belongsTo(City::class);
+  }
+
+  public function template()
+  {
+    return $this->belongsTo(Template::class);
+  }
+
+  public function grid()
+  {
+    return $this->hasOne(Grid::class);
+  }
 }
