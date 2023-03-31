@@ -20,6 +20,10 @@ class Course extends Model
 
   protected $guarded = [];
 
+  public function location()
+  {
+    return $this->belongsTo(Location::class);
+  }
   public function city()
   {
     return $this->belongsTo(City::class);
@@ -32,6 +36,6 @@ class Course extends Model
 
   public function grid()
   {
-    return $this->hasOne(Grid::class);
+    return $this->belongsTo(Grid::class);
   }
 }

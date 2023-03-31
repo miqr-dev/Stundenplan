@@ -9,7 +9,6 @@ import SimpleDelete from '@/Components/SimpleDelete.vue';
 
 require('moment/locale/de')
 
-
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'SP';
 
 createInertiaApp({

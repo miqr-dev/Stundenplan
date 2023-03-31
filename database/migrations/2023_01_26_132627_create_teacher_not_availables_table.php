@@ -16,7 +16,6 @@ class CreateTeacherNotAvailablesTable extends Migration
         Schema::create('teacher_not_availables', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('teacher_id');
-            $table->string('fulltime');
             $table->date('awaystartdate');
             $table->date('awayenddate');
             $table->softDeletes();

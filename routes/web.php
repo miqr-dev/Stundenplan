@@ -2,7 +2,6 @@
 
 use Inertia\Inertia;
 use App\Models\Subject;
-use App\Models\Gridslot;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\CityController;
@@ -14,6 +13,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\GridslotController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\StundenplanController;
 use App\Http\Controllers\TeacherNotAvailableController;
 
 Route::get('/', function () {
@@ -40,7 +40,10 @@ Route::get('/settings', function () {
     return Inertia::render('Settings/Index');
 })->middleware(['auth', 'verified'])->name('settings');
 
+// Stundenplan
+Route::resource('stundenplan', StundenplanController::class);
 
+// Settings
 Route::resource('city', CityController::class);
 Route::resource('location', LocationController::class);
 Route::resource('room', RoomController::class);
@@ -52,7 +55,12 @@ Route::resource('course', CourseController::class);
 Route::resource('teacher', TeacherController::class);
 Route::resource('teacher-not-available', TeacherNotAvailableController::class);
 
-// custom creates 
+
+
+Route::post('/stundenplan/{cityId}', [StundenplanController::class, 'updateCity'])->name('stundenplan.updateCity');
+
+
+// Settings custom creates 
 Route::get('city/{city}/location/create', [LocationController::class, 'create'])->name('location.create');
 Route::get('location/{location}/room/create', [RoomController::class, 'create'])->name('room.create');
 Route::get('teacher/{teacher}/not-available/create', [TeacherNotAvailableController::class, 'teacher_create'])->name('teacher.not-available.create');

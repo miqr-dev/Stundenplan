@@ -71,6 +71,7 @@ class SubjectController extends Controller
         'templates' => $subject->templates->pluck('id')->toArray()
       ],
       'templates' => Template::all()
+
     ]);
   }
 

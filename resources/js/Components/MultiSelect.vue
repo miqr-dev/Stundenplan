@@ -1,128 +1,148 @@
+<script setup>
+import { ref, computed, watch, defineEmit } from 'vue';
+
+const props = defineProps({
+  title: String,
+  searchPlaceholder: String,
+  items: {
+    type: Array,
+    required: true,
+  },
+  itemKey: {
+    type: String,
+    default: 'id',
+  },
+  itemLabel: {
+    type: String,
+    default: 'name',
+  },
+  selectedItems: Array,
+  showDropdown: {
+    type: Boolean,
+    default: true,
+  },
+});
+
+const search = ref('');
+const dropdownIndex = ref(null);
+
+const filteredItems = computed(() => {
+  if (!search.value) {
+    return props.items;
+  }
+  return props.items.filter((item) =>
+    item[props.itemLabel].toLowerCase().includes(search.value.toLowerCase())
+  );
+});
+
+const toggleItem = (itemKey) => {
+  const index = props.selectedItems.indexOf(itemKey);
+  if (index === -1) {
+    props.selectedItems.push(itemKey);
+  } else {
+    props.selectedItems.splice(index, 1);
+  }
+};
+
+const isSelected = (itemKey) => {
+  return props.selectedItems.includes(itemKey);
+};
+
+const getItemBy = (itemKey) => {
+  const item = props.items.find((item) => item[props.itemKey] === itemKey);
+  return item ? item[props.item.Label] : '';
+};
+const toggleDropdown = (index) => {
+dropdownIndex.value = dropdownIndex.value === index ? null : index;
+};
+
+const emit = defineEmit(['update:selectedItems']);
+watch(
+() => props.selectedItems,
+(value) => {
+emit('update:selectedItems', value);
+},
+{ deep: true }
+);
+</script>
+
+
 <template>
-  <div class="dual-list">
-    <div class="dual-list-search">
-      <input type="text" placeholder="Search" v-model="leftSearch" />
-    </div>
-    <div class="dual-list-container">
-      <div class="dual-list-box">
-        <div class="dual-list-header">
-          <div class="dual-list-title">Available Items</div>
+  <div class="mb-6 flex w-full space-x-3">
+    <div class="w-1/2">
+      <label
+        class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+        :for="inputId"
+      >
+        {{ label }}
+      </label>
+      <input
+        type="text"
+        v-model="search"
+        class="border-gray-300 focus:ring-blue-500 focus:border-blue-500 block sm:text-sm border rounded-md mb-2 w-full"
+                placeholder="Search items"
+        :id="inputId"
+      />
+      <div
+        class="overflow-auto h-72 border-solid border-2 border-gray-300 rounded-xl px-4 py-2"
+      >
+        <div
+          v-for="item in filteredItems"
+          :key="item.id"
+          :class="{
+            'bg-blue-400 text-white': selectedItems.includes(item.id),
+          }"
+          class="flex items-center px-4 py-2 mr-2 mb-2 text-sm font-medium rounded-lg cursor-pointer mt-2 bg-white"
+          @click="toggleItem(item.id)"
+        >
+          {{ item.name }}
         </div>
-        <ul>
-          <li v-for="item in filteredLeftItems" :key="item.id">
-            <label>
-              <input type="checkbox" :value="item.id" v-model="leftSelectedIds" />
-              {{ item.name }}
-            </label>
-          </li>
-          <li v-if="filteredLeftItems.length === 0">No items found.</li>
-        </ul>
       </div>
-      <div class="dual-list-controls">
-        <button @click="moveRight" :disabled="leftSelectedIds.length === 0">Select</button>
-        <button @click="moveLeft" :disabled="rightSelectedIds.length === 0">Deselect</button>
-      </div>
-      <div class="dual-list-box">
-        <div class="dual-list-header">
-          <div class="dual-list-title">Selected Items</div>
-        </div>
-        <ul>
-          <li v-for="item in filteredRightItems" :key="item.id">
-            <label>
-              <input type="checkbox" :value="item.id" v-model="rightSelectedIds" />
-              {{ item.name }}
-            </label>
-          </li>
-          <li v-if="filteredRightItems.length === 0">No items selected.</li>
-        </ul>
-      </div>
+      <div
+        v-if="errors         && errors[errorKey]"
+        v-text="errors[errorKey]"
+        class="text-red-500 text-sm mt-1"
+      ></div>
     </div>
-    <div class="dual-list-search">
-      <input type="text" placeholder="Search" v-model="rightSearch" />
+    <div class="w-1/2">
+      <label
+        v-if="selectedItems.length > 0"
+        class="block mb-2 text-sm font-bold text-gray-600 uppercase mb-6 p-3"
+      >
+        Included in
+        <span class="text-blue-500"
+          >({{ selectedItems.length }})</span
+        >
+        Items
+      </label>
+      <div class="overflow-auto h-72 p-4 text-left">
+        <label
+          v-if="selectedItems.length === 0"
+          class="block mb-2 text-sm font-bold text-gray-600 uppercase mb-6"
+        >
+          <span           class="text-red-300"> {{ itemName }}</span>
+          doesn't include in any Item
+        </label>
+        <div v-else>
+          <div
+            class="flex justify-between"
+            v-for="(itemId, index) in selectedItems"
+            :key="`${index}-${itemId}`"
+          >
+            <div
+              class="inline-flex items-center px-4 mr-2 mb-2 text-p-gray text-sm font-medium rounded-lg cursor-pointer text-white"
+            >
+              {{ index + 1 }}.
+              {{ getItemName(itemId).name }}
+            </div>
+            <slot name="actions" :itemId="itemId" :index="index"></slot>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
-<script setup>
-import { computed, defineEmits, defineProps } from 'vue';
-import Item from '@/Components/Item.vue';
 
-const props = defineProps({
-  items: {
-    type: Array,
-    required: true
-  },
-  leftSelected: {
-    type: Array,
-    default: () => []
-  },
-  rightSelected: {
-    type: Array,
-    default: () => []
-  },
-});
 
-const emits = defineEmits(['update:leftSelected', 'update:rightSelected']);
 
-const filteredLeftItems = computed(() => {
-  return props.items.filter(item => {
-    return !props.rightSelected.includes(item) && !props.leftSelected.includes(item);
-  });
-});
-
-const filteredRightItems = computed(() => {
-  return props.items.filter(item => {
-    return !props.leftSelected.includes(item) && !props.rightSelected.includes(item);
-  });
-});
-
-function moveRight() {
-  emits('update:rightSelected', [...props.rightSelected, ...props.leftSelected]);
-  emits('update:leftSelected', []);
-}
-
-function moveLeft() {
-  emits('update:leftSelected', [...props.leftSelected, ...props.rightSelected]);
-  emits('update:rightSelected', []);
-}
-</script>
-<style scoped>
-.dual-listbox {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  cursor: pointer;
-  margin: 5px 0;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-li.selected {
-  background-color: #e0e0e0;
-}
-
-.left,
-.right {
-  width: 45%;
-}
-
-.center {
-  width: 10%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-button {
-  margin: 10px;
-}
-</style>
+       

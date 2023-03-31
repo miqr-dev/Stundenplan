@@ -76,7 +76,7 @@ const showSubjects = ref(false);
                       {{ moment(course.start_date).format("LL") }}
                     </div>
                     <div class="text-p-gray text-xs self-start ml-1">
-                      ( {{ moment(course.start_Date).week() }}. KW )
+                       ( {{ moment(course.start_date).week() }}. KW  )
                     </div>
                   </div>
                 </div>
@@ -92,7 +92,7 @@ const showSubjects = ref(false);
                       {{ moment(course.end_date).format("LL") }}
                     </div>
                     <div class="text-p-gray text-xs self-start ml-1">
-                      ( {{ moment(course.end_Date).week() }}. KW )
+                      ( {{ moment(course.end_date).week() }}. KW )
                     </div>
                   </div>
                 </div>

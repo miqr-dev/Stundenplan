@@ -12,7 +12,6 @@ const props = defineProps({
 let form = useForm({
   teacher_id: props.teacher.id,
   awayDate: [],
-  fulltime: "",
 });
 
 let submit = () => {
@@ -47,14 +46,6 @@ let submit = () => {
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
               <form @submit.prevent="submit">
-                <div class="mb-6">
-                  <SimpleInput
-                    v-model="form.fulltime"
-                    label="Fulltime"
-                    type="text"
-                    :error="form.errors.fulltime"
-                  />
-                </div>
                 <div class="mb-6">
                   <label
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"

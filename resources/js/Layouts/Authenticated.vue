@@ -45,6 +45,12 @@ const showAlert = ref(true);
                   Dashboard
                 </BreezeNavLink>
                 <BreezeNavLink
+                  :href="route('stundenplan.index')"
+                  :active="route().current('stundenplan.index')"
+                >
+                  Stundenplan
+                </BreezeNavLink>
+                <BreezeNavLink
                   :href="route('settings')"
                   :active="
                     route().current('settings') ||
