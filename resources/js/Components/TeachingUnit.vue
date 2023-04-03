@@ -20,7 +20,7 @@
     >
       <div class="bg-white p-6 rounded shadow-md">
         <h3 class="text-xl font-semibold mb-4">
-          {{ day }} -
+          {{ day }} - {{ date }}
           {{ moment(gridSlotItem.start_time, "HH:mm:ss").format("HH.mm") }}
           -
           {{ moment(gridSlotItem.end_time, "HH:mm:ss").format("HH:mm") }}
@@ -91,9 +91,12 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  date: {
+    type: Object,
+  },
 });
 
-const emit = defineEmits(["selection"]);
+const emit = defineEmits({ selection: null });
 
 const selectedOption1 = ref("");
 const selectedOption2 = ref("");
@@ -101,18 +104,35 @@ const selectedOption3 = ref("");
 const selectedOption4 = ref("");
 const showDropdown = ref(false);
 const showModal = ref(false);
+
+
 const selectedOption1Style = computed(() => {
   return selectedOption1.value
     ? { backgroundColor: selectedOption1.value.color, color: "white" }
     : {};
 });
 
+const selectSlot = () => {
+  if (
+    selectedOption1.value &&
+    selectedOption2.value &&
+    selectedOption3.value &&
+    selectedOption4.value
+  ) {
+    emitSelection();
+  }
+};
+
 const emitSelection = () => {
-  emit.selection([
-    selectedOption1.value,
-    selectedOption2.value,
-    selectedOption3.value,
-    selectedOption4.value,
-  ]);
+  emit("selection", {
+    date: props.date,
+    gridSlotItem: props.gridSlotItem,
+    selectedOptions: [
+      selectedOption1.value,
+      selectedOption2.value,
+      selectedOption3.value,
+      selectedOption4.value,
+    ],
+  });
 };
 </script>

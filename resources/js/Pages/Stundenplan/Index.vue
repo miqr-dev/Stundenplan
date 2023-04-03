@@ -5,6 +5,7 @@ import { ref, computed } from "vue";
 import moment from "moment";
 import TeachingUnit from "@/Components/TeachingUnit.vue";
 
+import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
   courses: {
@@ -17,6 +18,33 @@ const props = defineProps({
   },
 });
 
+const handleSelection = (data) => {
+  const { date, gridSlotItem, selectedOptions } = data;
+
+  const form = useForm({
+    date: "",
+    course_id: "",
+    grid_slot_id: "",
+    start_time: "",
+    end_time: "",
+    grid_slot_id: "",
+    subject_id: "",
+    teacher_id: "",
+    room_id: "",
+  });
+
+  form.date = date.format("YYYY-MM-DD");
+  form.course_id = selectedCourse.value.id;
+  form.grid_slot_id = gridSlotItem.id;
+  form.start_time = gridSlotItem.start_time;
+  form.end_time = gridSlotItem.end_time;
+  form.subject_id = selectedOptions[0].id;
+  form.teacher_id = selectedOptions[1].id;
+  form.room_id = selectedOptions[3]; // Assuming the room_id is in the 4th selection
+
+  form.post("/stundenplan/teachingunit");
+};
+
 const selectedCourse = ref(null);
 const selectedWeek = ref(null);
 const selectedSubject = ref(null);
@@ -26,7 +54,10 @@ const weekDates = computed(() => {
   if (!selectedWeek.value) return [];
 
   const currentYear = moment().year();
-  const startDate = moment().year(currentYear).week(selectedWeek.value).startOf("week");
+  const startDate = moment()
+    .year(currentYear)
+    .week(selectedWeek.value)
+    .startOf("week");
   const dates = [];
 
   for (let i = 0; i < 5; i++) {
@@ -36,9 +67,14 @@ const weekDates = computed(() => {
   return dates;
 });
 
-const handleSelection = (selection) => {
-  console.log('selection');
-};
+const daysWithDates = computed(() => {
+  return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
+    (day, index) => ({
+      day,
+      date: weekDates.value[index],
+    })
+  );
+});
 
 // Add any other reactive variables, computed properties or methods here.
 </script>
@@ -139,15 +175,7 @@ const handleSelection = (selection) => {
                             }}
                           </td>
                           <!-- Generate a button for each day of the week -->
-                          <template
-                            v-for="day in [
-                              'Monday',
-                              'Tuesday',
-                              'Wednesday',
-                              'Thursday',
-                              'Friday',
-                            ]"
-                          >
+                          <template v-for="dayWithDate in daysWithDates">
                             <!-- Conditionally render the button if a course and week have been selected -->
                             <td
                               class="border px-4 py-2"
@@ -184,11 +212,20 @@ const handleSelection = (selection) => {
                                   {{ teacher.surname }}, {{ teacher.name }}
                                 </option>
                               </select> -->
-                              <TeachingUnit
+                              <!-- <TeachingUnit
                                 :options1="selectedCourse.template.subjects"
                                 :day="day"
                                 :gridSlotItem="gridSlotItem"
                                 @selection="handleSelection"
+                              /> -->
+                              <TeachingUnit
+                                :options1="selectedCourse.template.subjects"
+                                :day="dayWithDate.day"
+                                :date="dayWithDate.date"
+                                :gridSlotItem="gridSlotItem"
+                                @selection="
+                                  (...args) => handleSelection(...args)
+                                "
                               />
                             </td>
                           </template>

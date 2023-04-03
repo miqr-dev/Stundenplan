@@ -56,7 +56,7 @@ Route::resource('teacher', TeacherController::class);
 Route::resource('teacher-not-available', TeacherNotAvailableController::class);
 
 
-
+Route::post('/stundenplan/teachingunit', [StundenplanController::class, 'teachingunit'])->name('stundenplan.teachingunit');
 Route::post('/stundenplan/{cityId}', [StundenplanController::class, 'updateCity'])->name('stundenplan.updateCity');
 
 
@@ -65,7 +65,7 @@ Route::get('city/{city}/location/create', [LocationController::class, 'create'])
 Route::get('location/{location}/room/create', [RoomController::class, 'create'])->name('room.create');
 Route::get('teacher/{teacher}/not-available/create', [TeacherNotAvailableController::class, 'teacher_create'])->name('teacher.not-available.create');
 Route::get('grid/{grid}/gridslots/create', [GridslotController::class, 'create'])->name('gridslot.create');
-Route::get('grid/{grid}/gridslots/create', [GridslotController::class, 'create'])->name('gridslot.create');
+
 
 
 
