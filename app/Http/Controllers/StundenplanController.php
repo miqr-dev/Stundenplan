@@ -25,8 +25,7 @@ class StundenplanController extends Controller
   {
     $user = Auth::user(); //todo polor applicationin mech asi bedke asang ashkhadi
     $city_id = City::where('name', $user->ort)->value('id');
-    //$cities = City::with('locations')->get();
-    $courses = Course::where('city_id', $city_id)->with('grid.gridslots')->with('city.locations')->with('template.subjects.teachers')->get();
+    $courses = Course::where('location_id', $city_id)->with('grid.gridslots')->with('city.locations')->with('template.subjects.teachers')->get();
     //dd($courses);
 
 

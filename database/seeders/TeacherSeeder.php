@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use Faker\Factory;
+use App\Models\City;
+use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Database\Seeder;
 
@@ -25,5 +27,18 @@ class TeacherSeeder extends Seeder
             'email' => $faker->unique()->safeEmail,
         ]);
     }
+
+     $teachers = Teacher::all();
+
+        foreach ($teachers as $teacher) {
+            $teacher->subjects()->sync($faker->randomElements(
+                Subject::pluck('id')->toArray(),
+                $faker->numberBetween(1, 3)
+            ));
+            $teacher->cities()->sync($faker->randomElement(
+              City::pluck('id')->toArray(),
+              $faker->numberBetween(1,3)
+            ));    
+        }
     }
 }

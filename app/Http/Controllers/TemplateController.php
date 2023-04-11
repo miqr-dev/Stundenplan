@@ -10,12 +10,30 @@ use Illuminate\Foundation\Auth\User;
 
 class TemplateController extends Controller
 {
-  public function index()
-  {
-    return Inertia::render('Settings/Templates/Index', [
-      'templates' => Template::with('subjects')->get()
-    ]);
-  }
+public function index(Request $request)
+    {
+        return Inertia::render('Settings/Templates/Index', [
+            'templates' => Template::query()
+                ->with('subjects')
+                ->when($request->search, function ($query, $search) {
+                    $query->where('name', 'like', "%$search%");
+                })
+                ->paginate(10)
+                ->withQueryString()
+                ->through(fn ($template) => [
+                    'id' => $template->id,
+                    'name' => $template->name,
+                    'subjects' => $template->subjects->map(function ($subject) {
+                        return [
+                            'id' => $subject->id,
+                            'name' => $subject->name,
+                            'color' => $subject->color,
+                        ];
+                    }),
+                ]),
+            'filters' => request()->only(['search']),
+        ]);
+    }
 
   public function create()
   {

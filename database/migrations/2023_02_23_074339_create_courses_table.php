@@ -15,9 +15,9 @@ class CreateCoursesTable extends Migration
   {
     Schema::create('courses', function (Blueprint $table) {
       $table->id();
-      $table->unsignedBigInteger('location_id');
-      $table->unsignedBigInteger('template_id');
-      $table->unsignedBigInteger('grid_id');
+      $table->foreignId('location_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+      $table->foreignId('template_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+      $table->foreignId('grid_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->string('name');
       $table->date('start_date');
       $table->date('end_date');
@@ -28,9 +28,6 @@ class CreateCoursesTable extends Migration
       $table->boolean('active')->default(true);
       $table->timestamps();
       $table->softDeletes();
-      $table->foreign('city_id')->references('id')->on('cities');
-      $table->foreign('template_id')->references('id')->on('templates');
-      $table->foreign('grid_id')->references('id')->on('grids');
     });
   }
 

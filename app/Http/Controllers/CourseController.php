@@ -8,14 +8,13 @@ use Inertia\Inertia;
 use App\Models\Course;
 use App\Models\Template;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
 
   public function index(Request $request)
   {
-    $courses = Course::with('city', 'template')->get();
-
     return Inertia::render('Settings/Courses/Index', [
       'courses' => Course::query()
         ->with(['city', 'template'])
@@ -36,19 +35,16 @@ class CourseController extends Controller
 
   public function create()
   {
+    $user = Auth::user();
+    $city_id = City::where('name', $user->ort)->value('id');
     $templates = Template::all();
     $grids = Grid::all();
-    $cities = City::all();
+    $locations = City::where('id', $city_id)->with('locations')->first()->locations;
 
     return Inertia::render('Settings/Courses/Create', [
       'templates' => $templates,
       'grids' => $grids,
-      'cities' => $cities->map(function ($city) {
-        return [
-          'id' => $city->id,
-          'name' => $city->name,
-        ];
-      })
+      'locations' => $locations
     ]);
   }
 
@@ -61,7 +57,7 @@ class CourseController extends Controller
       'grid_id' => 'required',
       'courseDate' => 'required',
       'lbrn' => 'required',
-      'city_id' => 'required|exists:cities,id',
+      'location_id' => 'required|exists:locations,id',
       'template_id' => 'required|exists:templates,id',
 
     ]);
@@ -73,7 +69,7 @@ class CourseController extends Controller
     $course->start_date = $request->courseDate[0];
     $course->end_date = $request->courseDate[1];
     $course->lbrn = $request->lbrn;
-    $course->city_id = $request->city_id;
+    $course->location_id = $request->location_id;
     $course->grid_id = $request->grid_id;
     $course->template_id = $request->template_id;
     $course->save();
@@ -83,17 +79,11 @@ class CourseController extends Controller
 
   public function show(Course $course)
   {
-    // $course = $course->load(['template.subjects.teachers.cities']);
-    // return Inertia::render('Settings/Courses/Show', [
-    //   'course' => $course
-    // ]);
-
     $course = $course->load(['template.subjects.teachers' => function ($query) use ($course) {
       $query->whereHas('cities', function ($query) use ($course) {
-        $query->where('id', $course->city_id);
+        $query->where('id', $course->location->city->id);
       });
     }]);
-
     return Inertia::render('Settings/Courses/Show', [
       'course' => $course
     ]);

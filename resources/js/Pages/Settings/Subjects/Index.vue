@@ -118,6 +118,4 @@ watch(search, debounce(function (value) {
       </div>
     </div>
   </BreezeAuthenticatedLayout>
-
-
 </template>

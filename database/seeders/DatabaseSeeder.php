@@ -20,5 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SubjectSeeder::class);
         $this->call(TeacherSeeder::class);
         $this->call(WeekSeeder::class);
+        $this->call(TemplateSeeder::class);
+        $this->call(GridTableSeeder::class);
     }
 }

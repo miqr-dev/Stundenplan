@@ -10,7 +10,7 @@ import "vue3-swatches/dist/style.css";
 const props = defineProps({
   templates: {},
   grids: {},
-  cities: [],
+  locations: {},
 });
 
 const form = useForm({
@@ -19,8 +19,8 @@ const form = useForm({
   lbrn: "",
   color: "",
   type: "",
-  city_id: "",
   template_id: "",
+  location_id: "",
   grid_id: "",
 });
 </script>
@@ -147,29 +147,30 @@ const form = useForm({
                     City
                   </label>
                   <select
-                    v-model="form.city_id"
+                    v-model="form.location_id"
                     class="w-full p-2 border border-gray-400 rounded hover:border-gray-500"
-                    id="city"
-                    name="city"
+                    id="location"
+                    name="location"
                   >
                     <option value="" class="hover:bg-gray-200 hover:text-black">
                       Please select
                     </option>
                     <option
-                      v-for="city in props.cities"
-                      :value="city.id"
+                      v-for="location in props.locations"
+                      :key="location.id"
+                      :value="location.id"
                       class="hover:bg-gray-200 hover:text-black hover:font-bold"
                     >
-                      {{ city.name }}
+                      {{ location.name }}
                     </option>
                   </select>
                   <div
-                    v-if="form.errors.city"
-                    v-text="form.errors.city"
+                    v-if="form.errors.location"
+                    v-text="form.errors.location"
                     class="text-red-500 text-sm mt-1"
                   ></div>
                 </div>
-                 <div class="mb-6">
+                <div class="mb-6">
                   <label
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"
                     for="grid"
@@ -183,10 +184,7 @@ const form = useForm({
                     name="grid"
                   >
                     <option value="">Please select a Grid</option>
-                    <option
-                      v-for="grid in props.grids"
-                      :value="grid.id"
-                    >
+                    <option v-for="grid in props.grids" :value="grid.id">
                       {{ grid.name }}
                     </option>
                   </select>
