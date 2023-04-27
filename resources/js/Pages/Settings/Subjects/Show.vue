@@ -35,13 +35,12 @@ const submit = async (id) => {
               <h2>
                 {{ subject.name }}
               </h2>
-              <Link :href="route('subject.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
+            <div class="flex space-x-10">
               <div class="mb-6">
                 <label
                   class="block mb-2 text-xs font-bold text-gray-600 uppercase"
@@ -59,15 +58,30 @@ const submit = async (id) => {
                 ></VSwatches>
               </div>
               <div class="mb-6">
+               <label
+                  class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                  for="maxhourweek"
+                >
+                  Soll Stunden
+                </label>
+                <p>{{ subject.default_soll }} h</p>
+
+
+              </div>
+            </div>
+              <div class="mb-6">
                 <label
                   class="block mb-2 text-xs font-bold text-gray-600 uppercase mt-4"
                 >
                   Templates:
                 </label>
-                <div>
+                <div v-if="subject.templates.length">
                   <div v-for="template in subject.templates" :key="template.id">
                     <label>{{ template.name }} </label>
                   </div>
+                </div>
+                <div v-else>
+                  <p>this Subject is not yet in any Template</p>
                 </div>
               </div>
             </div>

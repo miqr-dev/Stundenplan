@@ -35,7 +35,12 @@ const showSubjects = ref(false);
               <div class="flex items-stretch">
                 <div>
                   <h2>
-                    {{ course.name }}
+                    <Link
+                      :href="`/course/${course.id}/edit`"
+                      class="hover:underline"
+                    >
+                      {{ course.name }}
+                    </Link>
                   </h2>
                 </div>
                 <div class="self-center">
@@ -56,9 +61,7 @@ const showSubjects = ref(false);
                   </span>
                 </div>
               </div>
-              <Link :href="route('course.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -76,7 +79,7 @@ const showSubjects = ref(false);
                       {{ moment(course.start_date).format("LL") }}
                     </div>
                     <div class="text-p-gray text-xs self-start ml-1">
-                       ( {{ moment(course.start_date).week() }}. KW  )
+                      ( {{ moment(course.start_date).week() }}. KW )
                     </div>
                   </div>
                 </div>
@@ -113,7 +116,7 @@ const showSubjects = ref(false);
                   ></VSwatches>
                 </div>
               </div>
-              <div class="flex space-x-3 mb-6">
+              <div class="flex space-x-3 mb-8">
                 <div class="w-1/3">
                   <SimpleInput
                     v-model="course.name"
@@ -133,6 +136,32 @@ const showSubjects = ref(false);
                 <div class="w-1/3">
                   <SimpleInput
                     v-model="course.type"
+                    label="Type"
+                    type="text"
+                    :readonly="true"
+                  />
+                </div>
+              </div>
+              <div class="flex space-x-3 mt-8">
+                <div class="w-1/3">
+                  <SimpleInput
+                    v-model="course.room.location.city.name"
+                    label="City"
+                    type="text"
+                    :readonly="true"
+                  />
+                </div>
+                <div class="w-1/3">
+                  <SimpleInput
+                    v-model="course.room.location.name"
+                    label="Address"
+                    type="text"
+                    :readonly="true"
+                  />
+                </div>
+                <div class="w-1/3">
+                  <SimpleInput
+                    v-model="course.room.name"
                     label="Type"
                     type="text"
                     :readonly="true"

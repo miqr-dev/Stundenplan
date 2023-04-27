@@ -24,7 +24,7 @@ const props = defineProps({
                     <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full mx-auto">
                       <div class="flex justify-between">
                         <h2 class="text-h2">Locations</h2>
-                        <!-- <Link :href="route('location.create')" class="text-blue-500 text-p"></Link> -->
+                        <SimpleBack />
                       </div>
 
                         <div class="grid grid-cols-3 gap-1">

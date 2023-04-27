@@ -11,6 +11,7 @@ const props = defineProps({
   templates: {},
   grids: {},
   locations: {},
+  rooms: {},
 });
 
 const form = useForm({
@@ -20,7 +21,7 @@ const form = useForm({
   color: "",
   type: "",
   template_id: "",
-  location_id: "",
+  room_id: "",
   grid_id: "",
 });
 </script>
@@ -99,13 +100,7 @@ const form = useForm({
                   >
                     Color
                   </label>
-                  <VSwatches
-                    v-model="form.color"
-                    swatches="text-advanced"
-                    row-length="12"
-                    show-border
-                    popover-x="button"
-                  ></VSwatches>
+                  <VSwatches v-model="form.color" swatches="text-advanced" />
                   <div
                     v-if="form.errors.color"
                     v-text="form.errors.color"
@@ -142,31 +137,39 @@ const form = useForm({
                 <div class="mb-6">
                   <label
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                    for="city"
+                    for="room"
                   >
-                    City
+                    Room
                   </label>
                   <select
-                    v-model="form.location_id"
+                    v-model="form.room_id"
                     class="w-full p-2 border border-gray-400 rounded hover:border-gray-500"
-                    id="location"
-                    name="location"
+                    id="room"
+                    name="room"
                   >
                     <option value="" class="hover:bg-gray-200 hover:text-black">
                       Please select
                     </option>
-                    <option
+                    <optgroup
                       v-for="location in props.locations"
                       :key="location.id"
-                      :value="location.id"
-                      class="hover:bg-gray-200 hover:text-black hover:font-bold"
+                      :label="location.name"
                     >
-                      {{ location.name }}
-                    </option>
+                      <option
+                        v-for="room in props.rooms.filter(
+                          (room) => room.location_id === location.id
+                        )"
+                        :key="room.id"
+                        :value="room.id"
+                        class="hover:bg-gray-200 hover:text-black hover:font-bold"
+                      >
+                        {{ room.name }} {{ room.room_number }}
+                      </option>
+                    </optgroup>
                   </select>
                   <div
-                    v-if="form.errors.location"
-                    v-text="form.errors.location"
+                    v-if="form.errors.room_id"
+                    v-text="form.errors.room_id"
                     class="text-red-500 text-sm mt-1"
                   ></div>
                 </div>

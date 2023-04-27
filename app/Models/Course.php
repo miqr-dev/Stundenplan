@@ -18,7 +18,24 @@ class Course extends Model
     'end_date'
   ];
 
-  protected $guarded = [];
+  protected $fillable = [
+  'room_id',
+  'template_id',
+  'grid_id',
+  'name',
+  'start_date',
+  'end_date',
+  'color',
+  'type',
+  'lbrn',
+  'description',
+  'active',
+  ];
+
+  public function room()
+  {
+    return $this->belongsTo(Room::class);
+  }
 
   public function location()
   {

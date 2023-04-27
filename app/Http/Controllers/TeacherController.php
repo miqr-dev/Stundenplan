@@ -51,10 +51,14 @@ class TeacherController extends Controller
       'maxhourweek' => 'required',
       'color' => 'required',
       'email' => 'required|email|unique:teachers',
-      'cities' => 'required|array|min:1',
-      'cities.*' => 'required|exists:cities,id',
-      'subjects' => 'required|array|min:1',
-      'subjects.*' => 'required|exists:subjects,id',
+      // 'cities' => 'required|array|min:1',
+      // 'cities.*' => 'required|exists:cities,id',
+      // 'subjects' => 'required|array|min:1',
+      // 'subjects.*' => 'required|exists:subjects,id',
+      'cities' => '',
+      'cities.*' => '',
+      'subjects' => '',
+      'subjects.*' => '',
     ]);
     $teacher = Teacher::create([
       'name' => $validated['name'],
@@ -103,18 +107,22 @@ class TeacherController extends Controller
 
   public function update(Request $request, Teacher $teacher)
   {
-      $data = $request->validate([
+    $data = $request->validate([
       'name' => 'required',
       'surname' => 'required',
       'maxhourweek' => 'required',
       'color' => 'required',
       'email' => 'required|email',
-      'cities' => 'required|array|min:1',
-      'cities.*' => 'required|exists:cities,id',
-      'subjects' => 'required|array|min:1',
-      'subjects.*' => 'required|exists:subjects,id',
+      // 'cities' => 'required|array|min:1',
+      // 'cities.*' => 'required|exists:cities,id',
+      // 'subjects' => 'required|array|min:1',
+      // 'subjects.*' => 'required|exists:subjects,id',
+      'cities' => '',
+      'cities.*' => '',
+      'subjects' => '',
+      'subjects.*' => '',
     ]);
-      $teacher->update([
+    $teacher->update([
       'name' => $data['name'],
       'surname' => $data['surname'],
       'maxhourweek' => $data['maxhourweek'],

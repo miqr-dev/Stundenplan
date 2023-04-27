@@ -6,6 +6,8 @@ import moment from 'moment/moment';
 import SimpleInput from "@/Components/SimpleInput.vue";
 import SimpleSubmit from "@/Components/SimpleSubmit.vue";
 import SimpleDelete from '@/Components/SimpleDelete.vue';
+import SimpleBack from "@/Components/SimpleBack.vue";
+
 
 require('moment/locale/de')
 
@@ -22,6 +24,7 @@ createInertiaApp({
             .component("SimpleInput", SimpleInput)
             .component("SimpleSubmit", SimpleSubmit)
             .component("SimpleDelete", SimpleDelete)
+            .component("SimpleBack", SimpleBack)
             .mount(el);
     },
     progress: {

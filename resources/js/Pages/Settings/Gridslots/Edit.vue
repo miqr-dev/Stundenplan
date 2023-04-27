@@ -42,9 +42,7 @@ const update = () => {
                   <Link :href="`/grid/${grid.id}`">{{ props.grid.name }}</Link>
                 </span>
               </h2>
-              <a href="#" onclick="history.back();return false;" class="text-blue-500 text-p"
-                >X</a
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-1 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -66,7 +64,7 @@ const update = () => {
                     >
                       <td class="border px-4 py-2">
                         <input
-                        class="px-4 py-2 border border-gray-400 bg-white rounded-md w-full"
+                          class="px-4 py-2 border border-gray-400 bg-white rounded-md w-full"
                           type="time"
                           v-model="form.start_times[index]"
                           required
@@ -74,7 +72,7 @@ const update = () => {
                       </td>
                       <td class="border px-4 py-2">
                         <input
-                        class="px-4 py-2 border border-gray-400 bg-white rounded-md w-full"
+                          class="px-4 py-2 border border-gray-400 bg-white rounded-md w-full"
                           type="time"
                           v-model="form.end_times[index]"
                           required

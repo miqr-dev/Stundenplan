@@ -30,6 +30,7 @@ const props = defineProps({
                 class="text-blue-500 text-p"
                 >Add a Location</Link
               >
+              <SimpleBack />
             </div>
             <div class="flex flex-col mt-4">
               <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

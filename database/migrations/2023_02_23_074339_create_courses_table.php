@@ -15,7 +15,8 @@ class CreateCoursesTable extends Migration
   {
     Schema::create('courses', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('location_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+      //$table->foreignId('location_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+      $table->foreignId('room_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->foreignId('template_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->foreignId('grid_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->string('name');

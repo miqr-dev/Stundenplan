@@ -1,6 +1,7 @@
-
+<!-- DeleteButton.vue -->
 <script setup>
-import { defineEmits } from 'vue';
+import { ref } from 'vue';
+import ConfirmationModal from '@/Components/SimpleConfirmationModal.vue';
 
 const props = defineProps({
   buttonText: {
@@ -11,18 +12,33 @@ const props = defineProps({
 
 const emits = defineEmits(['click']);
 
+const showModal = ref(false);
+
 const handleDelete = () => {
-  if (confirm('Are you sure you want to delete this item?')) {
-    emits('click');
-  }
+  showModal.value = true;
+};
+
+const handleConfirm = () => {
+  showModal.value = false;
+  emits('click');
+};
+
+const handleCancel = () => {
+  showModal.value = false;
 };
 </script>
 
-
-
 <template>
-  <button class="text-orange-600 hover:text-orange-900" type="button" @click="handleDelete">
-    {{ buttonText }}
-  </button>
+  <div>
+    <button class="text-orange-600 hover:text-orange-900" type="button" @click="handleDelete">
+      {{ buttonText }}
+    </button>
+    <ConfirmationModal
+      :isVisible="showModal"
+      title="Delete Confirmation"
+      message="Are you sure you want to delete this item?"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
+  </div>
 </template>
-

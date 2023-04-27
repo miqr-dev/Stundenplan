@@ -38,6 +38,7 @@ class SubjectController extends Controller
     $validated = $request->validate([
       'name' => 'required',
       'color' => 'required',
+      'default_soll' => 'numeric',
       'templates' => 'array',
       'templates.*' => 'exists:templates,id'
     ]);
@@ -45,6 +46,7 @@ class SubjectController extends Controller
     $subject = Subject::create([
       'name' => $validated['name'],
       'color' => $validated['color'],
+      'default_soll' => $validated['default_soll'],
     ]);
 
     $subject->templates()->attach($validated['templates']);
@@ -68,9 +70,21 @@ class SubjectController extends Controller
         'id' => $subject->id,
         'name' => $subject->name,
         'color' => $subject->color,
+        'default_soll' => $subject->default_soll,
         'templates' => $subject->templates->pluck('id')->toArray()
       ],
-      'templates' => Template::all()
+      'templates' => Template::all()->map(function ($template) {
+      return [
+        'id' => $template->id,
+        'name' => $template->name,
+      ];
+    }),
+      'subject_template' => $subject->templates->map(function ($template) {
+        return [
+          'template_id' => $template->id,
+          'soll' => $template->pivot->soll === null ? $template->default_soll : $template->pivot->soll
+        ];
+      }),
 
     ]);
   }
@@ -80,6 +94,7 @@ class SubjectController extends Controller
     $data = $request->validate([
       'name' => 'required',
       'color' => 'required',
+      'default_soll' => 'numeric',
       'templates' => 'array',
       'templates.*' => 'exists:templates,id'
     ]);
@@ -87,6 +102,7 @@ class SubjectController extends Controller
     $subject->update([
       'name' => $data['name'],
       'color' => $data['color'],
+      'default_soll' => $data['default_soll'],
     ]);
 
     $subject->templates()->sync($data['templates']);

@@ -16,6 +16,7 @@ class CreateSchedualDetailsTable extends Migration
     Schema::create('schedual_details', function (Blueprint $table) {
       $table->id();
       $table->foreignId('schedual_master_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+      $table->unsignedBigInteger('grid_slot_id');
       $table->time('start_time');
       $table->time('end_time');
       $table->boolean('is_break')->default(false);

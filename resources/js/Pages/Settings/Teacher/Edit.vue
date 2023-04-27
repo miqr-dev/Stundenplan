@@ -7,10 +7,14 @@ import "vue3-swatches/dist/style.css";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref, onMounted } from "vue";
+import SimpleItemSelector from "@/Components/SimpleItemSelector.vue";
+import { provide } from "vue";
+
+provide("parentComponent", "Edit");
 
 const props = defineProps({
   teacher: Object,
-  subjects: Object,
+  subjects: Array,
   cities: Object,
 });
 
@@ -33,7 +37,7 @@ const update = () => {
 };
 
 const destroy = () => {
-    form.delete(route("teacher.destroy", form.id));
+  form.delete(route("teacher.destroy", form.id));
 };
 </script>
 
@@ -53,9 +57,7 @@ const destroy = () => {
           >
             <div class="flex justify-between">
               <h2 class="text-h2">Edit {{ form.name }}, {{ form.surname }}</h2>
-              <Link :href="route('teacher.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -94,56 +96,18 @@ const destroy = () => {
                   />
                 </div>
                 <!-- implement the vue-swatch here -->
-                <div class="mb-6">
-                  <label
-                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                    for="subject"
-                    @click="showSubjects = !showSubjects"
-                  >
-                    Subjects
-                  </label>
-                  <div v-show="showSubjects">
-                    <div v-for="subject in subjects" :key="subject.id">
-                      <label
-                        >{{ subject.name }}
-                        <input
-                          type="checkbox"
-                          :value="subject.id"
-                          v-model="form.subjects"
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div
-                    v-if="form.errors.subjects"
-                    v-text="form.errors.subjects"
-                    class="text-red-500 text-sm mt-1"
-                  ></div>
-                </div>
-                <div class="mb-6">
-                  <label
-                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                    for="cities"
-                  >
-                    Cities
-                  </label>
-                  <div v-for="city in cities" :key="city.id">
-                    <label
-                      >{{ city.name }}
-                      <input
-                        type="checkbox"
-                        :value="city.id"
-                        v-model="form.cities"
-                      />
-                    </label>
-                  </div>
-                  <div
-                    v-if="form.errors.cities"
-                    v-text="form.errors.cities"
-                    class="text-red-500 text-sm mt-1"
-                  ></div>
-                </div>
+                <SimpleItemSelector
+                  v-model="form.subjects"
+                  :items="props.subjects"
+                  :searchable="true"
+                  label="subject"
+                ></SimpleItemSelector>
+                <SimpleItemSelector
+                  v-model="form.cities"
+                  :items="props.cities"
+                  :searchable="true"
+                  label="city"
+                ></SimpleItemSelector>
                 <div class="mb-1 flex justify-between">
                   <SimpleDelete @click="destroy" buttonText="Delete Template" />
                   <SimpleSubmit :processing="form.processing" />

@@ -4,45 +4,31 @@ import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 import { VSwatches } from "vue3-swatches";
 import "vue3-swatches/dist/style.css";
-import { reactive, ref, computed } from "vue";
-import { EllipsisHorizontalIcon } from "@heroicons/vue/20/solid";
-import SimpleInput from "@/Components/SimpleInput.vue";
-import SimpleDelete from "@/Components/SimpleDelete.vue";
-import SimpleSubmit from "@/Components/SimpleSubmit.vue";
 import SimpleItemSelector from "@/Components/SimpleItemSelector.vue";
+import { provide } from "vue";
 
+provide("parentComponent", "Create");
 const props = defineProps({
   subject: Object,
   templates: Array,
+  subject_template: Array,
 });
 
 const form = useForm({
   id: props.subject.id,
   name: props.subject.name,
   color: props.subject.color,
+  default_soll: props.subject.default_soll,
   templates: props.subject.templates,
+  subject_template: props.subject_template,
 });
 
-const getTemplateName = (templateId) => {
-  const template = props.templates.find((t) => t.id === templateId);
-  return template ? template.name : "";
-};
-
 const update = () => {
-  form.put(route("subject.update", form.id), {
-    onSuccess: () => form.reset(),
-  });
+  form.patch(route("subject.update", form.id));
 };
 
 const destroy = () => {
-  if (confirm("Are you sure you want to delete this subject?")) {
-    form.delete(route("subject.destroy", form.id), {
-      onSuccess: () => {
-        form.reset();
-        $inertia.visit(route("subject.index"));
-      },
-    });
-  }
+  form.delete(route("subject.destroy", form.id));
 };
 </script>
 
@@ -62,9 +48,7 @@ const destroy = () => {
           >
             <div class="flex justify-between">
               <h2 class="text-h2">Edit the subject</h2>
-              <Link :href="route('subject.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -76,6 +60,14 @@ const destroy = () => {
                     label="Name"
                     type="text"
                     :error="form.errors.name"
+                  />
+                </div>
+                <div class="mb-6 w-1/2">
+                  <SimpleInput
+                    v-model="form.default_soll"
+                    label="Soll Stunden"
+                    type="text"
+                    :error="form.errors.default_soll"
                   />
                 </div>
 
@@ -90,9 +82,6 @@ const destroy = () => {
                   <VSwatches
                     v-model="form.color"
                     swatches="text-advanced"
-                    row-length="12"
-                    show-border
-                    popover-x="button"
                   ></VSwatches>
                   <div
                     v-if="form.errors.color"
@@ -103,9 +92,8 @@ const destroy = () => {
                 <SimpleItemSelector
                   v-model="form.templates"
                   :items="props.templates"
-                  :get-item-name="getTemplateName"
                   :searchable="true"
-                  label="Temp"
+                  label="template"
                 ></SimpleItemSelector>
 
                 <!-- implement the vue-swatch here -->
@@ -122,9 +110,15 @@ const destroy = () => {
   </BreezeAuthenticatedLayout>
 </template>
 
-
 <style scoped>
-.Vswatches__wrapper {
-  padding: 0;
+:deep(.vue-swatches__row) {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+:deep(.vue-swatches__swatch) {
+  margin: 0 !important;
+  border-width: 2px !important;
 }
 </style>

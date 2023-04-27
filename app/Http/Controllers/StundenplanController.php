@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\City;
+use App\Models\Room;
 use App\Models\Week;
 use Inertia\Inertia;
 use App\Models\Course;
@@ -21,33 +22,36 @@ class StundenplanController extends Controller
    * @return \Illuminate\Http\Response
    */
 
-  public function index()
-  {
-    $user = Auth::user(); //todo polor applicationin mech asi bedke asang ashkhadi
+public function index()
+{
+    $user = Auth::user();
     $city_id = City::where('name', $user->ort)->value('id');
-    $courses = Course::where('location_id', $city_id)->with('grid.gridslots')->with('city.locations')->with('template.subjects.teachers')->get();
-    //dd($courses);
 
+    $courses = Course::whereHas('location', function ($query) use ($city_id) {
+        $query->where('city_id', $city_id);
+    })->with(['grid.gridslots', 'location.city', 'template.subjects.teachers'])->get();
 
-    // Get the current week number and the last week number of the year
-    $currentMonday = Carbon::now()->startOfWeek(); //todo the day from today until end of the year
+    // Retrieve rooms with their locations in the given city
+    $rooms = Room::whereHas('location', function ($query) use ($city_id) {
+        $query->where('city_id', $city_id);
+    })->with('location')->get();
+
+    $currentMonday = Carbon::now()->startOfWeek();
     $endOfYear = Carbon::now()->endOfYear();
 
-    // Generate an array of Mondays from the current week to the end of the year
     $mondays = [];
     while ($currentMonday->lte($endOfYear)) {
-      $mondays[] = $currentMonday->toDateString();
-      $currentMonday->addWeek();
+        $mondays[] = $currentMonday->toDateString();
+        $currentMonday->addWeek();
     }
     $weekNumbers = Week::whereIn('startDate', $mondays)->get();
 
-    //$weekNumbers = Week::all(); 
-
     return inertia('Stundenplan/Index', [
-      'courses' => $courses,
-      'weekNumbers' =>  $weekNumbers
+        'courses' => $courses,
+        'weekNumbers' =>  $weekNumbers,
+        'rooms' => $rooms // Include rooms with their locations here
     ]);
-  }
+}
 
   /**
    * Show the form for creating a new resource.

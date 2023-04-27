@@ -8,6 +8,10 @@ import { ref, computed } from "vue";
 import "vue3-swatches/dist/style.css";
 import SimpleCollapsibleTable from "@/Components/SimpleCollapsibleTable.vue";
 import SimpleCustomRow from "@/Components/SimpleCustomRow.vue";
+import SimpleItemSelector from "@/Components/SimpleItemSelector.vue";
+import { provide } from "vue";
+
+provide("parentComponent", "Edit");
 
 const props = defineProps({
   teacher: {},
@@ -39,9 +43,7 @@ const showSubjects = ref(false);
                 {{ teacher.name }}&#44; &nbsp;{{ teacher.surname }}
                 <span class="text-sm ml-4">{{ teacher.email }}</span>
               </h2>
-              <Link :href="route('teacher.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"

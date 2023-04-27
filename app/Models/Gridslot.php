@@ -11,10 +11,10 @@ class Gridslot extends Model
 
     
     protected $fillable = [
-        'grid_id',
         'start_time',
         'end_time',
         'is_break',
+        'grid_id',
     ];
 
     protected $casts = [

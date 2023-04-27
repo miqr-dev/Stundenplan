@@ -38,9 +38,7 @@ let destroy = () => {
           >
             <div class="flex justify-between">
               <h2 class="text-h2">Edit the location name</h2>
-              <Link :href="route('location.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -56,7 +54,7 @@ let destroy = () => {
                 </div>
                 <div class="mb-1 flex justify-between">
                   <SimpleDelete @click="destroy" buttonText="Delete Location" />
-                  <SimpleSubmit :processing="form.processing"/>
+                  <SimpleSubmit :processing="form.processing" />
                 </div>
               </form>
             </div>

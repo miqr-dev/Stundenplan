@@ -6,28 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateSubjectTemplatePivotTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('subject_template', function (Blueprint $table) {
-            $table->unsignedBigInteger('subject_id');
-            $table->unsignedBigInteger('template_id');
-            $table->unique(['subject_id', 'template_id']);
-            $table->timestamps();
-        });
-    }
+  public function up()
+  {
+    Schema::create('subject_template', function (Blueprint $table) {
+      $table->unsignedBigInteger('subject_id');
+      $table->unsignedBigInteger('template_id');
+      $table->unique(['subject_id', 'template_id']);
+      $table->integer('soll')->nullable();
+      $table->integer('ist')->default(0);
+      $table->timestamps();
+    });
+  }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('subject_template_pivot');
-    }
+  public function down()
+  {
+    Schema::dropIfExists('subject_template_pivot');
+  }
 }

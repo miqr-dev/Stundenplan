@@ -29,9 +29,7 @@ let submit = () => {
           >
             <div class="flex justify-between">
               <h2 class="text-h2">Add a new City</h2>
-              <Link :href="route('city.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100g p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -47,9 +45,7 @@ let submit = () => {
                 </div>
 
                 <div class="mb-1 text-right">
-                  <SimpleSubmit :processing="form.processing"
-                    Submit
-                  />
+                  <SimpleSubmit :processing="form.processing" Submit />
                 </div>
               </form>
             </div>

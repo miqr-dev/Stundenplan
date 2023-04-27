@@ -7,7 +7,8 @@ import { ref } from "vue";
 const props = defineProps({
   course: Object,
   templates: Array,
-  cities: Array,
+  locations: Array,
+  rooms: Array,
 });
 
 const form = useForm({
@@ -15,11 +16,11 @@ const form = useForm({
   name: props.course.name,
   type: props.course.type,
   lbrn: props.course.lbrn,
-  city_id: props.course.city_id,
+  room_id: props.course.room_id,
   template_id: props.course.template_id,
 });
 
-const selectedCity = ref(props.course.city_id);
+const selectedCity = ref(props.course.location_id);
 
 const update = () => {
   form.patch(route("course.update", form.id));
@@ -46,9 +47,7 @@ const destroy = () => {
           >
             <div class="flex justify-between">
               <h2 class="text-h2">Edit {{ form.name }}</h2>
-              <Link :href="route('course.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+              <SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -79,23 +78,52 @@ const destroy = () => {
                   />
                 </div>
                 <div class="mb-6">
-                  <label for="city_id" class="block mb-2 text-xs font-bold text-gray-600 uppercase">City</label>
-                  <select id="city_id" class="w-full p-2 border border-gray-400 bg-white rounded" v-model="form.city_id">
-                    <option
-                      v-for="city in cities"
-                      :key="city.id"
-                      :value="city.id"
-                    >
-                      {{ city.name }}
+                  <label
+                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                    for="room_id"
+                  >
+                    Room
+                  </label>
+                  <select
+                    id="room_id"
+                    class="w-full p-2 border border-gray-400 bg-white rounded"
+                    v-model="form.room_id"
+                  >
+                    <option value="" class="hover:bg-gray-200 hover:text-black">
+                      Please select
                     </option>
+                    <optgroup
+                      v-for="location in props.locations"
+                      :key="location.id"
+                      :label="location.name"
+                    >
+                      <option
+                        v-for="room in props.rooms.filter(
+                          (room) => room.location_id === location.id
+                        )"
+                        :key="room.id"
+                        :value="room.id"
+                        class="hover:bg-gray-200 hover:text-black hover:font-bold"
+                      >
+                        {{ room.name }} {{ room.room_number }}
+                      </option>
+                    </optgroup>
                   </select>
-                  <span v-if="form.errors.city_id" class="error">{{
-                    errors.city_id
+                  <span v-if="form.errors.room_id" class="error">{{
+                    errors.room_id
                   }}</span>
                 </div>
                 <div class="mb-6">
-                  <label for="template_id" class="block mb-2 text-xs font-bold text-gray-600 uppercase">Template</label>
-                  <select id="template_id" class="w-full p-2 border border-gray-400 bg-white rounded" v-model="form.template_id">
+                  <label
+                    for="template_id"
+                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                    >Template</label
+                  >
+                  <select
+                    id="template_id"
+                    class="w-full p-2 border border-gray-400 bg-white rounded"
+                    v-model="form.template_id"
+                  >
                     <option
                       v-for="template in templates"
                       :key="template.id"

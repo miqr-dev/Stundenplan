@@ -16,6 +16,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  rooms: {
+    type: Array,
+    required: true,
+  },
 });
 
 const handleSelection = (data) => {
@@ -27,7 +31,7 @@ const handleSelection = (data) => {
     grid_slot_id: "",
     start_time: "",
     end_time: "",
-    grid_slot_id: "",
+
     subject_id: "",
     teacher_id: "",
     room_id: "",
@@ -89,7 +93,11 @@ const daysWithDates = computed(() => {
       >
         This is the Stundenplan for
         <span class="text-blue-400">{{ selectedCourse.name }}</span> In
-        <span class="text-red-400">{{ selectedCourse.city.name }}</span>
+        <span class="text-red-400">{{
+          selectedCourse.location.city.name
+        }}</span>
+        At
+        <span class="text-green-400">{{ selectedCourse.location.name }}</span>
       </h2>
       <div class="h-full grid place-items-center bg-gray-800 text-white"></div>
     </template>
@@ -220,6 +228,7 @@ const daysWithDates = computed(() => {
                               /> -->
                               <TeachingUnit
                                 :options1="selectedCourse.template.subjects"
+                                :options3="rooms"
                                 :day="dayWithDate.day"
                                 :date="dayWithDate.date"
                                 :gridSlotItem="gridSlotItem"

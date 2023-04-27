@@ -41,6 +41,7 @@ const props = defineProps({
               <Link :href="route('room.create',{location:location.id})" class="text-blue-500 text-p"
                 >Add a Room</Link
               >
+              <SimpleBack />
             </div>
             <div class="flex flex-col mt-4">
               <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

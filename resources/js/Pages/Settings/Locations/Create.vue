@@ -41,9 +41,7 @@ let submit = () => {
                   }}</Link></span
                 >
               </h2>
-              <Link :href="route('location.index')" class="text-blue-500 text-p"
-                >X</Link
-              >
+<SimpleBack />
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
