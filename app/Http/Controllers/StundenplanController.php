@@ -22,18 +22,17 @@ class StundenplanController extends Controller
    * @return \Illuminate\Http\Response
    */
 
-public function index()
-{
+  public function index()
+  {
     $user = Auth::user();
     $city_id = City::where('name', $user->ort)->value('id');
 
-    $courses = Course::whereHas('location', function ($query) use ($city_id) {
-        $query->where('city_id', $city_id);
-    })->with(['grid.gridslots', 'location.city', 'template.subjects.teachers'])->get();
+    $courses = Course::whereHas('room.location', function ($query) use ($city_id) {
+      $query->where('city_id', $city_id);
+    })->with(['grid.gridslots', 'room.location.city', 'template.subjects.teachers'])->get();
 
-    // Retrieve rooms with their locations in the given city
     $rooms = Room::whereHas('location', function ($query) use ($city_id) {
-        $query->where('city_id', $city_id);
+      $query->where('city_id', $city_id);
     })->with('location')->get();
 
     $currentMonday = Carbon::now()->startOfWeek();
@@ -41,17 +40,17 @@ public function index()
 
     $mondays = [];
     while ($currentMonday->lte($endOfYear)) {
-        $mondays[] = $currentMonday->toDateString();
-        $currentMonday->addWeek();
+      $mondays[] = $currentMonday->toDateString();
+      $currentMonday->addWeek();
     }
     $weekNumbers = Week::whereIn('startDate', $mondays)->get();
 
     return inertia('Stundenplan/Index', [
-        'courses' => $courses,
-        'weekNumbers' =>  $weekNumbers,
-        'rooms' => $rooms // Include rooms with their locations here
+      'courses' => $courses,
+      'weekNumbers' =>  $weekNumbers,
+      'rooms' => $rooms, // Include rooms with their locations here
     ]);
-}
+  }
 
   /**
    * Show the form for creating a new resource.
@@ -66,7 +65,7 @@ public function index()
   public function teachingunit(Request $request)
   {
     $validated = $request->validate([
-      'date' => 'required|date',
+      'week' => 'required|integer', // change here
       'course_id' => 'required|integer',
       'grid_slot_id' => 'required|integer',
       'start_time' => 'required',
@@ -77,7 +76,7 @@ public function index()
     ]);
 
     $master = SchedualMaster::firstOrCreate([
-      'date' => $validated['date'],
+      'calendar_week' => $validated['week'], // and here
       'course_id' => $validated['course_id'],
     ]);
 
@@ -91,15 +90,7 @@ public function index()
       'room_id' => $validated['room_id'],
     ]);
 
-
     return redirect()->back()->with('success', 'Unit saved successfully.');
-    
-
-
-    // return Inertia::render('Stundenplan/Index', [
-    //   'success' => true,
-    //   'message' => 'Teaching unit saved successfully.',
-    // ]);
   }
   public function store(Request $request)
   {

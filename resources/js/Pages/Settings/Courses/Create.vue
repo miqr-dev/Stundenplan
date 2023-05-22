@@ -6,6 +6,22 @@ import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { VSwatches } from "vue3-swatches";
 import "vue3-swatches/dist/style.css";
+import { ref, computed, watch } from "vue";
+import SimpleConfirm from "@/Components/SimpleConfirm.vue";
+
+const selectedTemplate = computed(() => {
+  if (form.template_id) {
+    return props.templates.find((template) => template.id === form.template_id);
+  }
+  return null;
+});
+
+const selectedSubjects = computed(() => {
+  if (selectedTemplate.value) {
+    return selectedTemplate.value.subjects;
+  }
+  return [];
+});
 
 const props = defineProps({
   templates: {},
@@ -23,7 +39,29 @@ const form = useForm({
   template_id: "",
   room_id: "",
   grid_id: "",
+  subjects: [],
 });
+
+watch(selectedSubjects, (newSubjects) => {
+  form.subjects = newSubjects.map((subject) => ({
+    id: subject.id,
+    soll: subject.default_soll,
+  }));
+});
+
+const showConfirm = ref(false);
+
+const handleConfirm = () => {
+  showConfirm.value = false;
+  form.post('/course');
+};
+const handleCancel = () => {
+  showConfirm.value = false;
+};
+const handleSubmit = (e) => {
+  e.preventDefault();
+  showConfirm.value = true;
+};
 </script>
 
 <template>
@@ -49,7 +87,7 @@ const form = useForm({
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
-              <form @submit.prevent="form.post('/course')">
+              <form @submit.prevent="handleSubmit">
                 <div class="mb-6">
                   <SimpleInput
                     v-model="form.name"
@@ -206,5 +244,47 @@ const form = useForm({
         </div>
       </div>
     </div>
+    <div
+      v-if="selectedTemplate"
+      class="fixed top-1/2 right-2 transform -translate-y-1/2 py-2 px-4 bg-white border border-gray-400 rounded-xl shadow text-gray-700 z-10 md:max-w-[150px] lg:max-w-[250px] xl:min-w-[460px]"
+    >
+      <h2>
+        <span class="text-blue-400 text-h2 text-bold">{{
+          selectedTemplate.name
+        }}</span>
+      </h2>
+      <div v-if="selectedSubjects.length > 0" class="mb-6">
+        <label
+          class="block my-2 text-xs font-bold text-gray-600 uppercase"
+          for="subjects"
+        >
+          Subjects
+        </label>
+        <ul class="list-inside list-decimal space-y-1">
+          <li v-for="subject in selectedSubjects" :key="subject.id">
+            {{ subject.name }} -
+            <span class="text-bold text-blue-500"> Soll: </span>
+            <span v-if="!subject.editing" @dblclick="subject.editing = true">
+              {{ form.subjects.find((s) => s.id === subject.id).soll }}
+            </span>
+            <input
+              v-if="subject.editing"
+              v-model="form.subjects.find((s) => s.id === subject.id).soll"
+              @blur="subject.editing = false"
+              type="number"
+              class="border rounded p-1 w-16"
+              autofocus
+            />
+          </li>
+        </ul>
+      </div>
+    </div>
+<SimpleConfirm
+  :open="showConfirm"
+  title="Confirm Submission"
+  message="Make sure you chose the right Template, after Confirming the Template you have chosen can not be changed !!!"
+  @confirm="handleConfirm"
+  @cancel="handleCancel"
+/>
   </BreezeAuthenticatedLayout>
 </template>

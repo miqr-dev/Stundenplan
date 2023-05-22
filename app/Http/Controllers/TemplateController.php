@@ -86,12 +86,6 @@ public function edit(Template $template)
         'default_soll' => $subject->default_soll,
       ];
     }),
-    'subject_template' => $template->subjects->map(function ($subject) {
-      return [
-        'subject_id' => $subject->id,
-        'soll' => $subject->pivot->soll === null ? $subject->default_soll : $subject->pivot->soll
-      ];
-    }),
   ]);
 }
 
@@ -101,36 +95,13 @@ public function update(Request $request, Template $template)
         'name' => 'required',
         'subjects' => 'required|array',
         'subjects.*' => 'exists:subjects,id',
-        'subject_template' => 'nullable|array',
     ]);
 
     $template->update([
         'name' => $data['name'],
     ]);
 
-    $syncData = [];
-
-    // Create syncData with provided subject_template data
-    if (isset($data['subject_template'])) {
-        foreach ($data['subject_template'] as $subject) {
-            $syncData[$subject['subject_id']] = ['soll' => $subject['soll']];
-        }
-    }
-
-    // Find the subjects that are not in the subject_template array
-    $existingSubjects = array_keys($syncData);
-    $newSubjects = array_diff($data['subjects'], $existingSubjects);
-
-    // Add the default_soll values for the new subjects
-    if (!empty($newSubjects)) {
-        $subjects = Subject::whereIn('id', $newSubjects)->get();
-
-        foreach ($subjects as $subject) {
-            $syncData[$subject->id] = ['soll' => $subject->default_soll];
-        }
-    }
-
-    $template->subjects()->sync($syncData);
+    $template->subjects()->sync($data['subjects']);
 
     return redirect()->route('template.index')->with('success', 'Template updated successfully.');
 }

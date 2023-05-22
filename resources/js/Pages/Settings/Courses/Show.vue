@@ -2,16 +2,39 @@
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import { Link, Head } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import moment from "moment";
 import { VSwatches } from "vue3-swatches";
 import "vue3-swatches/dist/style.css";
 import { CheckBadgeIcon, XCircleIcon } from "@heroicons/vue/20/solid";
-import { VTooltip } from "floating-vue";
 import "floating-vue/dist/style.css";
+import { VTooltip } from "floating-vue";
 
 const props = defineProps({
   course: {},
+});
+
+const subjectDifference = computed(() => {
+  const courseSubjectCount = props.course.subjects.length;
+  const templateSubjectCount = props.course.template.subjects.length;
+  const templateName = props.course.template.name;
+
+  const courseSubjectIds = props.course.subjects.map((subject) => subject.id);
+  const failedSubjects = props.course.template.subjects.filter(
+    (subject) => !courseSubjectIds.includes(subject.id)
+  );
+
+  const difference = failedSubjects.length;
+
+  if (difference !== 0) {
+    return {
+      message: `This course failed ${difference} subject(s) from the template ${templateName} total ${templateSubjectCount}`,
+      failedSubjects: `<ol>${failedSubjects
+        .map((subject) => `<li>${subject.name}</li>`)
+        .join("")}</ol>`,
+    };
+  }
+  return { message: "", failedSubjects: "" };
 });
 
 const showSubjects = ref(false);
@@ -32,41 +55,58 @@ const showSubjects = ref(false);
             class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
           >
             <div class="flex justify-between">
-              <div class="flex items-stretch">
-                <div>
-                  <h2>
-                    <Link
-                      :href="`/course/${course.id}/edit`"
-                      class="hover:underline"
-                    >
-                      {{ course.name }}
-                    </Link>
-                  </h2>
-                </div>
-                <div class="self-center">
-                  <span
-                    class="inline-block animate-pulse rounded-full text-white text-sm ml-3"
-                    :class="course.active ? 'bg-green-600' : 'bg-red-400'"
+              <div class="w-2/3 flex items-center">
+                <h2>
+                  <Link
+                    :href="`/course/${course.id}/edit`"
+                    class="hover:underline"
                   >
-                    <CheckBadgeIcon
-                      v-if="course.active"
-                      v-tooltip="'Active'"
-                      class="h-6 w-6"
-                    />
-                    <XCircleIcon
-                      v-tooltip="'Inactive'"
-                      v-if="!course.active"
-                      class="h-6 w-6"
-                    />
-                  </span>
+                    {{ course.name }}
+                  </Link>
+                </h2>
+                <span
+                  class="inline-block animate-pulse rounded-full text-white text-sm ml-2"
+                  :class="course.active ? 'bg-green-600' : 'bg-red-400'"
+                >
+                  <CheckBadgeIcon
+                    v-if="course.active"
+                    v-tooltip="'Active'"
+                    class="h-6 w-6"
+                  />
+                  <XCircleIcon
+                    v-tooltip="'Inactive'"
+                    v-if="!course.active"
+                    class="h-6 w-6"
+                  />
+                </span>
+              </div>
+              <!-- Add Address Information Here -->
+              <div class="w-1/3">
+                <!-- Increase the value here to move the address more to the right -->
+                <div class="p-3 bg-gray-100">
+                  <div class="flex items-center mb-1">
+                    <span class="text-sm text-secondary-gray-gray">{{
+                      course.room.location.city.name
+                    }}</span>
+                    <span class="text-sm text-secondary-gray-gray mx-1">,</span>
+                    <span class="text-sm text-secondary-gray-gray">{{
+                      course.room.location.name
+                    }}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <span class="text-sm text-secondary-gray-gray"
+                      >{{ course.room.name }},
+                      {{ course.room.room_number }}</span
+                    >
+                  </div>
                 </div>
               </div>
               <SimpleBack />
             </div>
             <div
-              class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
+              class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-6 mt-5 shadow-sm sm:rounded-lg"
             >
-              <div class="flex space-x-3 mb-6">
+              <div class="flex space-x-3">
                 <div class="w-1/3">
                   <label
                     class="block mb-1 text-xs font-bold text-green-600 uppercase"
@@ -116,7 +156,8 @@ const showSubjects = ref(false);
                   ></VSwatches>
                 </div>
               </div>
-              <div class="flex space-x-3 mb-8">
+
+              <div class="flex space-x-3">
                 <div class="w-1/3">
                   <SimpleInput
                     v-model="course.name"
@@ -142,32 +183,6 @@ const showSubjects = ref(false);
                   />
                 </div>
               </div>
-              <div class="flex space-x-3 mt-8">
-                <div class="w-1/3">
-                  <SimpleInput
-                    v-model="course.room.location.city.name"
-                    label="City"
-                    type="text"
-                    :readonly="true"
-                  />
-                </div>
-                <div class="w-1/3">
-                  <SimpleInput
-                    v-model="course.room.location.name"
-                    label="Address"
-                    type="text"
-                    :readonly="true"
-                  />
-                </div>
-                <div class="w-1/3">
-                  <SimpleInput
-                    v-model="course.room.name"
-                    label="Type"
-                    type="text"
-                    :readonly="true"
-                  />
-                </div>
-              </div>
               <div class="mb-2">
                 <div class="container mx-auto">
                   <div class="py-2">
@@ -180,8 +195,18 @@ const showSubjects = ref(false);
                           Subjects
                         </button>
                         <span class="ml-2 text-md text-blue-500 self-center"
-                          >({{ course.template.subjects.length }})</span
+                          >({{ course.subjects.length }})</span
                         >
+                      </div>
+                      <div
+                        v-if="subjectDifference.message"
+                        class="self-center text-red-500"
+                        v-tooltip="{
+                          content: subjectDifference.failedSubjects,
+                          html: true,
+                        }"
+                      >
+                        {{ subjectDifference.message }}
                       </div>
                       <!-- <Link
                         :href="
@@ -217,13 +242,23 @@ const showSubjects = ref(false);
                               <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                               >
+                                Soll
+                              </th>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                Ist
+                              </th>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
                                 Teachers
                               </th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr
-                              v-for="subject in course.template.subjects"
+                              v-for="subject in course.subjects"
                               :key="subject.id"
                             >
                               <td
@@ -240,6 +275,16 @@ const showSubjects = ref(false);
                                   {{ moment(subject.awaystartdate).week() }}
                                   &nbsp; KW
                                 </p> -->
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                {{ subject.pivot.soll }}
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                {{ subject.pivot.ist }}
                               </td>
                               <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm"

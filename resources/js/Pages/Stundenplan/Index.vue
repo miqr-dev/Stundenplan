@@ -20,32 +20,35 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+    schedualDetails: {
+    type: Array,
+    required: true,
+  },
 });
+
 
 const handleSelection = (data) => {
   const { date, gridSlotItem, selectedOptions } = data;
 
   const form = useForm({
-    date: "",
+    week: "",
     course_id: "",
     grid_slot_id: "",
     start_time: "",
     end_time: "",
-
     subject_id: "",
     teacher_id: "",
     room_id: "",
   });
 
-  form.date = date.format("YYYY-MM-DD");
+  form.week = date.week();
   form.course_id = selectedCourse.value.id;
   form.grid_slot_id = gridSlotItem.id;
   form.start_time = gridSlotItem.start_time;
   form.end_time = gridSlotItem.end_time;
   form.subject_id = selectedOptions[0].id;
   form.teacher_id = selectedOptions[1].id;
-  form.room_id = selectedOptions[3]; // Assuming the room_id is in the 4th selection
-
+  form.room_id = selectedOptions[2];
   form.post("/stundenplan/teachingunit");
 };
 
@@ -94,10 +97,12 @@ const daysWithDates = computed(() => {
         This is the Stundenplan for
         <span class="text-blue-400">{{ selectedCourse.name }}</span> In
         <span class="text-red-400">{{
-          selectedCourse.location.city.name
+          selectedCourse.room.location.city.name
         }}</span>
         At
-        <span class="text-green-400">{{ selectedCourse.location.name }}</span>
+        <span class="text-green-400">{{
+          selectedCourse.room.location.name
+        }}</span>
       </h2>
       <div class="h-full grid place-items-center bg-gray-800 text-white"></div>
     </template>
@@ -189,43 +194,6 @@ const daysWithDates = computed(() => {
                               class="border px-4 py-2"
                               v-if="selectedCourse && selectedWeek"
                             >
-                              <!-- <select
-                                id="teacher-select"
-                                v-model="selectedSubject"
-                              >
-                                <option disabled value="">
-                                  Please select a Subject
-                                </option>
-                                <option
-                                  v-for="subject in selectedCourse.template.subjects"
-                                  :key="subject.id"
-                                  :value="subject"
-                                >
-                                  {{ subject.name }}
-                                </option>
-                              </select>
-                              <select
-                               v-if="selectedSubject"
-                                id="teacher-select"
-                                v-model="selectedTeacher"
-                              >
-                                <option disabled value="">
-                                  Please select a Teacher
-                                </option>
-                                <option
-                                  v-for="teacher in selectedSubject.teachers"
-                                  :key="teacher.id"
-                                  :value="teacher.id"
-                                >
-                                  {{ teacher.surname }}, {{ teacher.name }}
-                                </option>
-                              </select> -->
-                              <!-- <TeachingUnit
-                                :options1="selectedCourse.template.subjects"
-                                :day="day"
-                                :gridSlotItem="gridSlotItem"
-                                @selection="handleSelection"
-                              /> -->
                               <TeachingUnit
                                 :options1="selectedCourse.template.subjects"
                                 :options3="rooms"

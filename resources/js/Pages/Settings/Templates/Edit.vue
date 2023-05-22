@@ -10,14 +10,12 @@ provide("parentComponent", "Edit");
 const props = defineProps({
   template: Object,
   subjects: Array,
-  subject_template: Array,
 });
 
 const form = useForm({
   id: props.template.id,
   name: props.template.name,
   subjects: props.template.subjects,
-  subject_template: props.subject_template,
 });
 
 const update = () => {
@@ -28,6 +26,7 @@ const destroy = () => {
   form.delete(route("template.destroy", form.id));
 };
 </script>
+
 <template>
   <Head title="Template Edit" />
   <BreezeAuthenticatedLayout>
@@ -64,7 +63,6 @@ const destroy = () => {
                   :searchable="true"
                   label="subject"
                   :sollValues="form.subject_template"
-                  @update:sollValues="form.subject_template = $event"
                 ></SimpleItemSelector>
                 <div class="mb-1 flex justify-between">
                   <SimpleDelete @click="destroy" buttonText="Delete Template" />

@@ -12,8 +12,6 @@ class CreateSubjectTemplatePivotTable extends Migration
       $table->unsignedBigInteger('subject_id');
       $table->unsignedBigInteger('template_id');
       $table->unique(['subject_id', 'template_id']);
-      $table->integer('soll')->nullable();
-      $table->integer('ist')->default(0);
       $table->timestamps();
     });
   }

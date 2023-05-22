@@ -1,3 +1,74 @@
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, inject } from "vue";
+import { EllipsisHorizontalIcon } from "@heroicons/vue/20/solid";
+import { Link } from "@inertiajs/vue3";
+import SollValuesComponent from "@/Components/SollValuesComponent.vue";
+
+const parentComponent = inject("parentComponent");
+const dropdownIndex = ref(null);
+const search = ref("");
+const editing = ref({});
+const deselectedSollValues = ref([]);
+const emit = defineEmits(["update:modelValue"]);
+
+const props = defineProps({
+  label: String,
+  items: Array,
+  modelValue: Array,
+  itemName: String,
+  errors: String,
+});
+
+const filteredItems = computed(() => {
+  if (!search.value) {
+    return props.items;
+  }
+  return props.items.filter((item) =>
+    item.name.toLowerCase().includes(search.value.toLowerCase())
+  );
+});
+
+const getDefaultSollValue = (itemId) => {
+  const item = props.items.find((item) => item.id === itemId);
+  return item ? item.default_soll : "";
+};
+
+const getItemName = (itemId) => {
+  const item = props.items.find((item) => item.id === itemId);
+  return item ? { id: itemId, name: item.name } : { id: "", name: "" };
+};
+
+const toggleItem = (itemId) => {
+  const index = props.modelValue.indexOf(itemId);
+  if (index === -1) {
+    props.modelValue.push(itemId);
+  } else {
+    props.modelValue.splice(index, 1);
+  }
+  emit("update:modelValue", props.modelValue);
+};
+
+const toggleDropdown = (index) => {
+  if (dropdownIndex.value === index) {
+    dropdownIndex.value = null;
+  } else {
+    dropdownIndex.value = index;
+  }
+};
+const onClickOutside = (event) => {
+  if (dropdownIndex.value === null) return;
+  dropdownIndex.value = null;
+};
+
+onMounted(() => {
+  window.addEventListener("click", onClickOutside);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("click", onClickOutside);
+});
+</script>
+
 <template>
   <div class="mb-6 flex w-full space-x-3">
     <div class="w-1/2">
@@ -70,14 +141,11 @@
               >
                 {{ index + 1 }}. {{ getItemName(itemId).name }}
               </div>
-              <!-- Display "soll" column if sollValues are provided -->
-              <SollValuesComponent
-                v-if="sollValues.length > 0"
-                :itemId="itemId"
-                :sollValues="sollValues"
-                :items="items"
-                @update:sollValues="sollValues = $event"
-              />
+              <div>
+                <span class="text-emerald-600 ml-2">{{
+                  getDefaultSollValue(itemId)
+                }}</span>
+              </div>
             </div>
             <div class="relative" @click.stop="toggleDropdown(index)">
               <button class="focus:outline-none" type="button">
@@ -115,16 +183,6 @@
                         Edit <span class="capitalize">{{ label }}</span>
                       </Link>
                     </div>
-                    <div
-                      v-if="sollValues.length > 0"
-                      class="flex items-center px-4 py-2 text-sm font-medium"
-                      role="menuitem"
-                    >
-                      Default Soll:
-                      <span class="text-emerald-600 ml-2">{{
-                        getDefaultSollValue(itemId)
-                      }}</span>
-                    </div>
                   </div>
                 </div>
               </template>
@@ -136,108 +194,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount, inject } from "vue";
-import { EllipsisHorizontalIcon } from "@heroicons/vue/20/solid";
-import { Link } from "@inertiajs/vue3";
-import SollValuesComponent from "@/Components/SollValuesComponent.vue";
-
-const parentComponent = inject("parentComponent");
-const dropdownIndex = ref(null);
-const search = ref("");
-const editing = ref({});
-const deselectedSollValues = ref([]);
-const emit = defineEmits(["update:modelValue"]);
-
-const props = defineProps({
-  label: String,
-  items: Array,
-  modelValue: Array,
-  itemName: String,
-  errors: String,
-  sollValues: {
-    type: Array,
-    default: () => [],
-  },
-});
-
-const filteredItems = computed(() => {
-  if (!search.value) {
-    return props.items;
-  }
-  return props.items.filter((item) =>
-    item.name.toLowerCase().includes(search.value.toLowerCase())
-  );
-});
-
-const getDefaultSollValue = (itemId) => {
-  const item = props.items.find((item) => item.id === itemId);
-  return item ? item.default_soll : "";
-};
-
-const getItemName = (itemId) => {
-  const item = props.items.find((item) => item.id === itemId);
-  return item ? { id: itemId, name: item.name } : { id: "", name: "" };
-};
-
-const toggleItem = (itemId) => {
-  const index = props.modelValue.indexOf(itemId);
-  if (index === -1) {
-    props.modelValue.push(itemId);
-
-    // Restore the deselected subject's 'soll' value if it exists in deselectedSollValues
-    const deselectedIndex = deselectedSollValues.value.findIndex(
-      (s) => s.subject_id === itemId
-    );
-    if (deselectedIndex !== -1) {
-      props.sollValues.push(deselectedSollValues.value[deselectedIndex]);
-      deselectedSollValues.value.splice(deselectedIndex, 1);
-    }
-  } else {
-    props.modelValue.splice(index, 1);
-
-    // Save the deselected subject's 'soll' value in deselectedSollValues
-    const sollIndex = props.sollValues.findIndex(
-      (s) => s.subject_id === itemId
-    );
-    if (sollIndex !== -1) {
-      deselectedSollValues.value.push(props.sollValues[sollIndex]);
-      props.sollValues.splice(sollIndex, 1);
-    }
-  }
-  emit("update:modelValue", props.modelValue);
-  emit("update:sollValues", props.sollValues);
-};
-
-const toggleDropdown = (index) => {
-  if (dropdownIndex.value === index) {
-    dropdownIndex.value = null;
-  } else {
-    dropdownIndex.value = index;
-  }
-};
-const onClickOutside = (event) => {
-  // const inputElements = Object.values(editing.value);
-  // if (inputElements.some((input) => input === event.target)) return;
-
-  // for (const itemId in editing.value) {
-  //   if (editing.value[itemId]) {
-  //     setEditing(itemId, false);
-  //   }
-  // }
-
-  if (dropdownIndex.value === null) return;
-  dropdownIndex.value = null;
-};
-
-onMounted(() => {
-  window.addEventListener("click", onClickOutside);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("click", onClickOutside);
-});
-</script>
 <style scoped>
 .item {
   background-color: white;

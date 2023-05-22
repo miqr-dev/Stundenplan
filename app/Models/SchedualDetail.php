@@ -13,6 +13,26 @@ class SchedualDetail extends Model
 
   public function master()
   {
-    return $this->belongsTo(SchedualDetail::class);
+    return $this->belongsTo(SchedualMaster::class, 'schedual_master_id');
+  }
+
+  public function gridSlot()
+  {
+    return $this->belongsTo(GridSlot::class);
+  }
+
+  public function subject()
+  {
+    return $this->belongsTo(Subject::class);
+  }
+
+  public function teacher()
+  {
+    return $this->belongsTo(Teacher::class);
+  }
+
+  public function room()
+  {
+    return $this->belongsTo(Room::class);
   }
 }

@@ -19,17 +19,17 @@ class Course extends Model
   ];
 
   protected $fillable = [
-  'room_id',
-  'template_id',
-  'grid_id',
-  'name',
-  'start_date',
-  'end_date',
-  'color',
-  'type',
-  'lbrn',
-  'description',
-  'active',
+    'room_id',
+    'template_id',
+    'grid_id',
+    'name',
+    'start_date',
+    'end_date',
+    'color',
+    'type',
+    'lbrn',
+    'description',
+    'active',
   ];
 
   public function room()
@@ -54,5 +54,12 @@ class Course extends Model
   public function grid()
   {
     return $this->belongsTo(Grid::class);
+  }
+  public function subjects()
+  {
+    return $this->belongsToMany(Subject::class)
+      ->using(CourseSubject::class)
+      ->withPivot('template_id', 'soll', 'ist')
+      ->withTimestamps();
   }
 }

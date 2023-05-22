@@ -11,15 +11,15 @@ class CreateSchedualMastersTable extends Migration
    *
    * @return void
    */
-  public function up()
-  {
-    Schema::create('schedual_masters', function (Blueprint $table) {
-      $table->id();
-      $table->foreignId('course_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-      $table->date('date')->index();
-      $table->timestamps();
-    });
-  }
+public function up()
+{
+  Schema::create('schedual_masters', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('course_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+    $table->integer('calendar_week')->index();
+    $table->timestamps();
+  });
+}
 
   /**
    * Reverse the migrations.

@@ -9,10 +9,14 @@ class SchedualMaster extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date','course_id'];
+    protected $fillable = ['calendar_week','course_id'];
+  public function schedualDetails()
+  {
+    return $this->hasMany(SchedualDetail::class);
+  }
 
-    public function details()
+    public function course()
     {
-      return $this->hasMany(SchedualDetail::class);
-    } 
+      return $this->belongsTo(Course::class);
+    }
 }

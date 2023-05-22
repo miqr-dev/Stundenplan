@@ -25,6 +25,10 @@ const props = defineProps({
   date: {
     type: Object,
   },
+    teachingUnits: { // Add this prop to get existing teaching units
+    type: Array,
+    required: true,
+  },
 });
 
 const closeAndEmit = () => {
@@ -45,6 +49,10 @@ const selectedOption1Style = computed(() => {
   return selectedOption1.value
     ? { backgroundColor: selectedOption1.value.color, color: "white" }
     : {};
+});
+
+const selectedRoom = computed(() => {
+  return props.options3.find((room) => room.id === selectedOption3.value);
 });
 
 const selectSlot = () => {
@@ -91,8 +99,19 @@ const groupedRooms = computed(() => {
       <div v-if="selectedOption2">
         {{ selectedOption2.surname }}, {{ selectedOption2.name }}
       </div>
-<div v-if="selectedOption3">{{ selectedOption3.name }} - {{ selectedOption3.room_number }}</div>
+      <div v-if="selectedRoom">
+        {{ selectedRoom.name }} - {{ selectedRoom.room_number }}
+      </div>
 
+      <!-- Display existing teaching units if they exist -->
+      <div v-if="teachingUnits && teachingUnits.length">
+        <h3>Existing Teaching Units</h3>
+        <ul>
+          <li v-for="unit in teachingUnits" :key="unit.id">
+            {{ unit.subject.name }} by {{ unit.teacher.surname }}, {{ unit.teacher.name }} in room {{ unit.room.name }} - {{ unit.room.room_number }}
+          </li>
+        </ul>
+      </div>
 
       <div v-if="selectedOption4">{{ selectedOption4 }}</div>
       <button
@@ -143,7 +162,7 @@ const groupedRooms = computed(() => {
               :key="locationName"
               :label="locationName"
             >
-              <option v-for="room in roomGroup" :key="room.id" :value="room">
+              <option v-for="room in roomGroup" :key="room.id" :value="room.id">
                 {{ room.name }} {{ room.room_number }}
               </option>
             </optgroup>

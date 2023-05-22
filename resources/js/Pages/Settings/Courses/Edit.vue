@@ -2,7 +2,7 @@
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
-import { ref } from "vue";
+import { ref, reactive, watch } from "vue";
 
 const props = defineProps({
   course: Object,
@@ -18,9 +18,24 @@ const form = useForm({
   lbrn: props.course.lbrn,
   room_id: props.course.room_id,
   template_id: props.course.template_id,
+  subjects: props.course.subjects,
 });
 
 const selectedCity = ref(props.course.location_id);
+
+const subjectClasses = reactive(new Array(form.subjects.length).fill('text-green-600'));
+
+let initialSubjects = form.subjects.map(s => s.pivot.soll);
+
+watch(
+  () => form.subjects,
+  (newVal, oldVal) => {
+    for (let i = 0; i < newVal.length; i++) {
+      subjectClasses[i] = initialSubjects[i] === newVal[i].pivot.soll ? 'text-green-600' : 'text-blue-600';
+    }
+  },
+  { deep: true }
+);
 
 const update = () => {
   form.patch(route("course.update", form.id));
@@ -123,6 +138,7 @@ const destroy = () => {
                     id="template_id"
                     class="w-full p-2 border border-gray-400 bg-white rounded"
                     v-model="form.template_id"
+                    disabled
                   >
                     <option
                       v-for="template in templates"
@@ -132,10 +148,27 @@ const destroy = () => {
                       {{ template.name }}
                     </option>
                   </select>
+
                   <span v-if="form.errors.template_id" class="error">{{
                     errors.template_id
                   }}</span>
                 </div>
+  <div class="mb-6">
+    <h2 class="mb-4 text-xl font-bold text-gray-700">Subjects</h2>
+    <div
+      v-for="(subject, index) in form.subjects"
+      :key="subject.id"
+      class="flex items-center mb-2"
+    >
+      <label class="mr-4 text-sm font-bold text-gray-700">{{ subject.name }}</label>
+      <input
+        v-model="form.subjects[index].pivot.soll"
+        type="number"
+        min="0"
+        :class="`w-24 px-3 py-2 border rounded text-gray-700 focus:outline-none focus:shadow-outline ${subjectClasses[index]}`"
+      />
+    </div>
+  </div>
                 <div class="mb-1 flex justify-between">
                   <SimpleDelete @click="destroy" buttonText="Delete Course" />
                   <SimpleSubmit :processing="form.processing" />

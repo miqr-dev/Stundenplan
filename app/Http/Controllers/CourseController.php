@@ -9,7 +9,9 @@ use Inertia\Inertia;
 use App\Models\Course;
 use App\Models\Location;
 use App\Models\Template;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
@@ -39,7 +41,7 @@ class CourseController extends Controller
   {
     $user = Auth::user();
     $city_id = City::where('name', $user->ort)->value('id');
-    $templates = Template::all();
+    $templates = Template::with('subjects')->get();
     $grids = Grid::all();
 
     // Fetch locations in the given city
@@ -53,6 +55,7 @@ class CourseController extends Controller
       'grids' => $grids,
       'locations' => $locations,
       'rooms' => $rooms,
+      'subjects' => 'required|array',
     ]);
   }
 
@@ -80,17 +83,34 @@ class CourseController extends Controller
     $course->room_id = $request->room_id;
     $course->grid_id = $request->grid_id;
     $course->template_id = $request->template_id;
+
     $course->save();
+
+    $subjects = [];
+    foreach ($request->subjects as $subject) {
+      $subjects[$subject['id']] = [
+        'soll' => $subject['soll'], // Save the modified soll value
+        'template_id' => $request->template_id,
+      ];
+    }
+    $course->subjects()->attach($subjects);
 
     return redirect()->route('course.index')->with('success', 'Course created successfully.');
   }
 
   public function show(Course $course)
   {
+    $city_id = $course->room->location->city->id;
+
     $course = $course->load([
-      'template.subjects.teachers' => function ($query) use ($course) {
-        $query->whereHas('cities', function ($query) use ($course) {
-          $query->where('id', $course->room->location->city->id);
+      'template.subjects.teachers' => function ($query) use ($city_id) {
+        $query->whereHas('cities', function ($query) use ($city_id) {
+          $query->where('id', $city_id);
+        });
+      },
+      'subjects.teachers' => function ($query) use ($city_id) {
+        $query->whereHas('cities', function ($query) use ($city_id) {
+          $query->where('id', $city_id);
         });
       }
     ]);
@@ -108,6 +128,10 @@ class CourseController extends Controller
     $locations = City::where('id', $city_id)->with('locations')->first()->locations;
     // Fetch rooms with their related locations in the given city
     $rooms = Room::with('location')->whereIn('location_id', $locations->pluck('id'))->get();
+    $subjects = $course->subjects;
+       $course = $course->load(['subjects' => function ($query) use ($course) {
+        $query->wherePivot('course_id', $course->id);
+    }]);
 
     return Inertia::render('Settings/Courses/Edit', [
       'course' => $course,
@@ -119,23 +143,41 @@ class CourseController extends Controller
         ];
       }),
       'rooms' => $rooms,
+      'subjects' => $subjects->map(function ($subject) {
+        return [
+          'id' => $subject->id,
+          'name' => $subject->name,
+          'soll_stunden' => $subject->soll_stunden,
+        ];
+      }),
     ]);
   }
 
-  public function update(Request $request, Course $course)
-  {
+public function update(Request $request, Course $course)
+{
     $validated = $request->validate([
-      'name' => 'required',
-      'type' => 'required',
-      'lbrn' => 'required',
-      'room_id' => '',
-      'template_id' => 'required|exists:templates,id',
+        'name' => 'required',
+        'type' => 'required',
+        'lbrn' => 'required',
+        'room_id' => '',
+        'template_id' => 'required|exists:templates,id',
+        'subjects.*.id' => 'exists:subjects,id',
+        'subjects.*.pivot.soll' => 'required|numeric',
     ]);
 
-    $course->update($validated);
+    // Handle course data
+    $courseData = Arr::except($validated, ['subjects']);
+    $course->update($courseData);
+
+    // Handle subjects and soll_stunden
+    $subjectsData = [];
+    foreach ($validated['subjects'] as $subject) {
+        $subjectsData[$subject['id']] = ['soll' => $subject['pivot']['soll']];
+    }
+    $course->subjects()->sync($subjectsData);
 
     return redirect()->route('course.index')->with('success', 'Course updated successfully.');
-  }
+}
 
   public function destroy(Course $course)
   {
