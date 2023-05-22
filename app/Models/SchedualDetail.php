@@ -9,7 +9,7 @@ class SchedualDetail extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['schedual_master_id', 'start_time', 'end_time', 'is_break', 'subject_id', 'teacher_id', 'room_id', 'grid_slot_id'];
+  protected $fillable = ['schedual_master_id', 'start_time', 'end_time', 'is_break', 'subject_id', 'teacher_id', 'room_id', 'grid_slot_id','date'];
 
   public function master()
   {

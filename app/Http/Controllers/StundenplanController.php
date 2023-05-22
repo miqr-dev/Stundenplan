@@ -65,7 +65,7 @@ class StundenplanController extends Controller
   public function teachingunit(Request $request)
   {
     $validated = $request->validate([
-      'week' => 'required|integer', // change here
+      'week' => 'required|integer',
       'course_id' => 'required|integer',
       'grid_slot_id' => 'required|integer',
       'start_time' => 'required',
@@ -73,10 +73,11 @@ class StundenplanController extends Controller
       'subject_id' => 'required|integer',
       'teacher_id' => '',
       'room_id' => '',
+      'date' => 'required|date',
     ]);
 
     $master = SchedualMaster::firstOrCreate([
-      'calendar_week' => $validated['week'], // and here
+      'calendar_week' => $validated['week'],
       'course_id' => $validated['course_id'],
     ]);
 
@@ -88,6 +89,7 @@ class StundenplanController extends Controller
       'end_time' => $validated['end_time'],
       'teacher_id' => $validated['teacher_id'],
       'room_id' => $validated['room_id'],
+      'date' => $validated['date'],
     ]);
 
     return redirect()->back()->with('success', 'Unit saved successfully.');

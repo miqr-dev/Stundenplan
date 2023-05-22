@@ -39,9 +39,11 @@ const handleSelection = (data) => {
     subject_id: "",
     teacher_id: "",
     room_id: "",
+    date: "",
   });
 
   form.week = date.week();
+  form.date = date.format("YYYY-MM-DD");  // Add this line
   form.course_id = selectedCourse.value.id;
   form.grid_slot_id = gridSlotItem.id;
   form.start_time = gridSlotItem.start_time;

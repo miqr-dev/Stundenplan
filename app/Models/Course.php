@@ -62,4 +62,8 @@ class Course extends Model
       ->withPivot('template_id', 'soll', 'ist')
       ->withTimestamps();
   }
+
+  public function schedualMaster() {
+    return $this->hasOne(SchedualMaster::class);
+}
 }
