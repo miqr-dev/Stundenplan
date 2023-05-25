@@ -17,6 +17,7 @@ public function up()
     $table->id();
     $table->foreignId('course_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
     $table->integer('calendar_week')->index();
+          $table->date('date')->nullable()->index();
     $table->timestamps();
   });
 }

@@ -23,7 +23,6 @@ class CreateSchedualDetailsTable extends Migration
       $table->foreignId('subject_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->foreignId('teacher_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->foreignId('room_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-      $table->date('date')->nullable();
       $table->timestamps();
     });
   }
