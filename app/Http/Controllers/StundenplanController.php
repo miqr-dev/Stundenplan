@@ -79,6 +79,7 @@ class StundenplanController extends Controller
     $master = SchedualMaster::firstOrCreate([
       'calendar_week' => $validated['week'],
       'course_id' => $validated['course_id'],
+      'date' => $validated['date'],
     ]);
 
     $detail = SchedualDetail::create([
@@ -89,7 +90,6 @@ class StundenplanController extends Controller
       'end_time' => $validated['end_time'],
       'teacher_id' => $validated['teacher_id'],
       'room_id' => $validated['room_id'],
-      'date' => $validated['date'],
     ]);
 
     return redirect()->back()->with('success', 'Unit saved successfully.');
