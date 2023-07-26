@@ -1,6 +1,9 @@
 <script setup>
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed, defineEmits, onMounted, watch } from "vue";
 import moment from "moment";
+import { router } from '@inertiajs/vue3';
+import axios from 'axios';
+
 
 const props = defineProps({
   options1: {
@@ -25,11 +28,45 @@ const props = defineProps({
   date: {
     type: Object,
   },
-    teachingUnits: { // Add this prop to get existing teaching units
-    type: Array,
+    courseId: {
+    type: Number,
+    required: true,
+  },
+  calendarWeek: {
+    type: Number,
     required: true,
   },
 });
+
+// onMounted(() => {
+//   router.visit('/stundenplan/checkTeachingUnit', {
+//   method: 'get',
+//   data: {
+//     course_id: props.courseId,
+//     week: props.calendarWeek,
+//     date: props.date.format("YYYY-MM-DD"), // make sure the date is formatted correctly
+//     start_time: props.gridSlotItem.start_time,
+//     end_time: props.gridSlotItem.end_time},
+//   });
+// });
+
+onMounted(() => {
+  checkTeachingUnit();
+});
+
+const checkTeachingUnit = async () => {
+  const { data } = await axios.post("/stundenplan/check-teaching-unit", {
+    week: props.calendarWeek,
+    course_id: props.courseId,
+    start_time: props.gridSlotItem.start_time,
+    end_time: props.gridSlotItem.end_time,
+    date: props.date.format("YYYY-MM-DD"),
+  });
+
+  if (data.dataExists) {
+    console.log(data.dataExists);
+  }
+};
 
 const closeAndEmit = () => {
   emitSelection();
@@ -104,14 +141,14 @@ const groupedRooms = computed(() => {
       </div>
 
       <!-- Display existing teaching units if they exist -->
-      <div v-if="teachingUnits && teachingUnits.length">
+      <!-- <div v-if="teachingUnits && teachingUnits.length">
         <h3>Existing Teaching Units</h3>
         <ul>
           <li v-for="unit in teachingUnits" :key="unit.id">
             {{ unit.subject.name }} by {{ unit.teacher.surname }}, {{ unit.teacher.name }} in room {{ unit.room.name }} - {{ unit.room.room_number }}
           </li>
         </ul>
-      </div>
+      </div> -->
 
       <div v-if="selectedOption4">{{ selectedOption4 }}</div>
       <button

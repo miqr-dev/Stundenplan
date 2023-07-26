@@ -20,12 +20,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-    schedualDetails: {
-    type: Array,
-    required: true,
-  },
 });
-
 
 const handleSelection = (data) => {
   const { date, gridSlotItem, selectedOptions } = data;
@@ -43,7 +38,7 @@ const handleSelection = (data) => {
   });
 
   form.week = date.week();
-  form.date = date.format("YYYY-MM-DD");  // Add this line
+  form.date = date.format("YYYY-MM-DD"); // Add this line
   form.course_id = selectedCourse.value.id;
   form.grid_slot_id = gridSlotItem.id;
   form.start_time = gridSlotItem.start_time;
@@ -89,7 +84,7 @@ const daysWithDates = computed(() => {
 </script>
 
 <template>
-  <Head :title="'Stundenplan for ' + cityName" />
+  <Head :title="'Stundenplan'" />
   <BreezeAuthenticatedLayout>
     <template #header>
       <h2
@@ -202,6 +197,8 @@ const daysWithDates = computed(() => {
                                 :day="dayWithDate.day"
                                 :date="dayWithDate.date"
                                 :gridSlotItem="gridSlotItem"
+                                :courseId="selectedCourse.id"
+                                :calendarWeek="selectedWeek"
                                 @selection="
                                   (...args) => handleSelection(...args)
                                 "

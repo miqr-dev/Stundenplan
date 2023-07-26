@@ -26,30 +26,34 @@ class StundenplanController extends Controller
   {
     $user = Auth::user();
     $city_id = City::where('name', $user->ort)->value('id');
-
     $courses = Course::whereHas('room.location', function ($query) use ($city_id) {
       $query->where('city_id', $city_id);
     })->with(['grid.gridslots', 'room.location.city', 'template.subjects.teachers'])->get();
-
     $rooms = Room::whereHas('location', function ($query) use ($city_id) {
       $query->where('city_id', $city_id);
     })->with('location')->get();
 
+
     $currentMonday = Carbon::now()->startOfWeek();
     $endOfYear = Carbon::now()->endOfYear();
-
     $mondays = [];
     while ($currentMonday->lte($endOfYear)) {
       $mondays[] = $currentMonday->toDateString();
       $currentMonday->addWeek();
     }
     $weekNumbers = Week::whereIn('startDate', $mondays)->get();
+    return inertia('Stundenplan/Index', ['courses' => $courses, 'weekNumbers' => $weekNumbers, 'rooms' => $rooms,]);
+  }
 
-    return inertia('Stundenplan/Index', [
-      'courses' => $courses,
-      'weekNumbers' =>  $weekNumbers,
-      'rooms' => $rooms, // Include rooms with their locations here
-    ]);
+  public function getSchedualDetails($id)
+  {
+    $course = Course::where('id', $id)->with('schedualMaster.schedualDetails')->first();
+
+    if (!$course) {
+      return response()->json(['error' => 'Course not found'], 404);
+    }
+
+    return Inertia::render('CourseDetails', ['details' => $course->schedualMaster->schedualDetails]);
   }
 
   /**
@@ -76,6 +80,27 @@ class StundenplanController extends Controller
       'date' => 'required|date',
     ]);
 
+    // Check for existing master
+    $existingMaster = SchedualMaster::where([
+      'calendar_week' => $validated['week'],
+      'course_id' => $validated['course_id'],
+      'date' => $validated['date'],
+    ])->first();
+
+    if ($existingMaster) {
+      // Check for existing detail
+      $existingDetail = SchedualDetail::where([
+        'schedual_master_id' => $existingMaster->id,
+        'start_time' => $validated['start_time'],
+        'end_time' => $validated['end_time'],
+      ])->first();
+
+      if ($existingDetail) {
+        // Delete the detail
+        $existingDetail->delete();
+      }
+    }
+
     $master = SchedualMaster::firstOrCreate([
       'calendar_week' => $validated['week'],
       'course_id' => $validated['course_id'],
@@ -94,6 +119,40 @@ class StundenplanController extends Controller
 
     return redirect()->back()->with('success', 'Unit saved successfully.');
   }
+
+public function checkTeachingUnit(Request $request)
+{
+    $request->validate([
+        'course_id' => 'required|integer',
+        'week' => 'required|integer',
+        'date' => 'required|date',
+        'start_time' => 'required',
+        'end_time' => 'required',
+    ]);
+
+    $master = SchedualMaster::where([
+        'calendar_week' => $request->week,
+        'course_id' => $request->course_id,
+        'date' => $request->date,
+    ])->first();
+
+    if (!$master) {
+        return response()->json(['dataExists' => false]);
+    }
+
+    $detail = SchedualDetail::where([
+        'schedual_master_id' => $master->id,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
+    ])->first();
+
+    if ($detail === null) {
+        return response()->json(['dataExists' => false]);
+    } else {
+        return response()->json(['dataExists' => true, 'detail' => $detail]);
+    }
+}
+
   public function store(Request $request)
   {
   }
