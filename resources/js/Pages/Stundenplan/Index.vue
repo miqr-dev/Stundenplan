@@ -4,6 +4,7 @@ import { Head, router } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 import moment from "moment";
 import TeachingUnit from "@/Components/TeachingUnit.vue";
+import Sidebar from "@/Components/Sidebar.vue";
 
 import { useForm } from "@inertiajs/vue3";
 
@@ -21,6 +22,12 @@ const props = defineProps({
     required: true,
   },
 });
+
+const isOpen = ref(false); // sidebar is closed by default
+
+const toggleSidebar = () => {
+  isOpen.value = !isOpen.value;
+};
 
 const handleSelection = (data) => {
   const { date, gridSlotItem, selectedOptions } = data;
@@ -43,10 +50,11 @@ const handleSelection = (data) => {
   form.grid_slot_id = gridSlotItem.id;
   form.start_time = gridSlotItem.start_time;
   form.end_time = gridSlotItem.end_time;
-  form.subject_id = selectedOptions[0].id;
-  form.teacher_id = selectedOptions[1].id;
+  form.subject_id = selectedOptions[0];
+  form.teacher_id = selectedOptions[1];
   form.room_id = selectedOptions[2];
   form.post("/stundenplan/teachingunit");
+  
 };
 
 const selectedCourse = ref(null);
@@ -80,6 +88,44 @@ const daysWithDates = computed(() => {
   );
 });
 
+const selectedCourseTeachers = computed(() => {
+  // If no course is selected or the selected course doesn't have subjects,
+  // return an empty array.
+  if (
+    !selectedCourse.value ||
+    !selectedCourse.value.template ||
+    !selectedCourse.value.template.subjects
+  ) {
+    return [];
+  }
+
+  // Extract all the teachers from the subjects of the selected course.
+  const teachers = new Set();
+  selectedCourse.value.template.subjects.forEach((subject) => {
+    if (subject.teachers && subject.teachers.length > 0) {
+      subject.teachers.forEach((teacher) => {
+        teachers.add(teacher);
+      });
+    }
+  });
+
+  // Return the unique list of teachers as an array.
+  return Array.from(teachers);
+});
+
+// color the Calendar week select box
+const getWeekStatus = (weekNumber) => {
+  const currentWeekNumber = moment().week();
+
+  if (weekNumber < currentWeekNumber) {
+    return "past";
+  } else if (weekNumber > currentWeekNumber) {
+    return "future";
+  } else {
+    return "current";
+  }
+};
+
 // Add any other reactive variables, computed properties or methods here.
 </script>
 
@@ -108,37 +154,61 @@ const daysWithDates = computed(() => {
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
           <div class="p-6 bg-white border-b border-gray-200">
             <div>
-              <div class="flex">
-                <div>
-                  <label for="course-select">Select a Course:</label>
-                  <select id="course-select" v-model="selectedCourse">
-                    <option disabled value="">Please select a course</option>
-                    <option
-                      v-for="courseItem in courses"
-                      :key="courseItem.id"
-                      :value="courseItem"
+              <div class="flex justify-between">
+                <div class="flex space-x-4">
+                  <div>
+                    <label for="course-select">Select a Course:</label>
+                    <select
+                      id="course-select"
+                      v-model="selectedCourse"
+                      class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
-                      {{ courseItem.name }}
-                    </option>
-                  </select>
-                </div>
-                <div>
-                  <label for="calenderweek-select"
-                    >Select the Calendar Week</label
-                  >
-                  <select id="calenderweek-select" v-model="selectedWeek">
-                    <option disabled value="">Please select a week</option>
-                    <option
-                      v-for="item in weekNumbers"
-                      :key="item.id"
-                      :value="item.WeekNumber"
+                      <option disabled value="">Please select a course</option>
+                      <option
+                        v-for="courseItem in courses"
+                        :key="courseItem.id"
+                        :value="courseItem"
+                      >
+                        {{ courseItem.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="calenderweek-select"
+                      >Select the Calendar Week</label
                     >
-                      {{ item.WeekNumber }}
-                    </option>
-                  </select>
+                    <select
+                      id="calenderweek-select"
+                      v-model="selectedWeek"
+                      class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                      <option disabled value="">Please select a week</option>
+                      <option
+                        v-for="item in weekNumbers"
+                        :key="item.id"
+                        :value="item.WeekNumber"
+                        :class="{
+                          'bg-red-50 text-red-600':
+                            getWeekStatus(item.WeekNumber) === 'past',
+                          'bg-blue-50 text-blue-600':
+                            getWeekStatus(item.WeekNumber) === 'future',
+                          'bg-green-50 text-green-600':
+                            getWeekStatus(item.WeekNumber) === 'current',
+                        }"
+                      >
+                        {{ item.WeekNumber }}
+                      </option>
+                    </select>
+                  </div>
                 </div>
+                <button
+                  @click="toggleSidebar"
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-full self-center"
+                >
+                  
+                   Details
+                </button>
               </div>
-
               <div v-if="selectedCourse">
                 <div>
                   <h3>Grid {{ selectedCourse.grid.name }}</h3>
@@ -188,7 +258,7 @@ const daysWithDates = computed(() => {
                           <template v-for="dayWithDate in daysWithDates">
                             <!-- Conditionally render the button if a course and week have been selected -->
                             <td
-                              class="border px-4 py-2"
+                              class="border px-1 py-1"
                               v-if="selectedCourse && selectedWeek"
                             >
                               <TeachingUnit
@@ -199,6 +269,7 @@ const daysWithDates = computed(() => {
                                 :gridSlotItem="gridSlotItem"
                                 :courseId="selectedCourse.id"
                                 :calendarWeek="selectedWeek"
+                                :teachers="selectedCourseTeachers"
                                 @selection="
                                   (...args) => handleSelection(...args)
                                 "
@@ -220,5 +291,10 @@ const daysWithDates = computed(() => {
         </div>
       </div>
     </div>
+    <Sidebar
+      :isOpen="isOpen"
+      :toggleSidebar="toggleSidebar"
+      :teachers="selectedCourseTeachers"
+    />
   </BreezeAuthenticatedLayout>
 </template>

@@ -28,16 +28,17 @@ class StundenplanController extends Controller
     $city_id = City::where('name', $user->ort)->value('id');
     $courses = Course::whereHas('room.location', function ($query) use ($city_id) {
       $query->where('city_id', $city_id);
-    })->with(['grid.gridslots', 'room.location.city', 'template.subjects.teachers'])->get();
+    })->with(['grid.gridslots', 'room.location.city', 'template.subjects.teachers.teacherNotAvailable'])->get();
     $rooms = Room::whereHas('location', function ($query) use ($city_id) {
       $query->where('city_id', $city_id);
     })->with('location')->get();
 
 
-    $currentMonday = Carbon::now()->startOfWeek();
-    $endOfYear = Carbon::now()->endOfYear();
+    $currentMonday = Carbon::now()->startOfWeek()->subWeeks(10);
+    $endOfWeek = Carbon::now()->startOfWeek()->addWeek(10);
+
     $mondays = [];
-    while ($currentMonday->lte($endOfYear)) {
+    while ($currentMonday->lte($endOfWeek)) {
       $mondays[] = $currentMonday->toDateString();
       $currentMonday->addWeek();
     }
@@ -45,16 +46,6 @@ class StundenplanController extends Controller
     return inertia('Stundenplan/Index', ['courses' => $courses, 'weekNumbers' => $weekNumbers, 'rooms' => $rooms,]);
   }
 
-  public function getSchedualDetails($id)
-  {
-    $course = Course::where('id', $id)->with('schedualMaster.schedualDetails')->first();
-
-    if (!$course) {
-      return response()->json(['error' => 'Course not found'], 404);
-    }
-
-    return Inertia::render('CourseDetails', ['details' => $course->schedualMaster->schedualDetails]);
-  }
 
   /**
    * Show the form for creating a new resource.
@@ -74,7 +65,7 @@ class StundenplanController extends Controller
       'grid_slot_id' => 'required|integer',
       'start_time' => 'required',
       'end_time' => 'required',
-      'subject_id' => 'required|integer',
+      'subject_id' => 'required',
       'teacher_id' => '',
       'room_id' => '',
       'date' => 'required|date',
@@ -110,48 +101,48 @@ class StundenplanController extends Controller
     $detail = SchedualDetail::create([
       'schedual_master_id' => $master->id,
       'grid_slot_id' => $validated['grid_slot_id'],
-      'subject_id' => $validated['subject_id'],
+      'subject_id' => $validated['subject_id']['id'],
       'start_time' => $validated['start_time'],
       'end_time' => $validated['end_time'],
-      'teacher_id' => $validated['teacher_id'],
+      'teacher_id' => $validated['teacher_id'] ? $validated['teacher_id']['id'] : null, // check if 'teacher_id' is not null before accessing 'id'
       'room_id' => $validated['room_id'],
     ]);
 
     return redirect()->back()->with('success', 'Unit saved successfully.');
   }
 
-public function checkTeachingUnit(Request $request)
-{
+  public function checkTeachingUnit(Request $request)
+  {
     $request->validate([
-        'course_id' => 'required|integer',
-        'week' => 'required|integer',
-        'date' => 'required|date',
-        'start_time' => 'required',
-        'end_time' => 'required',
+      'course_id' => 'required|integer',
+      'week' => 'required|integer',
+      'date' => 'required|date',
+      'start_time' => 'required',
+      'end_time' => 'required',
     ]);
 
     $master = SchedualMaster::where([
-        'calendar_week' => $request->week,
-        'course_id' => $request->course_id,
-        'date' => $request->date,
+      'calendar_week' => $request->week,
+      'course_id' => $request->course_id,
+      'date' => $request->date,
     ])->first();
 
     if (!$master) {
-        return response()->json(['dataExists' => false]);
+      return response()->json(['dataExists' => false]);
     }
 
-    $detail = SchedualDetail::where([
-        'schedual_master_id' => $master->id,
-        'start_time' => $request->start_time,
-        'end_time' => $request->end_time,
+    $detail = SchedualDetail::with('subject', 'teacher', 'room')->where([
+      'schedual_master_id' => $master->id,
+      'start_time' => $request->start_time,
+      'end_time' => $request->end_time,
     ])->first();
 
     if ($detail === null) {
-        return response()->json(['dataExists' => false]);
+      return response()->json(['dataExists' => false]);
     } else {
-        return response()->json(['dataExists' => true, 'detail' => $detail]);
+      return response()->json(['dataExists' => true, 'detail' => $detail]);
     }
-}
+  }
 
   public function store(Request $request)
   {
