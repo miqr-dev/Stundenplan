@@ -59,8 +59,6 @@ const handleSelection = (data) => {
 
 const selectedCourse = ref(null);
 const selectedWeek = ref(null);
-const selectedSubject = ref(null);
-const selectedTeacher = ref(null);
 
 const weekDates = computed(() => {
   if (!selectedWeek.value) return [];
@@ -137,7 +135,6 @@ const getWeekStatus = (weekNumber) => {
         class="font-semibold text-xl text-gray-800 leading-tight"
         v-if="selectedCourse"
       >
-        This is the Stundenplan for
         <span class="text-blue-400">{{ selectedCourse.name }}</span> In
         <span class="text-red-400">{{
           selectedCourse.room.location.city.name
@@ -145,6 +142,13 @@ const getWeekStatus = (weekNumber) => {
         At
         <span class="text-green-400">{{
           selectedCourse.room.location.name
+        }}</span>
+        In
+        <span class="text-green-400">{{
+          selectedCourse.room.name
+        }}</span> ,
+        <span class="text-green-400">{{
+          selectedCourse.room.room_number
         }}</span>
       </h2>
       <div class="h-full grid place-items-center bg-gray-800 text-white"></div>
@@ -262,8 +266,9 @@ const getWeekStatus = (weekNumber) => {
                               v-if="selectedCourse && selectedWeek"
                             >
                               <TeachingUnit
-                                :options1="selectedCourse.template.subjects"
-                                :options3="rooms"
+                                :subjects="selectedCourse.template.subjects"
+                                :default_room= "selectedCourse.room_id"
+                                :rooms="rooms"
                                 :day="dayWithDate.day"
                                 :date="dayWithDate.date"
                                 :gridSlotItem="gridSlotItem"
