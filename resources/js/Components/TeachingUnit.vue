@@ -13,14 +13,14 @@ import {
 import axios from "axios";
 
 const props = defineProps({
-  options1: {
+  subjects: {
     type: Array,
     required: true,
   },
   options2: {
     type: Array,
   },
-  options3: {
+  rooms: {
     type: Array,
     required: true,
   },
@@ -46,7 +46,12 @@ const props = defineProps({
   teachers: {
     type: Array,
   },
+  default_room:{
+  type: Number,
+  required: true,
+  },
 });
+
 
 // fill out the table with each hours info
 const teachingUnitData = ref(null);
@@ -70,9 +75,13 @@ const checkTeachingUnit = async () => {
 
   if (data.dataExists) {
     teachingUnitData.value = data.detail;
+  } else {
+    // if there is no record, set selectedOption3 to default_room
+    selectedOption3.value = props.default_room;
   }
   return data;
 };
+
 
 // Watch for changes in courseId or calendarWeek, and re-fetch data if changed
 watch(
@@ -90,7 +99,7 @@ watch(
     console.log("selectedOption1 updated:", selectedOption1);
 
     // Find the selected subject by its id
-    let selectedSubject = props.options1.find(
+    let selectedSubject = props.subjects.find(
       (subject) => subject.id === selectedOption1
     );
     // Check for each teacher's availability
@@ -118,7 +127,7 @@ const showModal = ref(false);
 // Function to load saved data on page not on Table cells if available
 const loadSavedData = () => {
   if (teachingUnitData.value) {
-    selectedOption1.value = props.options1.find(
+    selectedOption1.value = props.subjects.find(
       (option) => option.id === teachingUnitData.value.subject.id
     );
     console.log("selected Option1".selectedOption1);
@@ -127,10 +136,23 @@ const loadSavedData = () => {
         (teacher) => teacher.id === teachingUnitData.value.teacher.id
       );
     }
-    selectedOption3.value = teachingUnitData.value.room.id;
-    // Fill selectedOption4.value similarly, if needed
+    // check that teachingUnitData.value.room is defined before setting selectedOption3
+    if (teachingUnitData.value && teachingUnitData.value.room) {
+      selectedOption3.value = teachingUnitData.value.room.id;
+    }
   }
 };
+
+// Styling room default or Manual dropdown
+const selectedOption3Class = computed(() => {
+  return selectedOption3.value === props.default_room ? 'bg-green-300' : 'bg-blue-300';
+});
+
+// Styling room default or Manual show
+const divStyle = computed(() => {
+  return selectedOption3.value === props.default_room ? 'bg-green-100' : 'bg-blue-100';
+});
+
 
 const teachersOnLeave = computed(() => {
   return props.teachers.filter(isTeacherOnLeave);
@@ -179,7 +201,7 @@ watch(
 
 // computed property to find selected room
 const selectedRoom = computed(() => {
-  return props.options3.find((room) => room.id === selectedOption3.value);
+  return props.rooms.find((room) => room.id === selectedOption3.value);
 });
 
 const emitSelection = () => {
@@ -204,7 +226,7 @@ const closeAndEmit = async () => {
 
 // computed property to group rooms by location
 const groupedRooms = computed(() => {
-  return props.options3.reduce((result, room) => {
+  return props.rooms.reduce((result, room) => {
     const locationName = room.location.name;
     if (result[locationName]) {
       result[locationName].push(room);
@@ -229,7 +251,12 @@ watch(
 
 // computed property to determine status icon
 const statusIcon = computed(() => {
-  if (
+  if(!teachingUnitData.value)
+      return {
+      component: XMarkIcon,
+      color: "red",
+    };
+  else if (
     teachingUnitData.value &&
     teachingUnitData.value.subject &&
     teachingUnitData.value.subject.id &&
@@ -293,7 +320,7 @@ const statusIcon = computed(() => {
           :style="{ fill: teachingUnitData.subject.color }"
         />
       </div>
-      <p>{{ teachingUnitData.room.name }}</p>
+      <p :class="divStyle">{{ teachingUnitData.room.name }}, {{ teachingUnitData.room.room_number }}</p>
     </div>
     <div v-if="!showModal">
       <button
@@ -325,7 +352,7 @@ const statusIcon = computed(() => {
         <div class="space-y-4 flex flex-col">
           <select v-model="selectedOption1">
             <option disabled value="">Select Option 1</option>
-            <option v-for="option in options1" :value="option">
+            <option v-for="option in subjects" :value="option">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
@@ -362,7 +389,7 @@ const statusIcon = computed(() => {
             </option>
           </select>
 
-          <select v-model="selectedOption3">
+          <select v-model="selectedOption3" :class="selectedOption3Class">
             <option disabled value="">Select Option 3</option>
             <optgroup
               v-for="(roomGroup, locationName) in groupedRooms"
