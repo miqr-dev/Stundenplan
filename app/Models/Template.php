@@ -12,10 +12,10 @@ class Template extends Model
 
   protected $fillable = ['name'];
 
-public function subjects()
-{
+  public function subjects()
+  {
     return $this->belongsToMany(Subject::class);
-}
+  }
 
   public function courses()
   {

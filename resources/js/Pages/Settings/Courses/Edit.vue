@@ -23,15 +23,20 @@ const form = useForm({
 
 const selectedCity = ref(props.course.location_id);
 
-const subjectClasses = reactive(new Array(form.subjects.length).fill('text-green-600'));
+const subjectClasses = reactive(
+  new Array(form.subjects.length).fill("text-green-600")
+);
 
-let initialSubjects = form.subjects.map(s => s.pivot.soll);
+let initialSubjects = form.subjects.map((s) => s.pivot.soll);
 
 watch(
   () => form.subjects,
   (newVal, oldVal) => {
     for (let i = 0; i < newVal.length; i++) {
-      subjectClasses[i] = initialSubjects[i] === newVal[i].pivot.soll ? 'text-green-600' : 'text-blue-600';
+      subjectClasses[i] =
+        initialSubjects[i] === newVal[i].pivot.soll
+          ? "text-green-600"
+          : "text-blue-600";
     }
   },
   { deep: true }
@@ -153,22 +158,24 @@ const destroy = () => {
                     errors.template_id
                   }}</span>
                 </div>
-  <div class="mb-6">
-    <h2 class="mb-4 text-xl font-bold text-gray-700">Subjects</h2>
-    <div
-      v-for="(subject, index) in form.subjects"
-      :key="subject.id"
-      class="flex items-center mb-2"
-    >
-      <label class="mr-4 text-sm font-bold text-gray-700">{{ subject.name }}</label>
-      <input
-        v-model="form.subjects[index].pivot.soll"
-        type="number"
-        min="0"
-        :class="`w-24 px-3 py-2 border rounded text-gray-700 focus:outline-none focus:shadow-outline ${subjectClasses[index]}`"
-      />
-    </div>
-  </div>
+                <div class="mb-6">
+                  <h2 class="mb-4 text-xl font-bold text-gray-700">Subjects</h2>
+                  <div
+                    v-for="(subject, index) in form.subjects"
+                    :key="subject.id"
+                    class="flex items-center mb-2"
+                  >
+                    <label class="mr-4 text-sm font-bold text-gray-700">{{
+                      subject.name
+                    }}</label>
+                    <input
+                      v-model="form.subjects[index].pivot.soll"
+                      type="number"
+                      min="0"
+                      :class="`w-24 px-3 py-2 border rounded text-gray-700 focus:outline-none focus:shadow-outline ${subjectClasses[index]}`"
+                    />
+                  </div>
+                </div>
                 <div class="mb-1 flex justify-between">
                   <SimpleDelete @click="destroy" buttonText="Delete Course" />
                   <SimpleSubmit :processing="form.processing" />

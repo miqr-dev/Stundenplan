@@ -77,6 +77,7 @@ const checkTeachingUnit = async () => {
   });
   if (data.dataExists) {
     teachingUnitData.value = data.detail;
+    console.log(data.detail);
     // Also set selectedOption3 if data exists
     selectedOption3.value = data.detail.room
       ? data.detail.room.id
@@ -146,20 +147,6 @@ const loadSavedData = () => {
     }
   }
 };
-
-// Styling room default or Manual dropdown
-// const selectedOption3Class = computed(() => {
-//   return selectedOption3.value === props.default_room
-//     ? "bg-green-300"
-//     : "bg-blue-300";
-// });
-
-// // Styling room default or Manual show
-// const divStyle = computed(() => {
-//   return selectedOption3.value === props.default_room
-//     ? "bg-green-100"
-//     : "bg-blue-100";
-// });
 
 // Determine if the leave period overlaps with the selected week
 const doesLeavePeriodOverlap = (leavePeriod, weekStartDate, weekEndDate) => {
@@ -273,6 +260,13 @@ const statusIcon = computed(() => {
     color: "red",
   };
 });
+
+const isCurrentTeacherOnLeave = computed(() => {
+  if (!teachingUnitData.value?.teacher) {
+    return false;
+  }
+  return isTeacherOnLeave(teachingUnitData.value.teacher);
+});
 </script>
 
 <template>
@@ -288,13 +282,20 @@ const statusIcon = computed(() => {
           :style="{ color: statusIcon.color }"
         />
         <div class="flex items-center" v-if="teachingUnitData.teacher">
-          <p class="mb-0">
+          <p
+            class="mb-0"
+            :class="{ 'text-red-500 underline': isCurrentTeacherOnLeave }"
+          >
             {{ teachingUnitData.teacher.surname }},
             {{ teachingUnitData.teacher.name }}
           </p>
           <UserIcon
             class="h-5 w-5 mr-2"
             :style="{ fill: teachingUnitData.teacher.color }"
+          />
+          <ExclamationCircleIcon
+            v-if="isCurrentTeacherOnLeave"
+            class="h-5 w-5 text-red-500 ml-2"
           />
         </div>
         <div class="flex items-center" v-if="!teachingUnitData.teacher">
@@ -348,6 +349,7 @@ const statusIcon = computed(() => {
           <div class="space-y-4 flex flex-col">
             <select v-model="selectedOption1">
               <option disabled value="">Select Option 1</option>
+              <option value="">Select Later</option>
               <option v-for="option in subjects" :value="option">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -367,6 +369,7 @@ const statusIcon = computed(() => {
             </select>
             <select v-model="selectedOption2">
               <option disabled value="">Select Option 2</option>
+              <option value="">Select Later</option>
               <option
                 v-for="option in selectedOption1.teachers"
                 :value="option"
@@ -393,6 +396,7 @@ const statusIcon = computed(() => {
               }"
             >
               <option disabled value="">Select Option 3</option>
+              <option value="">Select Later</option>
               <optgroup
                 v-for="(roomGroup, locationName) in groupedRooms"
                 :key="locationName"

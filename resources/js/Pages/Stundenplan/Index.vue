@@ -1,7 +1,7 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import moment from "moment";
 import TeachingUnit from "@/Components/TeachingUnit.vue";
 import Sidebar from "@/Components/Sidebar.vue";
@@ -23,7 +23,9 @@ const props = defineProps({
   },
 });
 
+// Sidebar
 const isOpen = ref(false); // sidebar is closed by default
+// End Sidebar
 
 const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
@@ -54,7 +56,6 @@ const handleSelection = (data) => {
   form.teacher_id = selectedOptions[1];
   form.room_id = selectedOptions[2];
   form.post("/stundenplan/teachingunit");
-  
 };
 
 const selectedCourse = ref(null);
@@ -91,15 +92,15 @@ const selectedCourseTeachers = computed(() => {
   // return an empty array.
   if (
     !selectedCourse.value ||
-    !selectedCourse.value.template ||
-    !selectedCourse.value.template.subjects
+    !selectedCourse.value ||
+    !selectedCourse.value.subjects
   ) {
     return [];
   }
 
   // Extract all the teachers from the subjects of the selected course.
   const teachers = new Set();
-  selectedCourse.value.template.subjects.forEach((subject) => {
+  selectedCourse.value.subjects.forEach((subject) => {
     if (subject.teachers && subject.teachers.length > 0) {
       subject.teachers.forEach((teacher) => {
         teachers.add(teacher);
@@ -131,26 +132,36 @@ const getWeekStatus = (weekNumber) => {
   <Head :title="'Stundenplan'" />
   <BreezeAuthenticatedLayout>
     <template #header>
-      <h2
-        class="font-semibold text-xl text-gray-800 leading-tight"
-        v-if="selectedCourse"
-      >
-        <span class="text-blue-400">{{ selectedCourse.name }}</span> In
-        <span class="text-red-400">{{
-          selectedCourse.room.location.city.name
-        }}</span>
-        At
-        <span class="text-green-400">{{
-          selectedCourse.room.location.name
-        }}</span>
-        In
-        <span class="text-green-400">{{
-          selectedCourse.room.name
-        }}</span> ,
-        <span class="text-green-400">{{
-          selectedCourse.room.room_number
-        }}</span>
-      </h2>
+      <div class="flex flex-col items-center justify-center">
+        <div
+          class="rounded-full py-2 px-2 leading-tight relative z-10 bg-gray-500 text-white w-full flex items-center justify-center font-semibold text-lg"
+          v-if="selectedCourse"
+        >
+          {{ selectedCourse.name }}
+        </div>
+        <h2
+          class="font-semibold text-xl bg-gray-100 rounded-full p-2 border-4 border-white text-gray-400 leading-tight relative z-10 flex items-center justify-center"
+          v-if="selectedCourse"
+          style="
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+          "
+        >
+          <span class="text-blue-600">{{
+            selectedCourse.room.location.city.name
+          }}</span
+          >&nbsp;&nbsp;&nbsp;
+          <span class="text-gray-500">{{
+            selectedCourse.room.location.name
+          }}</span
+          >&nbsp;
+          <span class="text-gray-500">{{ selectedCourse.room.name }}</span>&nbsp;
+          <span class="text-gray-500">{{
+            selectedCourse.room.room_number
+          }}</span>
+        </h2>
+      </div>
       <div class="h-full grid place-items-center bg-gray-800 text-white"></div>
     </template>
     <div class="py-4">
@@ -209,8 +220,7 @@ const getWeekStatus = (weekNumber) => {
                   @click="toggleSidebar"
                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-full self-center"
                 >
-                  
-                   Details
+                  Details
                 </button>
               </div>
               <div v-if="selectedCourse">
@@ -266,8 +276,8 @@ const getWeekStatus = (weekNumber) => {
                               v-if="selectedCourse && selectedWeek"
                             >
                               <TeachingUnit
-                                :subjects="selectedCourse.template.subjects"
-                                :default_room= "selectedCourse.room_id"
+                                :subjects="selectedCourse.subjects"
+                                :default_room="selectedCourse.room_id"
                                 :rooms="rooms"
                                 :day="dayWithDate.day"
                                 :date="dayWithDate.date"

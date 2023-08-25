@@ -1,58 +1,203 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, computed } from "vue";
+import moment from "moment";
 
-
-// We define our props here
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    required: true
+    required: true,
   },
   toggleSidebar: {
     type: Function,
-    required: true
+    required: true,
   },
   teachers: {
-  type: Array,
-  }
+    type: Array,
+  },
 });
+
 const closeSidebar = () => {
   props.toggleSidebar();
+};
+const currentMonth = moment().month();
+const currentYear = moment().year();
+
+const getClassForLeave = (leave) => {
+  const today = moment().startOf("day");
+  const leaveStart = moment(leave.awaystartdate).startOf("day");
+  const leaveEnd = moment(leave.awayenddate).startOf("day");
+
+  // If the leave is already taken (in the past) and both start and end date are in the same month, then Black
+  if (
+    leaveStart.month() === leaveEnd.month() &&
+    leaveStart.year() === leaveEnd.year() &&
+    leaveEnd.isBefore(today)
+  ) {
+    return "text-black";
+  }
+
+  // If the current day is inside the leave range (no matter when started), then Orange
+  if (today.isBetween(leaveStart, leaveEnd, undefined, "[]")) {
+    return "text-orange-500";
+  }
+
+  // If the leave starts after today and within the current month or next month, then Blue
+  if (leaveStart.isSameOrAfter(today)) {
+    if (
+      (leaveStart.month() === currentMonth &&
+        leaveStart.year() === currentYear) ||
+      (leaveStart.month() === (currentMonth + 1) % 12 &&
+        leaveStart.year() ===
+          (leaveStart.month() === 0 ? currentYear + 1 : currentYear))
+    ) {
+      return "text-blue-500";
+    }
+  }
+
+  // Otherwise, Black
+  return "text-black";
+};
+
+const teachersWithLeavesThisMonth = computed(() => {
+  const uniqueTeachers = {};
+
+  return props.teachers.filter((teacher) => {
+    // Skip this teacher if they are already in the list
+    if (uniqueTeachers[teacher.id]) return false;
+
+    const hasLeaveThisMonth = teacher.teacher_not_available.some((leave) => {
+      const leaveStartMonth = moment(leave.awaystartdate).month();
+      const leaveEndMonth = moment(leave.awayenddate).month();
+      const leaveStartYear = moment(leave.awaystartdate).year();
+      const leaveEndYear = moment(leave.awayenddate).year();
+
+      return (
+        (leaveStartMonth === currentMonth && leaveStartYear === currentYear) ||
+        (leaveEndMonth === currentMonth && leaveEndYear === currentYear)
+      );
+    });
+
+    if (hasLeaveThisMonth) {
+      // Add this teacher to the list of unique teachers
+      uniqueTeachers[teacher.id] = true;
+    }
+
+    return hasLeaveThisMonth;
+  });
+});
+
+const leavesForCurrentAndNextMonth = (teacher) => {
+  // Filter leaves for the current and next month
+  const leaves = teacher.teacher_not_available.filter((leave) => {
+    const leaveStartMonth = moment(leave.awaystartdate).month();
+    const leaveEndMonth = moment(leave.awayenddate).month();
+    const leaveStartYear = moment(leave.awaystartdate).year();
+    const leaveEndYear = moment(leave.awayenddate).year();
+
+    return (
+      (leaveStartMonth === currentMonth && leaveStartYear === currentYear) ||
+      (leaveEndMonth === currentMonth && leaveEndYear === currentYear) ||
+      (leaveStartMonth === (currentMonth + 1) % 12 &&
+        leaveStartYear === currentYear + (leaveStartMonth === 0 ? 1 : 0)) ||
+      (leaveEndMonth === (currentMonth + 1) % 12 &&
+        leaveEndYear === currentYear + (leaveEndMonth === 0 ? 1 : 0))
+    );
+  });
+
+  // Remove duplicates based on 'id'
+  const uniqueLeaves = Array.from(new Set(leaves.map((l) => l.id))).map((id) =>
+    leaves.find((l) => l.id === id)
+  );
+
+  // Sort leaves by 'awaystartdate' in ascending order
+  uniqueLeaves.sort((a, b) => {
+    const dateA = moment(a.awaystartdate);
+    const dateB = moment(b.awaystartdate);
+    return dateA.isAfter(dateB) ? 1 : -1;
+  });
+
+  return uniqueLeaves;
 };
 </script>
 
 <template>
   <transition name="slide">
     <aside
-      v-if="props.isOpen"  
-      class="fixed top-0 right-0 h-full w-3/4 md:w-1/2 p-6 bg-white shadow-lg overflow-y-auto z-50">
-      <!-- Close button -->
-  <div class="flex justify-end">
-    <button @click="closeSidebar" class="close-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="red">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-  </div>
-      <!-- Here goes your sidebar content -->
-<h2 class="text-xl font-semibold mb-4">Teachers</h2>
-     <ul>
-        <li v-for="teacher in props.teachers" :key="teacher.id">
-          {{ teacher.name }} - {{ teacher.surname }}
-        </li>
-      </ul>
+      v-if="props.isOpen"
+      class="fixed top-0 right-0 h-full w-3/4 md:w-1/2 p-6 bg-white shadow-lg overflow-y-auto z-50"
+    >
+      <div class="flex justify-end">
+        <button @click="closeSidebar" class="close-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="red"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <h2 class="text-xl font-semibold mb-4">
+        Teachers with Leaves this Month
+      </h2>
 
-      <!-- ... -->
+      <div class="mb-4 text-sm">
+        <p>
+          <span class="text-black font-bold">■</span> war abwesend
+        </p>
+        <p>
+          <span class="text-orange-500 font-bold">■</span> aktuell abwesend
+        </p>
+        <p>
+          <span class="text-blue-500 font-bold">■</span> demnächst abwesend
+        </p>
+      </div>
+
+      <!-- Table Starts Here -->
+      <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+          <tr>
+            <th class="py-2 px-4 border">Teacher Name</th>
+            <th class="py-2 px-4 border">Leaves</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="teacher in teachersWithLeavesThisMonth">
+            <tr
+              v-for="(leave, index) in leavesForCurrentAndNextMonth(teacher)"
+              :key="leave.id"
+            >
+              <td class="py-2 px-4 border" v-if="index === 0">
+                {{ teacher.name }} - {{ teacher.surname }}
+              </td>
+              <td class="py-2 px-4 border" v-else></td>
+              <td class="py-2 px-4 border">
+                <span :class="getClassForLeave(leave)">
+                  {{ moment(leave.awaystartdate).format("MMM DD") }} -
+                  {{ moment(leave.awayenddate).format("MMM DD") }}
+                </span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+      <!-- Table Ends Here -->
     </aside>
   </transition>
 </template>
 
-
-
+<!-- Your styles remain the same -->
 <style scoped>
 .slide-enter-active,
 .slide-leave-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 .slide-enter,
 .slide-leave-to {

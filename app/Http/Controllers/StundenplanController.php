@@ -26,9 +26,21 @@ class StundenplanController extends Controller
   {
     $user = Auth::user();
     $city_id = City::where('name', $user->ort)->value('id');
-    $courses = Course::whereHas('room.location', function ($query) use ($city_id) {
-      $query->where('city_id', $city_id);
-    })->with(['grid.gridslots', 'room.location.city', 'template.subjects.teachers.teacherNotAvailable'])->get();
+$courses = Course::whereHas('room.location', function ($query) use ($city_id) {
+    $query->where('city_id', $city_id);
+})
+->with([
+    'grid.gridslots',
+    'room.location.city',
+    'subjects.teachers' => function ($query) use ($city_id) {
+        $query->whereHas('cities', function ($query) use ($city_id) {
+            $query->where('id', $city_id);
+        });
+    },
+    'subjects.teachers.teacherNotAvailable'
+])
+->get();
+
     $rooms = Room::whereHas('location', function ($query) use ($city_id) {
       $query->where('city_id', $city_id);
     })->with('location')->get();
@@ -140,6 +152,7 @@ class StundenplanController extends Controller
     if ($detail === null) {
       return response()->json(['dataExists' => false]);
     } else {
+      $detail->append('template_detail');
       return response()->json(['dataExists' => true, 'detail' => $detail]);
     }
   }

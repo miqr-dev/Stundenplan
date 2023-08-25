@@ -63,7 +63,8 @@ class Course extends Model
       ->withTimestamps();
   }
 
-  public function schedualMaster() {
+  public function schedualMaster()
+  {
     return $this->hasOne(SchedualMaster::class);
-}
+  }
 }
