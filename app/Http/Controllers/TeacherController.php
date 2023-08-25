@@ -14,14 +14,21 @@ class TeacherController extends Controller
 
   public function index(Request $request)
   {
+    $user = auth()->user();
+    $city_id = City::where('name', $user->ort)->value('id');
     return Inertia::render('Settings/Teacher/Index', [
       'teachers' => Teacher::query()
         ->with(['teacherNotAvailable', 'cities', 'subjects'])
+        ->when($city_id, function ($query, $city_id) { // Added this line
+          $query->whereHas('cities', function ($q) use ($city_id) {
+            $q->where('id', $city_id);
+          });
+        })
         ->when($request->search, function ($query, $search) {
           $query->where('name', 'like', "%$search%")
             ->orWhere('surname', 'like', "%$search%");
         })
-        ->paginate(5)
+        ->paginate(10)
         ->withQueryString()
         ->through(fn ($teacher) => [
           'id' => $teacher->id,
