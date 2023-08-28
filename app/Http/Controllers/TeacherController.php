@@ -15,20 +15,25 @@ class TeacherController extends Controller
   public function index(Request $request)
   {
     $user = auth()->user();
-    $city_id = City::where('name', $user->ort)->value('id');
+    $city_id = $request->cityId ?? City::where('name', $user->ort)->value('id');
+    $cities = City::all();
+
     return Inertia::render('Settings/Teacher/Index', [
       'teachers' => Teacher::query()
         ->with(['teacherNotAvailable', 'cities', 'subjects'])
-        ->when($city_id, function ($query, $city_id) { // Added this line
-          $query->whereHas('cities', function ($q) use ($city_id) {
-            $q->where('id', $city_id);
+        ->when($request->cityId || (!$request->viewAll && $city_id), function ($query) use ($city_id, $request) {
+          $final_city_id = $request->cityId ?? $city_id;
+          $query->whereHas('cities', function ($q) use ($final_city_id) {
+            $q->where('id', $final_city_id);
           });
         })
         ->when($request->search, function ($query, $search) {
-          $query->where('name', 'like', "%$search%")
-            ->orWhere('surname', 'like', "%$search%");
+          $query->where(function ($query) use ($search) {
+            $query->where('name', 'like', "%$search%")
+              ->orWhere('surname', 'like', "%$search%");
+          });
         })
-        ->paginate(10)
+        ->paginate(15)
         ->withQueryString()
         ->through(fn ($teacher) => [
           'id' => $teacher->id,
@@ -36,9 +41,12 @@ class TeacherController extends Controller
           'surname' => $teacher->surname,
           'color' => $teacher->color,
         ]),
-      'filters' => request()->only(['search'])
+      'filters' => request()->only(['search', 'viewAll']),
+      'cities' => $cities,
+      'defaultCityId' => (int) $city_id,
     ]);
   }
+
 
   public function create()
   {
