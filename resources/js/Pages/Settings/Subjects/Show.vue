@@ -7,6 +7,7 @@ import "vue3-swatches/dist/style.css";
 
 const props = defineProps({
   subject: {},
+  teachers: {},
 });
 
 const subject = props.subject;
@@ -40,35 +41,33 @@ const submit = async (id) => {
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
-            <div class="flex space-x-10">
-              <div class="mb-6">
-                <label
-                  class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                  for="maxhourweek"
-                >
-                  Color
-                </label>
-                <VSwatches
-                  v-model="subject.color"
-                  swatches="text-advanced"
-                  row-length="12"
-                  show-border
-                  popover-x="button"
-                  :disabled="true"
-                ></VSwatches>
+              <div class="flex space-x-10">
+                <div class="mb-6">
+                  <label
+                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                    for="maxhourweek"
+                  >
+                    Color
+                  </label>
+                  <VSwatches
+                    v-model="subject.color"
+                    swatches="text-advanced"
+                    row-length="12"
+                    show-border
+                    popover-x="button"
+                    :disabled="true"
+                  ></VSwatches>
+                </div>
+                <div class="mb-6">
+                  <label
+                    class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                    for="maxhourweek"
+                  >
+                    Soll Stunden
+                  </label>
+                  <p>{{ subject.default_soll }} h</p>
+                </div>
               </div>
-              <div class="mb-6">
-               <label
-                  class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                  for="maxhourweek"
-                >
-                  Soll Stunden
-                </label>
-                <p>{{ subject.default_soll }} h</p>
-
-
-              </div>
-            </div>
               <div class="mb-6">
                 <label
                   class="block mb-2 text-xs font-bold text-gray-600 uppercase mt-4"
@@ -82,6 +81,33 @@ const submit = async (id) => {
                 </div>
                 <div v-else>
                   <p>this Subject is not yet in any Template</p>
+                </div>
+              </div>
+              <div class="mb-6">
+                <label
+                  class="font-bold block mb-2 text-gray-600 text-xs uppercase mt-4"
+                  >Teachers:</label
+                >
+                <div v-if="teachers.length">
+                  <div
+                    :key="teacher.id"
+                    v-for="teacher in teachers"
+                    class="flex items-center space-x-4"
+                  >
+                    <Link
+                      :href="route('teacher.edit', { teacher: teacher.id })"
+                      class="hover:underline"
+                    >
+                      {{ teacher.name }} {{ teacher.surname }}
+                    </Link>
+                    <div
+                      :style="{ backgroundColor: teacher.color }"
+                      class="w-4 h-4"
+                    ></div>
+                  </div>
+                </div>
+                <div v-else>
+                  <p>No teachers available for this subject in your city.</p>
                 </div>
               </div>
             </div>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use Inertia\Inertia;
 use App\Models\Subject;
+use App\Models\Teacher;
 use App\Models\Template;
 use Illuminate\Http\Request;
 
@@ -54,14 +56,37 @@ class SubjectController extends Controller
     return redirect()->route('subject.index')->with('success', 'Subject created successfully.');
   }
 
-  public function show($id)
-  {
+  // public function show($id)
+  // {
+  //   $subject = Subject::with('templates')->findOrFail($id);
+  //   return Inertia::render('Settings/Subjects/Show', [
+  //     'subject' => $subject,
+  //     'templates' => $subject->templates,
+  //   ]);
+  // }
+
+  public function show(Request $request, $id)
+{
+    // Retrieve the subject and its related templates
     $subject = Subject::with('templates')->findOrFail($id);
+
+    // Get the user's city
+    $user = auth()->user();
+    $city_id = $request->cityId ?? City::where('name', $user->ort)->value('id');
+
+    // Retrieve the teachers related to this subject and located in the same city as the user
+    $teachers = Teacher::whereHas('subjects', function ($query) use ($id) {
+        $query->where('subject_id', $id);
+    })->whereHas('cities', function ($query) use ($city_id) {
+        $query->where('city_id', $city_id);
+    })->get();
+
     return Inertia::render('Settings/Subjects/Show', [
-      'subject' => $subject,
-      'templates' => $subject->templates,
+        'subject' => $subject,
+        'templates' => $subject->templates,
+        'teachers' => $teachers,
     ]);
-  }
+}
 
   public function edit(Subject $subject)
   {
