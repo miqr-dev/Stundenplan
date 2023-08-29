@@ -12,7 +12,9 @@ const props = defineProps({
   subject: Object,
   templates: Array,
   subject_template: Array,
+  available_teachers: Array, // Add this line
 });
+
 
 const form = useForm({
   id: props.subject.id,
@@ -21,6 +23,7 @@ const form = useForm({
   default_soll: props.subject.default_soll,
   templates: props.subject.templates,
   subject_template: props.subject_template,
+  teachers: props.subject.teachers,  // Add this line
 });
 
 const update = () => {
@@ -94,6 +97,12 @@ const destroy = () => {
                   :items="props.templates"
                   :searchable="true"
                   label="template"
+                ></SimpleItemSelector>
+                <SimpleItemSelector
+                  v-model="form.teachers"
+                  :items="props.available_teachers"
+                  :searchable="true"
+                  label="teacher"
                 ></SimpleItemSelector>
 
                 <!-- implement the vue-swatch here -->

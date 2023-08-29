@@ -66,7 +66,7 @@ class SubjectController extends Controller
   // }
 
   public function show(Request $request, $id)
-{
+  {
     // Retrieve the subject and its related templates
     $subject = Subject::with('templates')->findOrFail($id);
 
@@ -76,41 +76,85 @@ class SubjectController extends Controller
 
     // Retrieve the teachers related to this subject and located in the same city as the user
     $teachers = Teacher::whereHas('subjects', function ($query) use ($id) {
-        $query->where('subject_id', $id);
+      $query->where('subject_id', $id);
     })->whereHas('cities', function ($query) use ($city_id) {
-        $query->where('city_id', $city_id);
+      $query->where('city_id', $city_id);
     })->get();
 
     return Inertia::render('Settings/Subjects/Show', [
-        'subject' => $subject,
-        'templates' => $subject->templates,
-        'teachers' => $teachers,
+      'subject' => $subject,
+      'templates' => $subject->templates,
+      'teachers' => $teachers,
     ]);
-}
+  }
 
-  public function edit(Subject $subject)
+  // public function edit(Subject $subject)
+  // {
+  //   return Inertia::render('Settings/Subjects/Edit', [
+  //     'subject' => [
+  //       'id' => $subject->id,
+  //       'name' => $subject->name,
+  //       'color' => $subject->color,
+  //       'default_soll' => $subject->default_soll,
+  //       'templates' => $subject->templates->pluck('id')->toArray()
+  //     ],
+  //     'templates' => Template::all()->map(function ($template) {
+  //     return [
+  //       'id' => $template->id,
+  //       'name' => $template->name,
+  //     ];
+  //   }),
+  //     'subject_template' => $subject->templates->map(function ($template) {
+  //       return [
+  //         'template_id' => $template->id,
+  //         'soll' => $template->pivot->soll === null ? $template->default_soll : $template->pivot->soll
+  //       ];
+  //     }),
+  //   ]);
+  // }
+
+
+  public function edit(Subject $subject, Request $request)
   {
+    $user = auth()->user();
+    $cityId = $request->cityId ?? City::where('name', $user->ort)->value('id');
+
+    // Get teachers that are both associated with the subject and available in the user's city
+    $filteredTeachers = $subject->teachers->filter(function ($teacher) use ($cityId) {
+      return $teacher->cities->contains('id', $cityId);
+    })->pluck('id')->toArray();
+
+    $availableTeachers = Teacher::whereHas('cities', function ($query) use ($cityId) {
+      $query->where('id', $cityId);
+    })->get()->map(function ($teacher) {
+      return [
+        'id' => $teacher->id,
+        'name' => $teacher->name . ', ' . $teacher->surname,
+      ];
+    });
+
     return Inertia::render('Settings/Subjects/Edit', [
       'subject' => [
         'id' => $subject->id,
         'name' => $subject->name,
         'color' => $subject->color,
         'default_soll' => $subject->default_soll,
-        'templates' => $subject->templates->pluck('id')->toArray()
+        'templates' => $subject->templates->pluck('id')->toArray(),
+        'teachers' => $filteredTeachers,  // Add the filtered teachers IDs
       ],
       'templates' => Template::all()->map(function ($template) {
-      return [
-        'id' => $template->id,
-        'name' => $template->name,
-      ];
-    }),
+        return [
+          'id' => $template->id,
+          'name' => $template->name,
+        ];
+      }),
       'subject_template' => $subject->templates->map(function ($template) {
         return [
           'template_id' => $template->id,
-          'soll' => $template->pivot->soll === null ? $template->default_soll : $template->pivot->soll
+          'soll' => $template->pivot->soll === null ? $template->default_soll : $template->pivot->soll,
         ];
       }),
-
+      'available_teachers' => $availableTeachers
     ]);
   }
 
@@ -121,7 +165,9 @@ class SubjectController extends Controller
       'color' => 'required',
       'default_soll' => 'numeric',
       'templates' => 'array',
-      'templates.*' => 'exists:templates,id'
+      'templates.*' => 'exists:templates,id',
+      'teachers' => 'array', 
+      'teachers.*' => 'exists:teachers,id' 
     ]);
 
     $subject->update([
@@ -131,6 +177,8 @@ class SubjectController extends Controller
     ]);
 
     $subject->templates()->sync($data['templates']);
+    $subject->teachers()->sync($data['teachers']);
+
 
     return redirect()->route('subject.index')->with('success', 'Subject updated successfully.');
   }
