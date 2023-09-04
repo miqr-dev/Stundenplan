@@ -12,8 +12,10 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Stundenplan;
 use Illuminate\Http\Request;
+use App\Models\CourseSubject;
 use App\Models\SchedualDetail;
 use App\Models\SchedualMaster;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class StundenplanController extends Controller
@@ -83,8 +85,30 @@ class StundenplanController extends Controller
       'subject_id' => 'required',
       'teacher_id' => '',
       'room_id' => '',
+      'template_id' => '',
       'date' => 'required|date',
     ]);
+
+    // Update 'ist' field for the course and subject
+    $courseSubject = CourseSubject::where('course_id', $validated['course_id'])
+      ->where('subject_id', $validated['subject_id']['id'])
+      ->where('template_id', $validated['template_id'])
+      ->first();
+
+    if ($courseSubject) {
+      // Add the duration of the teaching unit to 'ist'
+      $startTime = new \DateTime($validated['start_time']);
+      $endTime = new \DateTime($validated['end_time']);
+      $duration = $endTime->diff($startTime)->h * 60 + $endTime->diff($startTime)->i; // duration in minutes
+      $durationInHours = ceil($duration / 60);
+      // Update the ist value directly in the database
+      DB::table('course_subject')
+        ->where('course_id', $validated['course_id'])
+        ->where('subject_id', $validated['subject_id']['id'])
+        ->where('template_id', $validated['template_id'])
+        ->increment('ist', $durationInHours);
+    }
+
 
     // Check for existing master
     $existingMaster = SchedualMaster::where([
@@ -124,6 +148,7 @@ class StundenplanController extends Controller
       'teacher_id' => $validated['teacher_id'] ? $validated['teacher_id']['id'] : null, // check if 'teacher_id' is not null before accessing 'id'
       'room_id' => $validated['room_id'],
     ]);
+
 
     return redirect()->back()->with('success', 'Unit saved successfully.');
   }
@@ -166,7 +191,7 @@ class StundenplanController extends Controller
 
   public function checkTeacherConflicts(Request $request)
   {
-  ddd($request);
+    ddd($request);
     $date = $request->input('date');
     $startTime = $request->input('start_time');
     $endTime = $request->input('end_time');

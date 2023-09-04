@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class CourseSubject extends Pivot
 {
     protected $table = 'course_subject';
+    protected $guarded = [];
 
     public function course()
     {

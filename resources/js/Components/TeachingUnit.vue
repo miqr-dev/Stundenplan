@@ -10,6 +10,7 @@ import {
   XMarkIcon,
 } from "@heroicons/vue/20/solid";
 import axios from "axios";
+
 // --------------------- Defining Props ------------------------
 const props = defineProps({
   subjects: { type: Array, required: true },

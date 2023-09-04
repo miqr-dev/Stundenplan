@@ -85,6 +85,7 @@ const handleSelection = (data) => {
   const form = useForm({
     week: "",
     year: "",
+    template_id: "",
     course_id: "",
     grid_slot_id: "",
     start_time: "",
@@ -105,6 +106,7 @@ const handleSelection = (data) => {
   form.subject_id = selectedOptions[0];
   form.teacher_id = selectedOptions[1];
   form.room_id = selectedOptions[2];
+  form.template_id = selectedCourse.value.template_id;
   form.post("/stundenplan/teachingunit");
 };
 

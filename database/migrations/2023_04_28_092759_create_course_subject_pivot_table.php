@@ -13,7 +13,7 @@ class CreateCourseSubjectPivotTable extends Migration
             $table->unsignedBigInteger('subject_id');
             $table->unsignedBigInteger('template_id'); // include template_id
             $table->integer('soll')->nullable();
-            $table->integer('ist')->default(0);
+            $table->float('ist')->default(0);
             $table->timestamps();
 
             // Foreign keys
