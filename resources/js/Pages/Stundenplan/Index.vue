@@ -13,20 +13,68 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  weekNumbers: {
-    type: Array,
-    required: true,
-  },
   rooms: {
     type: Array,
     required: true,
   },
 });
 
+const selectedCourse = ref(null);
+const selectedWeek = ref(null);
+const currentYear = moment().year();
+const years = Array.from({ length: 7 }, (_, i) => currentYear - 3 + i);
+const selectedYear = ref(currentYear);
+
+const isCourseInSelectedWeek = computed(() => {
+  // If the selectedCourse or selectedWeek is not available, return false
+  if (!selectedCourse.value || !selectedWeek.value) {
+    console.log("Either course or week is not selected");
+    return false;
+  }
+
+  // Convert the start and end date of the selected course to moment objects
+  const courseStartDate = moment(selectedCourse.value.start_date);
+  const courseEndDate = moment(selectedCourse.value.end_date);
+
+  // Get the start and end date of the selected week
+  const currentYear = moment().year();
+  const weekStartDate = moment()
+    .year(selectedYear.value)
+    .week(selectedWeek.value)
+    .startOf("week");
+  const weekEndDate = moment()
+    .year(selectedYear.value)
+    .week(selectedWeek.value)
+    .endOf("week");
+  // Check if the course is active during the selected week
+  const isActive =
+    courseStartDate.isSameOrBefore(weekEndDate, "day") &&
+    courseEndDate.isSameOrAfter(weekStartDate, "day") &&
+    courseStartDate.year() <= selectedYear.value &&
+    courseEndDate.year() >= selectedYear.value;
+
+  console.log("Is course active during the selected week:", isActive);
+  return isActive;
+});
+
+const weekNumbers = computed(() => {
+  const totalWeeks = moment().year(selectedYear.value).isoWeeksInYear();
+  const weekNumbers = [];
+  for (let i = 1; i <= totalWeeks; i++) {
+    weekNumbers.push({ id: i, WeekNumber: i });
+  }
+  return weekNumbers;
+});
+
+watch(selectedYear, (newYear, oldYear) => {
+});
+
+watch(selectedWeek, (newWeek, oldWeek) => {
+});
+
 // Sidebar
 const isOpen = ref(false); // sidebar is closed by default
 // End Sidebar
-
 const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
 };
@@ -36,6 +84,7 @@ const handleSelection = (data) => {
 
   const form = useForm({
     week: "",
+    year: "",
     course_id: "",
     grid_slot_id: "",
     start_time: "",
@@ -47,6 +96,7 @@ const handleSelection = (data) => {
   });
 
   form.week = date.week();
+  form.year = selectedYear.value;
   form.date = date.format("YYYY-MM-DD"); // Add this line
   form.course_id = selectedCourse.value.id;
   form.grid_slot_id = gridSlotItem.id;
@@ -58,23 +108,16 @@ const handleSelection = (data) => {
   form.post("/stundenplan/teachingunit");
 };
 
-const selectedCourse = ref(null);
-const selectedWeek = ref(null);
-
 const weekDates = computed(() => {
   if (!selectedWeek.value) return [];
-
-  const currentYear = moment().year();
   const startDate = moment()
-    .year(currentYear)
+    .year(selectedYear.value)
     .week(selectedWeek.value)
     .startOf("week");
   const dates = [];
-
   for (let i = 0; i < 5; i++) {
     dates.push(startDate.clone().add(i, "days"));
   }
-
   return dates;
 });
 
@@ -112,10 +155,27 @@ const selectedCourseTeachers = computed(() => {
   return Array.from(teachers);
 });
 
+const getWeekLabel = (weekNumber, year) => {
+  const startDate = moment().year(year).isoWeek(weekNumber).startOf("isoWeek");
+  const endDate = moment()
+    .year(year)
+    .isoWeek(weekNumber)
+    .endOf("isoWeek")
+    .subtract(2, "days");
+
+  const startDay = startDate.format("DD");
+  const endDay = endDate.format("DD");
+  const startMonth = startDate.format("MMM");
+  const endMonth = endDate.format("MMM");
+
+  let label = `Week ${weekNumber} (${startDay} ${startMonth} - ${endDay} ${endMonth})`;
+
+  return label;
+};
+
 // color the Calendar week select box
 const getWeekStatus = (weekNumber) => {
   const currentWeekNumber = moment().week();
-
   if (weekNumber < currentWeekNumber) {
     return "past";
   } else if (weekNumber > currentWeekNumber) {
@@ -124,7 +184,6 @@ const getWeekStatus = (weekNumber) => {
     return "current";
   }
 };
-
 // Add any other reactive variables, computed properties or methods here.
 </script>
 
@@ -156,7 +215,8 @@ const getWeekStatus = (weekNumber) => {
             selectedCourse.room.location.name
           }}</span
           >&nbsp;
-          <span class="text-gray-500">{{ selectedCourse.room.name }}</span>&nbsp;
+          <span class="text-gray-500">{{ selectedCourse.room.name }}</span
+          >&nbsp;
           <span class="text-gray-500">{{
             selectedCourse.room.room_number
           }}</span>
@@ -171,12 +231,17 @@ const getWeekStatus = (weekNumber) => {
             <div>
               <div class="flex justify-between">
                 <div class="flex space-x-4">
-                  <div>
-                    <label for="course-select">Select a Course:</label>
+                  <!-- Course Select -->
+                  <div class="w-4/5">
+                    <label
+                      for="course-select"
+                      class="block text-sm font-medium text-gray-700"
+                      >Course</label
+                    >
                     <select
                       id="course-select"
                       v-model="selectedCourse"
-                      class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="form-select mt-1 block w-96 py-2 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-opacity-50 focus:ring-indigo-500"
                     >
                       <option disabled value="">Please select a course</option>
                       <option
@@ -188,16 +253,20 @@ const getWeekStatus = (weekNumber) => {
                       </option>
                     </select>
                   </div>
-                  <div>
-                    <label for="calenderweek-select"
-                      >Select the Calendar Week</label
+
+                  <!-- Calendar Week Select -->
+                  <div class="w-4/5">
+                    <label
+                      for="calenderweek-select"
+                      class="block text-sm font-medium text-gray-700"
+                      >KW</label
                     >
                     <select
                       id="calenderweek-select"
                       v-model="selectedWeek"
-                      class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="form-select mt-1 block w-96 py-2 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-opacity-50 focus:ring-indigo-500"
                     >
-                      <option disabled value="">Please select a week</option>
+                      <option disabled value="" selected>Select a week</option>
                       <option
                         v-for="item in weekNumbers"
                         :key="item.id"
@@ -211,11 +280,34 @@ const getWeekStatus = (weekNumber) => {
                             getWeekStatus(item.WeekNumber) === 'current',
                         }"
                       >
-                        {{ item.WeekNumber }}
+                        {{ getWeekLabel(item.WeekNumber, selectedYear) }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Year Select -->
+                  <div class="w-3/5">
+                    <label
+                      for="year-select"
+                      class="block text-sm font-medium text-gray-700"
+                      >Year</label
+                    >
+                    <select
+                      id="year-select"
+                      v-model="selectedYear"
+                      class="form-select mt-1 block w-24 py-2 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-opacity-50 focus:ring-indigo-500"
+                    >
+                      <option
+                        v-for="year in years"
+                        :key="year"
+                        :value="year"
+                        :selected="year === currentYear"
+                      >
+                        {{ year }}
                       </option>
                     </select>
                   </div>
                 </div>
+
                 <button
                   @click="toggleSidebar"
                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-full self-center"
@@ -224,81 +316,88 @@ const getWeekStatus = (weekNumber) => {
                 </button>
               </div>
               <div v-if="selectedCourse">
-                <div>
-                  <h3>Grid {{ selectedCourse.grid.name }}</h3>
-                  <table class="table-auto w-full mt-1 text-p border">
-                    <thead>
-                      <tr class="text-left font-bold">
-                        <th class="border px-4 py-2"></th>
-                        <th
-                          class="border px-4 py-2"
-                          v-for="(day, index) in [
-                            'Monday',
-                            'Tuesday',
-                            'Wednesday',
-                            'Thursday',
-                            'Friday',
-                          ]"
-                          :key="index"
+                <div class="mt-4">
+                  <!-- <h3>Grid {{ selectedCourse.grid.name }}</h3> -->
+                  <template v-if="selectedCourse && selectedWeek">
+                    <table class="table-auto w-full mt-1 text-p border">
+                      <thead>
+                        <tr class="text-left font-bold">
+                          <th class="border px-4 py-2"></th>
+                          <th
+                            class="border px-4 py-2"
+                            v-for="(day, index) in [
+                              'Monday',
+                              'Tuesday',
+                              'Wednesday',
+                              'Thursday',
+                              'Friday',
+                            ]"
+                            :key="index"
+                          >
+                            {{ day }}
+                            <span v-if="weekDates.length">{{
+                              weekDates[index].format("MMM DD")
+                            }}</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template
+                          v-for="gridSlotItem in selectedCourse.grid.gridslots"
+                          :key="gridSlotItem.id"
                         >
-                          {{ day }}
-                          <span v-if="weekDates.length">{{
-                            weekDates[index].format("MMM DD")
-                          }}</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <template
-                        v-for="gridSlotItem in selectedCourse.grid.gridslots"
-                        :key="gridSlotItem.id"
-                      >
-                        <tr class="text-left">
-                          <td class="border px-2 py-2">
-                            {{
-                              moment(
-                                gridSlotItem.start_time,
-                                "HH:mm:ss"
-                              ).format("HH.mm")
-                            }}
-                            -
-                            {{
-                              moment(gridSlotItem.end_time, "HH:mm:ss").format(
-                                "HH:mm"
-                              )
-                            }}
-                          </td>
-                          <!-- Generate a button for each day of the week -->
-                          <template v-for="dayWithDate in daysWithDates">
-                            <!-- Conditionally render the button if a course and week have been selected -->
-                            <td
-                              class="border px-1 py-1"
-                              v-if="selectedCourse && selectedWeek"
-                            >
-                              <TeachingUnit
-                                :subjects="selectedCourse.subjects"
-                                :default_room="selectedCourse.room_id"
-                                :rooms="rooms"
-                                :day="dayWithDate.day"
-                                :date="dayWithDate.date"
-                                :gridSlotItem="gridSlotItem"
-                                :courseId="selectedCourse.id"
-                                :calendarWeek="selectedWeek"
-                                :teachers="selectedCourseTeachers"
-                                @selection="
-                                  (...args) => handleSelection(...args)
-                                "
-                              />
+                          <tr class="text-left">
+                            <td class="border px-2 py-2">
+                              {{
+                                moment(
+                                  gridSlotItem.start_time,
+                                  "HH:mm:ss"
+                                ).format("HH.mm")
+                              }}
+                              -
+                              {{
+                                moment(
+                                  gridSlotItem.end_time,
+                                  "HH:mm:ss"
+                                ).format("HH:mm")
+                              }}
                             </td>
-                          </template>
-                        </tr>
-                        <tr v-if="gridSlotItem.is_break">
-                          <td class="border px-4 py-1 bg-gray-200">Pause</td>
-                          <!-- Generate a button for each day of the week -->
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
+                            <!-- Loop through each day of the week -->
+                            <template v-for="dayWithDate in daysWithDates">
+                              <td class="border px-1 py-1">
+                                <template v-if="selectedCourse && selectedWeek">
+                                  <!-- Check if the course is active during the selected week -->
+                                  <div v-if="isCourseInSelectedWeek">
+                                    <TeachingUnit
+                                      :subjects="selectedCourse.subjects"
+                                      :default_room="selectedCourse.room_id"
+                                      :rooms="rooms"
+                                      :day="dayWithDate.day"
+                                      :date="dayWithDate.date"
+                                      :gridSlotItem="gridSlotItem"
+                                      :courseId="selectedCourse.id"
+                                      :calendarWeek="selectedWeek"
+                                      :selectedYear="selectedYear"
+                                      :teachers="selectedCourseTeachers"
+                                      @selection="
+                                        (...args) => handleSelection(...args)
+                                      "
+                                    />
+                                  </div>
+                                  <!-- If the course is not active, display a message -->
+                                  <div v-else>Course is not available here</div>
+                                </template>
+                              </td>
+                            </template>
+                          </tr>
+                          <tr v-if="gridSlotItem.is_break">
+                            <td class="border px-4 py-1 bg-gray-200">Pause</td>
+                            <!-- Generate a button for each day of the week -->
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </template>
                 </div>
               </div>
             </div>

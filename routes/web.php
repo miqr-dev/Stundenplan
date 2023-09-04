@@ -58,6 +58,7 @@ Route::resource('teacher', TeacherController::class);
 Route::resource('teacher-not-available', TeacherNotAvailableController::class);
 
 Route::post('/stundenplan/check-teaching-unit', [StundenplanController::class, 'checkTeachingUnit']);
+Route::post('/stundenplan/check-teacher-conflicts', [StundenplanController::class, 'checkTeacherConflicts']);
 Route::post('/stundenplan/teachingunit', [StundenplanController::class, 'teachingunit'])->name('stundenplan.teachingunit');
 Route::post('/stundenplan/{cityId}', [StundenplanController::class, 'updateCity'])->name('stundenplan.updateCity');
 

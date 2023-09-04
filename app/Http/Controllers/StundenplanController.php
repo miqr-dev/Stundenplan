@@ -8,6 +8,8 @@ use App\Models\Room;
 use App\Models\Week;
 use Inertia\Inertia;
 use App\Models\Course;
+use App\Models\Subject;
+use App\Models\Teacher;
 use App\Models\Stundenplan;
 use Illuminate\Http\Request;
 use App\Models\SchedualDetail;
@@ -73,6 +75,7 @@ class StundenplanController extends Controller
   {
     $validated = $request->validate([
       'week' => 'required|integer',
+      'year' => 'required|integer',
       'course_id' => 'required|integer',
       'grid_slot_id' => 'required|integer',
       'start_time' => 'required',
@@ -86,6 +89,7 @@ class StundenplanController extends Controller
     // Check for existing master
     $existingMaster = SchedualMaster::where([
       'calendar_week' => $validated['week'],
+      'year' => $validated['year'],
       'course_id' => $validated['course_id'],
       'date' => $validated['date'],
     ])->first();
@@ -106,6 +110,7 @@ class StundenplanController extends Controller
 
     $master = SchedualMaster::firstOrCreate([
       'calendar_week' => $validated['week'],
+      'year' => $validated['year'],
       'course_id' => $validated['course_id'],
       'date' => $validated['date'],
     ]);
@@ -131,12 +136,14 @@ class StundenplanController extends Controller
       'date' => 'required|date',
       'start_time' => 'required',
       'end_time' => 'required',
+      'year' => 'required',
     ]);
 
     $master = SchedualMaster::where([
       'calendar_week' => $request->week,
       'course_id' => $request->course_id,
       'date' => $request->date,
+      'year' => $request->year,
     ])->first();
 
     if (!$master) {
@@ -156,6 +163,41 @@ class StundenplanController extends Controller
       return response()->json(['dataExists' => true, 'detail' => $detail]);
     }
   }
+
+  public function checkTeacherConflicts(Request $request)
+  {
+  ddd($request);
+    $date = $request->input('date');
+    $startTime = $request->input('start_time');
+    $endTime = $request->input('end_time');
+    $subjectId = $request->input('subject_id');
+
+    // Find all teachers related to the subject
+    $subjectTeachers = Teacher::whereHas('subjects', function ($query) use ($subjectId) {
+      $query->where('subject_id', $subjectId);
+    })->pluck('id')->toArray(); // pluck 'id' to get only the teacher IDs in an array
+
+    // Find all teacher IDs that have conflicts
+    $conflictedSchedules = SchedualDetail::where([
+      ['date', $date],
+      ['subject_id', $subjectId],
+    ])
+      ->whereIn('teacher_id', $subjectTeachers)
+      ->where(function ($query) use ($startTime, $endTime) {
+        $query->whereBetween('start_time', [$startTime, $endTime])
+          ->orWhereBetween('end_time', [$startTime, $endTime]);
+      })
+      ->select('teacher_id', 'start_time', 'end_time', 'course_id', 'schedual_master_id')
+      ->get()->toArray();
+
+    return response()->json([
+      'conflicts' => $conflictedSchedules
+    ]);
+  }
+
+
+
+
 
   public function store(Request $request)
   {

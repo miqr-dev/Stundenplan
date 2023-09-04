@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed } from "vue";
+import { computed } from "vue";
 import moment from "moment";
 
 const props = defineProps({
@@ -19,8 +19,25 @@ const props = defineProps({
 const closeSidebar = () => {
   props.toggleSidebar();
 };
+
 const currentMonth = moment().month();
 const currentYear = moment().year();
+
+const isDateInCurrentOrNextMonth = (date) => {
+  const dateMonth = moment(date).month();
+  const dateYear = moment(date).year();
+  return (
+    (dateMonth === currentMonth && dateYear === currentYear) ||
+    (dateMonth === (currentMonth + 1) % 12 &&
+      dateYear === (currentMonth === 11 ? currentYear + 1 : currentYear))
+  );
+};
+
+const filterLeavesForCurrentAndNextMonth = (leaves) =>
+  leaves.filter(({ awaystartdate, awayenddate }) =>
+    isDateInCurrentOrNextMonth(awaystartdate) ||
+    isDateInCurrentOrNextMonth(awayenddate)
+  );
 
 const getClassForLeave = (leave) => {
   const today = moment().startOf("day");
@@ -42,19 +59,12 @@ const getClassForLeave = (leave) => {
   }
 
   // If the leave starts after today and within the current month or next month, then Blue
-  if (leaveStart.isSameOrAfter(today)) {
-    if (
-      (leaveStart.month() === currentMonth &&
-        leaveStart.year() === currentYear) ||
-      (leaveStart.month() === (currentMonth + 1) % 12 &&
-        leaveStart.year() ===
-          (leaveStart.month() === 0 ? currentYear + 1 : currentYear))
-    ) {
-      return "text-blue-500";
-    }
+  if (
+    isDateInCurrentOrNextMonth(leaveStart)
+  ) {
+    return "text-blue-500";
   }
 
-  // Otherwise, Black
   return "text-black";
 };
 
@@ -62,54 +72,29 @@ const teachersWithLeavesThisMonth = computed(() => {
   const uniqueTeachers = {};
 
   return props.teachers.filter((teacher) => {
-    // Skip this teacher if they are already in the list
     if (uniqueTeachers[teacher.id]) return false;
 
-    const hasLeaveThisMonth = teacher.teacher_not_available.some((leave) => {
-      const leaveStartMonth = moment(leave.awaystartdate).month();
-      const leaveEndMonth = moment(leave.awayenddate).month();
-      const leaveStartYear = moment(leave.awaystartdate).year();
-      const leaveEndYear = moment(leave.awayenddate).year();
+    const hasLeaveThisOrNextMonth = filterLeavesForCurrentAndNextMonth(
+      teacher.teacher_not_available
+    ).length;
 
-      return (
-        (leaveStartMonth === currentMonth && leaveStartYear === currentYear) ||
-        (leaveEndMonth === currentMonth && leaveEndYear === currentYear)
-      );
-    });
-
-    if (hasLeaveThisMonth) {
-      // Add this teacher to the list of unique teachers
+    if (hasLeaveThisOrNextMonth) {
       uniqueTeachers[teacher.id] = true;
     }
 
-    return hasLeaveThisMonth;
+    return hasLeaveThisOrNextMonth;
   });
 });
 
 const leavesForCurrentAndNextMonth = (teacher) => {
-  // Filter leaves for the current and next month
-  const leaves = teacher.teacher_not_available.filter((leave) => {
-    const leaveStartMonth = moment(leave.awaystartdate).month();
-    const leaveEndMonth = moment(leave.awayenddate).month();
-    const leaveStartYear = moment(leave.awaystartdate).year();
-    const leaveEndYear = moment(leave.awayenddate).year();
+  const leaves = filterLeavesForCurrentAndNextMonth(
+    teacher.teacher_not_available
+  );
 
-    return (
-      (leaveStartMonth === currentMonth && leaveStartYear === currentYear) ||
-      (leaveEndMonth === currentMonth && leaveEndYear === currentYear) ||
-      (leaveStartMonth === (currentMonth + 1) % 12 &&
-        leaveStartYear === currentYear + (leaveStartMonth === 0 ? 1 : 0)) ||
-      (leaveEndMonth === (currentMonth + 1) % 12 &&
-        leaveEndYear === currentYear + (leaveEndMonth === 0 ? 1 : 0))
-    );
-  });
-
-  // Remove duplicates based on 'id'
   const uniqueLeaves = Array.from(new Set(leaves.map((l) => l.id))).map((id) =>
     leaves.find((l) => l.id === id)
   );
 
-  // Sort leaves by 'awaystartdate' in ascending order
   uniqueLeaves.sort((a, b) => {
     const dateA = moment(a.awaystartdate);
     const dateB = moment(b.awaystartdate);
@@ -149,9 +134,6 @@ const leavesForCurrentAndNextMonth = (teacher) => {
       </h2>
 
       <div class="mb-4 text-sm">
-        <p>
-          <span class="text-black font-bold">■</span> war abwesend
-        </p>
         <p>
           <span class="text-orange-500 font-bold">■</span> aktuell abwesend
         </p>

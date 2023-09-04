@@ -9,206 +9,41 @@ import {
   ExclamationCircleIcon,
   XMarkIcon,
 } from "@heroicons/vue/20/solid";
-
 import axios from "axios";
-
+// --------------------- Defining Props ------------------------
 const props = defineProps({
-  subjects: {
-    type: Array,
-    required: true,
-  },
-  options2: {
-    type: Array,
-  },
-  rooms: {
-    type: Array,
-    required: true,
-  },
-  day: {
-    type: String,
-    required: true,
-  },
-  gridSlotItem: {
-    type: Object,
-    required: true,
-  },
-  date: {
-    type: Object,
-  },
-  courseId: {
-    type: Number,
-    required: true,
-  },
-  calendarWeek: {
-    type: Number,
-    required: true,
-  },
-  teachers: {
-    type: Array,
-  },
-  default_room: {
-    type: Number,
-    required: true,
-  },
+  subjects: { type: Array, required: true },
+  options2: { type: Array },
+  rooms: { type: Array, required: true },
+  day: { type: String, required: true },
+  gridSlotItem: { type: Object, required: true },
+  date: { type: Object },
+  courseId: { type: Number, required: true },
+  calendarWeek: { type: Number, required: true },
+  teachers: { type: Array },
+  default_room: { type: Number, required: true },
+  selectedYear: { type: Number, required: true },
 });
 
-// fill out the table with each hours info
+// ---------------------- Defining refs ---------------------------
 const teachingUnitData = ref(null);
-
-// Initialize a loading state
 const isLoading = ref(true);
-
-// On mount, fetch teaching unit data
-onMounted(async () => {
-  await checkTeachingUnit();
-  isLoading.value = false; // Update loading state after data has been fetched
-});
-
-// Function to fetch teaching unit data from backend
-const checkTeachingUnit = async () => {
-  // set teachingUnitData to null
-  teachingUnitData.value = null;
-  const { data } = await axios.post("/stundenplan/check-teaching-unit", {
-    week: props.calendarWeek,
-    course_id: props.courseId,
-    start_time: props.gridSlotItem.start_time,
-    end_time: props.gridSlotItem.end_time,
-    date: props.date.format("YYYY-MM-DD"),
-  });
-  if (data.dataExists) {
-    teachingUnitData.value = data.detail;
-    console.log(data.detail);
-    // Also set selectedOption3 if data exists
-    selectedOption3.value = data.detail.room
-      ? data.detail.room.id
-      : props.default_room;
-  } else {
-    selectedOption3.value = props.default_room;
-  }
-};
-
-// Watch for changes in courseId or calendarWeek, and re-fetch data if changed
-// Update isLoading whenever courseId or calendarWeek changes
-watch(
-  () => [props.courseId, props.calendarWeek],
-  async () => {
-    isLoading.value = true;
-    await checkTeachingUnit();
-    isLoading.value = false;
-  },
-  { immediate: true }
-); // This options object will cause the watcher to trigger immediately, similarly to the onMounted() lifecycle hook
-
-// Watches selectedOption1 changes and logs teacher's availability
-watch(
-  () => selectedOption1,
-  () => {
-    // Find the selected subject by its id
-    let selectedSubject = props.subjects.find(
-      (subject) => subject.id === selectedOption1
-    );
-    // Check for each teacher's availability
-    if (selectedSubject && selectedSubject.teachers) {
-      for (let teacher of selectedSubject.teachers) {
-        teacherAvailabilities[teacher.id] = isTeacherAvailable(teacher);
-      }
-    } else {
-    }
-  },
-  { immediate: true }
-);
-
-// Define a custom emit event 'selection'
-const emit = defineEmits({ selection: null });
-// Defining refs to keep track of selected options and modal visibility
 const selectedOption1 = ref("");
 const selectedOption2 = ref("");
 const selectedOption3 = ref(props.default_room);
 const selectedOption4 = ref("");
 const showModal = ref(false);
 
-// Function to load saved data on page not on Table cells if available
-const loadSavedData = () => {
-  if (teachingUnitData.value) {
-    selectedOption1.value = props.subjects.find(
-      (option) => option.id === teachingUnitData.value.subject.id
-    );
-    if (teachingUnitData.value && teachingUnitData.value.teacher) {
-      selectedOption2.value = selectedOption1.value.teachers.find(
-        (teacher) => teacher.id === teachingUnitData.value.teacher.id
-      );
-    }
-    // check that teachingUnitData.value.room is defined before setting selectedOption3
-    if (teachingUnitData.value && teachingUnitData.value.room) {
-      selectedOption3.value = teachingUnitData.value.room.id;
-    } else {
-      // if teachingUnitData.value.room is not defined, set selectedOption3 to default_room
-      selectedOption3.value = props.default_room;
-    }
-  }
-};
-
-// Determine if the leave period overlaps with the selected week
-const doesLeavePeriodOverlap = (leavePeriod, weekStartDate, weekEndDate) => {
-  const awaystartdate = moment(leavePeriod.awaystartdate);
-  const awayenddate = moment(leavePeriod.awayenddate);
-  return (
-    awaystartdate.isBefore(weekEndDate) && awayenddate.isAfter(weekStartDate)
-  );
-};
-
-const isTeacherOnLeave = (teacher) => {
-  if (!teacher || !teacher.teacher_not_available) {
-    // If the teacher has no leave dates, return false
-    return false;
-  }
-  // Get the start and end of the current week
-  const weekStartDate = moment().startOf("week").week(props.calendarWeek);
-  const weekEndDate = moment().endOf("week").week(props.calendarWeek);
-
-  // Go through all leave periods and check if one overlaps with the selected week
-  return teacher.teacher_not_available.some((leavePeriod) =>
-    doesLeavePeriodOverlap(leavePeriod, weekStartDate, weekEndDate)
-  );
-};
-
+// ------------------ Defining computed properties ----------------------
 const selectedTeacherOnLeave = computed(() => {
-  if (!selectedOption2.value) {
-    return false;
-  }
-  const onLeave = isTeacherOnLeave(selectedOption2.value);
-  if (onLeave) {
-  } else {
-  }
-  return onLeave;
+  if (!selectedOption2.value) return false;
+  return isTeacherOnLeave(selectedOption2.value);
 });
 
-// computed property to find selected room
 const selectedRoom = computed(() => {
   return props.rooms.find((room) => room.id === selectedOption3.value);
 });
 
-const emitSelection = () => {
-  emit("selection", {
-    date: props.date,
-    gridSlotItem: props.gridSlotItem,
-    selectedOptions: [
-      selectedOption1.value,
-      selectedOption2.value,
-      selectedOption3.value,
-      selectedOption4.value,
-    ],
-  });
-};
-// Function to emit selection and close the modal
-const closeAndEmit = async () => {
-  emitSelection();
-  showModal.value = false;
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  checkTeachingUnit();
-};
-
-// computed property to group rooms by location
 const groupedRooms = computed(() => {
   return props.rooms.reduce((result, room) => {
     const locationName = room.location.name;
@@ -221,20 +56,6 @@ const groupedRooms = computed(() => {
   }, {});
 });
 
-// watch for changes in showModal value and load saved data if true
-watch(
-  () => showModal.value,
-  async (newVal) => {
-    if (newVal) {
-      isLoading.value = true;
-      await checkTeachingUnit();
-      loadSavedData();
-      isLoading.value = false;
-    }
-  }
-);
-
-// computed property to determine status icon
 const statusIcon = computed(() => {
   if (!teachingUnitData.value) {
     return {
@@ -267,6 +88,161 @@ const isCurrentTeacherOnLeave = computed(() => {
   }
   return isTeacherOnLeave(teachingUnitData.value.teacher);
 });
+
+// ----------------- Defining Helper Functions -----------------------
+const checkTeachingUnit = async () => {
+  // set teachingUnitData to null
+  teachingUnitData.value = null;
+  const { data } = await axios.post("/stundenplan/check-teaching-unit", {
+    week: props.calendarWeek,
+    year: props.selectedYear,
+    course_id: props.courseId,
+    start_time: props.gridSlotItem.start_time,
+    end_time: props.gridSlotItem.end_time,
+    date: props.date.format("YYYY-MM-DD"),
+  });
+  if (data.dataExists) {
+    teachingUnitData.value = data.detail;
+    console.log(data.detail);
+    // Also set selectedOption3 if data exists
+    selectedOption3.value = data.detail.room
+      ? data.detail.room.id
+      : props.default_room;
+  } else {
+    selectedOption3.value = props.default_room;
+  }
+};
+
+const isLeavePeriodOverlapping = (
+  { awaystartdate, awayenddate },
+  weekStartDate,
+  weekEndDate
+) => {
+  const start = moment(awaystartdate);
+  const end = moment(awayenddate);
+  return start.isBefore(weekEndDate) && end.isAfter(weekStartDate);
+};
+
+const isTeacherOnLeave = (teacher) => {
+  if (!teacher || !teacher.teacher_not_available) {
+    return false; // If the teacher has no leave dates, return false
+  }
+  const specificDate = moment(props.date).startOf("day");
+  return teacher.teacher_not_available.some((leavePeriod) => {
+    const start = moment(leavePeriod.awaystartdate).startOf("day");
+    const end = moment(leavePeriod.awayenddate).startOf("day");
+    const isOnLeave = specificDate.isBetween(start, end, null, "[]");
+    return isOnLeave;
+  });
+};
+
+const loadSavedData = () => {
+  if (teachingUnitData.value) {
+    selectedOption1.value = props.subjects.find(
+      (option) => option.id === teachingUnitData.value.subject.id
+    );
+    if (teachingUnitData.value && teachingUnitData.value.teacher) {
+      selectedOption2.value = selectedOption1.value.teachers.find(
+        (teacher) => teacher.id === teachingUnitData.value.teacher.id
+      );
+    }
+    // check that teachingUnitData.value.room is defined before setting selectedOption3
+    if (teachingUnitData.value && teachingUnitData.value.room) {
+      selectedOption3.value = teachingUnitData.value.room.id;
+    } else {
+      // if teachingUnitData.value.room is not defined, set selectedOption3 to default_room
+      selectedOption3.value = props.default_room;
+    }
+  }
+};
+
+async function initTeachingUnit() {
+  await checkTeachingUnit();
+  isLoading.value = false;
+}
+
+// ----------------- Lifecycle Hooks -----------------------
+onMounted(initTeachingUnit);
+
+// ------------------ Watchers -------------------------
+const watchCourseAndWeek = () => {
+  isLoading.value = true;
+  checkTeachingUnit().then(() => {
+    isLoading.value = false;
+  });
+};
+
+watch(
+  () => [props.courseId, props.calendarWeek, props.selectedYear],
+  watchCourseAndWeek,
+  { immediate: true }
+);
+
+watch(
+  () => props.selectedYear,
+  () => {
+    isLoading.value = true;
+    checkTeachingUnit().then(() => {
+      isLoading.value = false;
+    });
+  },
+  { immediate: true }
+);
+
+// Watches selectedOption1 changes and logs teacher's availability
+watch(
+  () => selectedOption1,
+  () => {
+    // Find the selected subject by its id
+    let selectedSubject = props.subjects.find(
+      (subject) => subject.id === selectedOption1
+    );
+    // Check for each teacher's availability
+    if (selectedSubject && selectedSubject.teachers) {
+      for (let teacher of selectedSubject.teachers) {
+        teacherAvailabilities[teacher.id] = isTeacherAvailable(teacher);
+      }
+    } else {
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => showModal.value,
+  async (newVal) => {
+    if (newVal) {
+      isLoading.value = true;
+      await checkTeachingUnit();
+      loadSavedData();
+      isLoading.value = false;
+    }
+  }
+);
+
+// ---------------- Emit Definitions --------------------
+const emit = defineEmits({ selection: null });
+
+// ---------------- Event Emitting Functions --------------------
+const emitSelection = () => {
+  emit("selection", {
+    date: props.date,
+    gridSlotItem: props.gridSlotItem,
+    selectedOptions: [
+      selectedOption1.value,
+      selectedOption2.value,
+      selectedOption3.value,
+      selectedOption4.value,
+    ],
+  });
+};
+
+const closeAndEmit = async () => {
+  emitSelection();
+  showModal.value = false;
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  checkTeachingUnit();
+};
 </script>
 
 <template>
@@ -377,10 +353,6 @@ const isCurrentTeacherOnLeave = computed(() => {
                   isTeacherOnLeave(option)
                     ? 'text-orange-500 cursor-not-allowed'
                     : 'text-green-500',
-                  selectedTeacherOnLeave.value &&
-                  selectedOption2.value.id === option.id
-                    ? 'text-red-500'
-                    : '',
                 ]"
                 :disabled="isTeacherOnLeave(option)"
               >
