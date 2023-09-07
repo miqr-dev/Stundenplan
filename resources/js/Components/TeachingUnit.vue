@@ -104,7 +104,8 @@ const checkTeachingUnit = async () => {
   });
   if (data.dataExists) {
     teachingUnitData.value = data.detail;
-    console.log(data.detail);
+    //console.log(data.soll);
+    emit("emitSollData", data.soll);
     // Also set selectedOption3 if data exists
     selectedOption3.value = data.detail.room
       ? data.detail.room.id
@@ -222,7 +223,7 @@ watch(
 );
 
 // ---------------- Emit Definitions --------------------
-const emit = defineEmits({ selection: null });
+const emit = defineEmits({ selection: null, emitSollData: null });
 
 // ---------------- Event Emitting Functions --------------------
 const emitSelection = () => {

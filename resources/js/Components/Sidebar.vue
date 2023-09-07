@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref, watchEffect, defineEmits } from "vue";
 import moment from "moment";
 
 const props = defineProps({
@@ -14,6 +14,49 @@ const props = defineProps({
   teachers: {
     type: Array,
   },
+  course: {
+    type: Object,
+  },
+  sollData: {
+    type: Object,
+    required: false, // or true, depends on your requirements
+  },
+});
+
+const emit = defineEmits();
+let subjects = ref([]);
+
+watchEffect(() => {
+  if (props.course) {
+    subjects.value = props.course.subjects;
+  } else {
+    subjects.value = []; // Reset to empty array if no course is selected
+  }
+});
+
+watchEffect(() => {
+  if (props.updateSollDataInSidebar) {
+    props.updateSollDataInSidebar(sollData);
+  }
+});
+
+const updateSollData = (sollData) => {
+  sollData.forEach((soll) => {
+    const subjectIndex = subjects.value.findIndex(
+    subject => subject.id === soll.subject_id
+    );
+    if (subjectIndex !== -1) {
+      subjects.value[subjectIndex].pivot.ist = soll.ist;
+    }
+  });
+
+  subjects.value = [...subjects.value];
+};
+watchEffect(() => {
+  if (props.sollData) {
+    console.log("We Are in WatchEffect to run the function ");
+    updateSollData(props.sollData);
+  }
 });
 
 const closeSidebar = () => {
@@ -34,9 +77,10 @@ const isDateInCurrentOrNextMonth = (date) => {
 };
 
 const filterLeavesForCurrentAndNextMonth = (leaves) =>
-  leaves.filter(({ awaystartdate, awayenddate }) =>
-    isDateInCurrentOrNextMonth(awaystartdate) ||
-    isDateInCurrentOrNextMonth(awayenddate)
+  leaves.filter(
+    ({ awaystartdate, awayenddate }) =>
+      isDateInCurrentOrNextMonth(awaystartdate) ||
+      isDateInCurrentOrNextMonth(awayenddate)
   );
 
 const getClassForLeave = (leave) => {
@@ -59,9 +103,7 @@ const getClassForLeave = (leave) => {
   }
 
   // If the leave starts after today and within the current month or next month, then Blue
-  if (
-    isDateInCurrentOrNextMonth(leaveStart)
-  ) {
+  if (isDateInCurrentOrNextMonth(leaveStart)) {
     return "text-blue-500";
   }
 
@@ -134,12 +176,8 @@ const leavesForCurrentAndNextMonth = (teacher) => {
       </h2>
 
       <div class="mb-4 text-sm">
-        <p>
-          <span class="text-orange-500 font-bold">■</span> aktuell abwesend
-        </p>
-        <p>
-          <span class="text-blue-500 font-bold">■</span> demnächst abwesend
-        </p>
+        <p><span class="text-orange-500 font-bold">■</span> aktuell abwesend</p>
+        <p><span class="text-blue-500 font-bold">■</span> demnächst abwesend</p>
       </div>
 
       <!-- Table Starts Here -->
@@ -171,6 +209,31 @@ const leavesForCurrentAndNextMonth = (teacher) => {
         </tbody>
       </table>
       <!-- Table Ends Here -->
+
+      <h2 class="mt-8 mb-4 font-semibold text-xl">
+        Subjects and Soll-Ist Values
+      </h2>
+      <table class="border bg-white border-gray-300 min-w-0 mt-4 w-full">
+        <thead>
+          <tr>
+            <th class="border px-2 py-1">Subject Name</th>
+            <th class="border px-2 py-1">Soll</th>
+            <th class="border px-2 py-1">Ist</th>
+            <th class="border px-2 py-1">Difference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="subject in subjects" :key="subject.id">
+            <!-- Use subjects.value here -->
+            <td class="border px-2 py-1 text-sm">{{ subject.name }}</td>
+            <td class="border px-2 py-1 text-sm">{{ subject.pivot.soll }}</td>
+            <td class="border px-2 py-1 text-sm">{{ subject.pivot.ist }}</td>
+            <td class="border px-2 py-1 text-sm">
+              {{ subject.pivot.soll - subject.pivot.ist }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </aside>
   </transition>
 </template>

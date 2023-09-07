@@ -1,11 +1,10 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, defineEmits } from "vue";
 import moment from "moment";
 import TeachingUnit from "@/Components/TeachingUnit.vue";
 import Sidebar from "@/Components/Sidebar.vue";
-
 import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -19,11 +18,14 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["updateSollDataInSidebar"]);
+
 const selectedCourse = ref(null);
 const selectedWeek = ref(null);
 const currentYear = moment().year();
 const years = Array.from({ length: 7 }, (_, i) => currentYear - 3 + i);
 const selectedYear = ref(currentYear);
+const sollData = ref(null);
 
 const isCourseInSelectedWeek = computed(() => {
   // If the selectedCourse or selectedWeek is not available, return false
@@ -66,10 +68,11 @@ const weekNumbers = computed(() => {
   return weekNumbers;
 });
 
-watch(selectedYear, (newYear, oldYear) => {
-});
+watch(selectedYear, (newYear, oldYear) => {});
 
-watch(selectedWeek, (newWeek, oldWeek) => {
+watch(selectedWeek, (newWeek, oldWeek) => {});
+watch(selectedCourse, (newVal, oldVal) => {
+  console.log("selectedCourse changed", newVal, oldVal);
 });
 
 // Sidebar
@@ -108,6 +111,11 @@ const handleSelection = (data) => {
   form.room_id = selectedOptions[2];
   form.template_id = selectedCourse.value.template_id;
   form.post("/stundenplan/teachingunit");
+};
+
+const handleSollData = (newSollData) => {
+  console.log("Index: Got new sollData:", newSollData);
+  sollData.value = newSollData;
 };
 
 const weekDates = computed(() => {
@@ -381,6 +389,7 @@ const getWeekStatus = (weekNumber) => {
                                       :calendarWeek="selectedWeek"
                                       :selectedYear="selectedYear"
                                       :teachers="selectedCourseTeachers"
+                                      @emitSollData="handleSollData"
                                       @selection="
                                         (...args) => handleSelection(...args)
                                       "
@@ -408,9 +417,11 @@ const getWeekStatus = (weekNumber) => {
       </div>
     </div>
     <Sidebar
+      :sollData="sollData"
       :isOpen="isOpen"
       :toggleSidebar="toggleSidebar"
       :teachers="selectedCourseTeachers"
+      :course="selectedCourse"
     />
   </BreezeAuthenticatedLayout>
 </template>

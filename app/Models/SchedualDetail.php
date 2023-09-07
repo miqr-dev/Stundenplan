@@ -37,19 +37,23 @@ class SchedualDetail extends Model
   }
 
   // Accessor to get the related template subjects and teachers.
-  public function getTemplateDetailAttribute()
-  {
-    $course = $this->schedualMaster->course; // Assuming you have a relation from SchedualMaster to Course
-    $templateId = $course->template_id;
+public function getTemplateDetailAttribute()
+{
+  $course = $this->schedualMaster->course; // Assuming you have a relation from SchedualMaster to Course
+  $templateId = $course->template_id;
 
-    $template = Template::find($templateId);
+  $template = Template::find($templateId);
 
-    // Get the subjects and teachers related to this template.
-    $subjects = $template->subjects; // Assuming you have a 'subjects' relation in Template model
-    foreach ($subjects as &$subject) {
-      $subject->teachers = $subject->teachers; // Load teachers for each subject
-    }
-
-    return $subjects;
+  // Get the subjects and teachers related to this template.
+  $subjects = $template->subjects; // Assuming you have a 'subjects' relation in Template model
+  foreach ($subjects as &$subject) {
+    $subject->teachers = $subject->teachers; // Load teachers for each subject
   }
+
+  return [
+    'subjects' => $subjects,
+    'template_id' => $templateId,
+    'course_id' => $course->id
+  ];
+}
 }

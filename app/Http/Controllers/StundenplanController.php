@@ -16,6 +16,7 @@ use App\Models\CourseSubject;
 use App\Models\SchedualDetail;
 use App\Models\SchedualMaster;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class StundenplanController extends Controller
@@ -49,7 +50,6 @@ class StundenplanController extends Controller
       $query->where('city_id', $city_id);
     })->with('location')->get();
 
-
     $currentMonday = Carbon::now()->startOfWeek()->subWeeks(10);
     $endOfWeek = Carbon::now()->startOfWeek()->addWeek(10);
 
@@ -59,6 +59,7 @@ class StundenplanController extends Controller
       $currentMonday->addWeek();
     }
     $weekNumbers = Week::whereIn('startDate', $mondays)->get();
+
     return inertia('Stundenplan/Index', ['courses' => $courses, 'weekNumbers' => $weekNumbers, 'rooms' => $rooms,]);
   }
 
@@ -88,28 +89,6 @@ class StundenplanController extends Controller
       'template_id' => '',
       'date' => 'required|date',
     ]);
-
-    // Update 'ist' field for the course and subject
-    $courseSubject = CourseSubject::where('course_id', $validated['course_id'])
-      ->where('subject_id', $validated['subject_id']['id'])
-      ->where('template_id', $validated['template_id'])
-      ->first();
-
-    if ($courseSubject) {
-      // Add the duration of the teaching unit to 'ist'
-      $startTime = new \DateTime($validated['start_time']);
-      $endTime = new \DateTime($validated['end_time']);
-      $duration = $endTime->diff($startTime)->h * 60 + $endTime->diff($startTime)->i; // duration in minutes
-      $durationInHours = ceil($duration / 60);
-      // Update the ist value directly in the database
-      DB::table('course_subject')
-        ->where('course_id', $validated['course_id'])
-        ->where('subject_id', $validated['subject_id']['id'])
-        ->where('template_id', $validated['template_id'])
-        ->increment('ist', $durationInHours);
-    }
-
-
     // Check for existing master
     $existingMaster = SchedualMaster::where([
       'calendar_week' => $validated['week'],
@@ -127,7 +106,27 @@ class StundenplanController extends Controller
       ])->first();
 
       if ($existingDetail) {
-        // Delete the detail
+
+        $oldcourseSubject = DB::table('course_subject')
+          ->where('course_id', $validated['course_id'])
+          ->where('subject_id', $existingDetail->subject_id)
+          ->where('template_id', $validated['template_id'])
+          ->first();
+
+        if ($oldcourseSubject) {
+          // Add the duration of the teaching unit to 'ist'
+          $startTime = new \DateTime($validated['start_time']);
+          $endTime = new \DateTime($validated['end_time']);
+          $duration = $endTime->diff($startTime)->h * 60 + $endTime->diff($startTime)->i; // duration in minutes
+          $durationInHours = (int) ceil($duration / 60);
+          // Update the ist value directly in the database
+          DB::table('course_subject')
+            ->where('course_id', $validated['course_id'])
+            ->where('subject_id', $existingDetail->subject_id)
+            ->where('template_id', $validated['template_id'])
+            ->decrement('ist', $durationInHours);
+        }
+
         $existingDetail->delete();
       }
     }
@@ -149,7 +148,26 @@ class StundenplanController extends Controller
       'room_id' => $validated['room_id'],
     ]);
 
+    // Update 'ist' field for the course, subject and template
+    $courseSubject = DB::table('course_subject')
+      ->where('course_id', $validated['course_id'])
+      ->where('subject_id', $validated['subject_id']['id'])
+      ->where('template_id', $validated['template_id'])
+      ->first();
 
+    if ($courseSubject) {
+      // Add the duration of the teaching unit to 'ist'
+      $startTime = new \DateTime($validated['start_time']);
+      $endTime = new \DateTime($validated['end_time']);
+      $duration = $endTime->diff($startTime)->h * 60 + $endTime->diff($startTime)->i; // duration in minutes
+      $durationInHours = (int) ceil($duration / 60);
+      // Update the ist value directly in the database
+      DB::table('course_subject')
+        ->where('course_id', $validated['course_id'])
+        ->where('subject_id', $validated['subject_id']['id'])
+        ->where('template_id', $validated['template_id'])
+        ->increment('ist', $durationInHours);
+    }
     return redirect()->back()->with('success', 'Unit saved successfully.');
   }
 
@@ -185,7 +203,21 @@ class StundenplanController extends Controller
       return response()->json(['dataExists' => false]);
     } else {
       $detail->append('template_detail');
-      return response()->json(['dataExists' => true, 'detail' => $detail]);
+      $templateDetails = $detail->template_detail;
+
+      $templateId = $templateDetails['template_id'];
+      $courseId = $templateDetails['course_id'];
+
+      $soll = DB::table('course_subject')
+        ->where('course_id', $courseId)
+        ->where('template_id', $templateId)
+        ->get();
+
+      return response()->json([
+        'dataExists' => true,
+        'detail' => $detail,
+        'soll' => $soll
+      ]);
     }
   }
 
