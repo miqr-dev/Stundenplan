@@ -24,4 +24,9 @@ class Teacher extends Model
   {
     return $this->belongsToMany(Subject::class, 'subject_teacher');
   }
+  public function conflicts()
+{
+    return $this->hasMany(Conflict::class);
+}
+
 }

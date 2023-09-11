@@ -50,4 +50,9 @@ class User extends Authenticatable implements LdapAuthenticatable
     {
       return $this->hasMany(Grid::class);
     }
+
+    public function conflicts()
+{
+    return $this->hasMany(Conflict::class);
+}
 }

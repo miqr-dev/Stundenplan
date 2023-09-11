@@ -7,6 +7,7 @@ import {
   UserIcon,
   CheckIcon,
   ExclamationCircleIcon,
+  ExclamationTriangleIcon,
   XMarkIcon,
 } from "@heroicons/vue/20/solid";
 import axios from "axios";
@@ -34,6 +35,9 @@ const selectedOption2 = ref("");
 const selectedOption3 = ref(props.default_room);
 const selectedOption4 = ref("");
 const showModal = ref(false);
+const conflict = ref(false);
+const showConflictModal = ref(false);
+const conflictDetails = ref(null);
 
 // ------------------ Defining computed properties ----------------------
 const selectedTeacherOnLeave = computed(() => {
@@ -94,6 +98,8 @@ const isCurrentTeacherOnLeave = computed(() => {
 const checkTeachingUnit = async () => {
   // set teachingUnitData to null
   teachingUnitData.value = null;
+  conflictDetails.value = null;
+  conflict.value = false;
   const { data } = await axios.post("/stundenplan/check-teaching-unit", {
     week: props.calendarWeek,
     year: props.selectedYear,
@@ -110,6 +116,11 @@ const checkTeachingUnit = async () => {
     selectedOption3.value = data.detail.room
       ? data.detail.room.id
       : props.default_room;
+    if (data.conflict) {
+      conflict.value = true;
+      conflictDetails.value = data.overlappingSchedules;
+      console.log("conflict found", conflictDetails.value);
+    }
   } else {
     selectedOption3.value = props.default_room;
   }
@@ -297,14 +308,22 @@ const closeAndEmit = async () => {
           {{ teachingUnitData.room.room_number }}
         </p>
       </div>
-      <div v-if="!showModal">
+      <div v-if="!showModal" class="flex justify-between items-center">
         <button
           @click="showModal = true"
-          class="bg-gray-500 hover:bg-gray-700 text-white font-bold m-2 py-2 px-4 rounded inline-flex items-center"
+          class="flex justify-center items-center bg-gray-500 hover:bg-gray-700 text-white font-bold m-2 py-1 px-2 rounded w-[40px] h-[40px]"
         >
           <PencilIcon class="h-5 w-5" />
         </button>
+        <button
+          v-if="conflict"
+          class="flex justify-center items-center bg-red-500 font-bold hover:bg-red-700 m-2 px-2 py-1 rounded w-[40px] h-[40px] text-white"
+          @click="showConflictModal = !showConflictModal"
+        >
+          <ExclamationTriangleIcon class="h-5 w-5" />
+        </button>
       </div>
+
       <div
         v-if="showModal"
         class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
@@ -400,6 +419,29 @@ const closeAndEmit = async () => {
             Submit
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex items-center justify-center bg-black bg-opacity-50 fixed inset-0 z-50"
+    v-if="showConflictModal"
+  >
+    <div class="relative bg-white p-6 rounded-xl shadow-md">
+      <button
+        class="absolute right-2 top-2 font-semibold hover:text-gray-800 text-gray-500 text-xl"
+        @click.prevent="showConflictModal = false"
+      >
+        ×
+      </button>
+      <h3 class="font-semibold text-xl mb-4">Conflict Details</h3>
+      <div v-if="conflictDetails">
+        <ul>
+          <p>confilcDetails is working</p>
+          <li v-for="detail in conflictDetails" :key="detail.id">
+            {{ detail.schedual_master.date }}
+            {{ detail.schedual_master.course.name }}
+          </li>
+        </ul>
       </div>
     </div>
   </div>

@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\Conflict;
 use App\Models\Stundenplan;
 use Illuminate\Http\Request;
 use App\Models\CourseSubject;
@@ -213,11 +214,63 @@ class StundenplanController extends Controller
         ->where('template_id', $templateId)
         ->get();
 
-      return response()->json([
-        'dataExists' => true,
-        'detail' => $detail,
-        'soll' => $soll
-      ]);
+      $teacherId = $detail->teacher_id;
+      $checkDate = $request->date;
+      $startTime = $request->start_time;
+      $endTime = $request->end_time;
+
+      $overlappingSchedules = SchedualDetail::join('schedual_masters', 'schedual_masters.id', '=', 'schedual_details.schedual_master_id')
+        ->where('schedual_details.teacher_id', $teacherId)
+        ->where('schedual_masters.date', $checkDate)
+        ->where(function ($query) use ($startTime, $endTime) {
+          $query->where(function ($query) use ($startTime, $endTime) {
+            $query->where('start_time', '<', $endTime)
+              ->where('end_time', '>', $startTime);
+          });
+        })
+        ->where('schedual_details.id', '!=', $detail->id) // Exclude the current SchedualDetail record from the query
+        ->select('schedual_details.*') // To get only schedual_details fields
+        ->with(['schedualMaster.course.city', 'subject', 'room']) // Including related data, adjust as necessary
+        ->get();
+
+      if ($overlappingSchedules->isEmpty()) {
+
+        // Delete record from Conflict table if it exists
+        Conflict::where([
+          'user_id' => auth()->id(),
+          'date' => $checkDate,
+          'start_time' => $startTime,
+          'end_time' => $endTime,
+        ])->delete();
+
+        return response()->json([
+          'dataExists' => true,
+          'detail' => $detail,
+          'soll' => $soll
+        ]);
+      } else {
+        // Overlapping schedules found
+        foreach ($overlappingSchedules as $overlap) {
+          Conflict::firstOrCreate(
+            [
+              'user_id' => auth()->id(),
+              'teacher_id' => $teacherId,
+              'first_course_id' => $detail->schedualMaster->course->id,
+              'second_course_id' => $overlap->schedualMaster->course->id,
+              'date' => $checkDate,
+              'start_time' => $startTime,
+              'end_time' => $endTime,
+            ],
+          );
+        }
+        return response()->json([
+          'dataExists' => true,
+          'detail' => $detail,
+          'soll' => $soll,
+          'conflict' => true,
+          'overlappingSchedules' => $overlappingSchedules
+        ]);
+      }
     }
   }
 

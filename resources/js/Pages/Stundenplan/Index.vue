@@ -6,6 +6,7 @@ import moment from "moment";
 import TeachingUnit from "@/Components/TeachingUnit.vue";
 import Sidebar from "@/Components/Sidebar.vue";
 import { useForm } from "@inertiajs/vue3";
+import { FaceFrownIcon } from "@heroicons/vue/20/solid";
 
 const props = defineProps({
   courses: {
@@ -114,6 +115,7 @@ const handleSelection = (data) => {
 };
 
 const handleSollData = (newSollData) => {
+sollData.value = null;
   console.log("Index: Got new sollData:", newSollData);
   sollData.value = newSollData;
 };
@@ -317,13 +319,15 @@ const getWeekStatus = (weekNumber) => {
                     </select>
                   </div>
                 </div>
-
-                <button
-                  @click="toggleSidebar"
-                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-full self-center"
-                >
-                  Details
-                </button>
+                <div class="flex items-center space-x-4">
+                  <FaceFrownIcon class="self-center text-red-400 h-8 w-8" />
+                  <button
+                    @click="toggleSidebar"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded self-center"
+                  >
+                    Details
+                  </button>
+                </div>
               </div>
               <div v-if="selectedCourse">
                 <div class="mt-4">

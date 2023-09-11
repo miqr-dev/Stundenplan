@@ -1035,6 +1035,12 @@ select {
 .h-20 {
   height: 5rem;
 }
+.h-10 {
+  height: 2.5rem;
+}
+.h-\[40px\] {
+  height: 40px;
+}
 .max-h-\[3\.6rem\] {
   max-height: 3.6rem;
 }
@@ -1109,6 +1115,15 @@ select {
 }
 .w-32 {
   width: 8rem;
+}
+.w-10 {
+  width: 2.5rem;
+}
+.w-12 {
+  width: 3rem;
+}
+.w-\[40px\] {
+  width: 40px;
 }
 .min-w-0 {
   min-width: 0px;
@@ -2045,6 +2060,10 @@ select {
 .hover\:bg-blue-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
+.hover\:bg-red-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(185 28 28 / var(--tw-bg-opacity));
 }
 .hover\:font-bold:hover {
   font-weight: 700;

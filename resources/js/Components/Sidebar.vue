@@ -43,7 +43,7 @@ watchEffect(() => {
 const updateSollData = (sollData) => {
   sollData.forEach((soll) => {
     const subjectIndex = subjects.value.findIndex(
-    subject => subject.id === soll.subject_id
+      (subject) => subject.id === soll.subject_id
     );
     if (subjectIndex !== -1) {
       subjects.value[subjectIndex].pivot.ist = soll.ist;
@@ -145,6 +145,41 @@ const leavesForCurrentAndNextMonth = (teacher) => {
 
   return uniqueLeaves;
 };
+
+const remainingWeeks = computed(() => {
+  const endDate = moment(props.course.end_date);
+  const today = moment().startOf("day");
+  const weeksLeft = endDate.diff(today, "weeks");
+
+  return weeksLeft;
+});
+
+const subjectsWithRequiredHours = computed(() => {
+  return subjects.value.map((subject) => {
+    // Log initial subject data
+    console.log(`Calculating for subject: ${subject.name}`);
+    console.log(`Initial Soll: ${subject.pivot.soll}`);
+    console.log(`Initial Ist: ${subject.pivot.ist}`);
+
+    // Calculate and log remaining Soll
+    const remainingSoll = subject.pivot.soll - subject.pivot.ist;
+    console.log(`Remaining Soll: ${remainingSoll}`);
+
+    // Log remaining weeks
+    console.log(`Remaining Weeks: ${remainingWeeks.value}`);
+
+    // Calculate and log requiredHoursPerWeek
+    const requiredHoursPerWeek =
+      remainingWeeks.value > 0 ? remainingSoll / remainingWeeks.value : 0;
+    console.log(`Required Hours Per Week: ${requiredHoursPerWeek}`);
+
+    // Return new subject object with added requiredHoursPerWeek
+    return {
+      ...subject,
+      requiredHoursPerWeek: requiredHoursPerWeek.toFixed(2),
+    };
+  });
+});
 </script>
 
 <template>
@@ -213,27 +248,26 @@ const leavesForCurrentAndNextMonth = (teacher) => {
       <h2 class="mt-8 mb-4 font-semibold text-xl">
         Subjects and Soll-Ist Values
       </h2>
-      <table class="border bg-white border-gray-300 min-w-0 mt-4 w-full">
-        <thead>
-          <tr>
-            <th class="border px-2 py-1">Subject Name</th>
-            <th class="border px-2 py-1">Soll</th>
-            <th class="border px-2 py-1">Ist</th>
-            <th class="border px-2 py-1">Difference</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="subject in subjects" :key="subject.id">
-            <!-- Use subjects.value here -->
-            <td class="border px-2 py-1 text-sm">{{ subject.name }}</td>
-            <td class="border px-2 py-1 text-sm">{{ subject.pivot.soll }}</td>
-            <td class="border px-2 py-1 text-sm">{{ subject.pivot.ist }}</td>
-            <td class="border px-2 py-1 text-sm">
-              {{ subject.pivot.soll - subject.pivot.ist }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+<table class="border bg-white border-gray-300 min-w-0 mt-4 w-full">
+  <thead>
+    <tr>
+      <th class="border px-2 py-1">Subject Name</th>
+      <th class="border px-2 py-1">Soll</th>
+      <th class="border px-2 py-1">Ist</th>
+      <th class="border px-2 py-1">Difference</th>
+      <th class="border px-2 py-1">Required Hours/Week</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr :key="subject.id" v-for="subject in subjectsWithRequiredHours">
+      <td class="border px-2 py-1 text-sm">{{ subject.name }}</td>
+      <td class="border px-2 py-1 text-sm">{{ subject.pivot.soll }}</td>
+      <td class="border px-2 py-1 text-sm">{{ subject.pivot.ist }}</td>
+      <td class="border px-2 py-1 text-sm">{{ subject.pivot.soll - subject.pivot.ist }}</td>
+      <td class="border px-2 py-1 text-sm">{{ subject.requiredHoursPerWeek }}</td>
+    </tr>
+  </tbody>
+</table>
     </aside>
   </transition>
 </template>
