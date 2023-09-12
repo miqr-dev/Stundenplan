@@ -26,4 +26,8 @@ class City extends Model
   {
     return $this->hasMany(Course::class);
   }
+  public function bundesland()
+{
+    return $this->belongsTo(Bundesland::class);
+}
 }

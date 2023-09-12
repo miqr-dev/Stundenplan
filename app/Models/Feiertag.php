@@ -8,5 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Feiertag extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = ['bundesland_id', 'year', 'date', 'name'];
+
+    public function bundesland()
+{
+    return $this->belongsTo(Bundesland::class);
+}
 }

@@ -9,7 +9,7 @@ class Bundesland extends Model
 {
   use HasFactory;
 
-  protected $guarded = [];
+  protected $fillable = ['name', 'short_name'];
 
   public function cities()
   {

@@ -115,7 +115,7 @@ const handleSelection = (data) => {
 };
 
 const handleSollData = (newSollData) => {
-sollData.value = null;
+  sollData.value = null;
   console.log("Index: Got new sollData:", newSollData);
   sollData.value = newSollData;
 };
@@ -134,12 +134,14 @@ const weekDates = computed(() => {
 });
 
 const daysWithDates = computed(() => {
-  return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
+  const result = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
     (day, index) => ({
       day,
       date: weekDates.value[index],
     })
   );
+  console.log("Computed daysWithDates:", result); // Add this line for debugging
+  return result;
 });
 
 const selectedCourseTeachers = computed(() => {
@@ -196,6 +198,15 @@ const getWeekStatus = (weekNumber) => {
     return "current";
   }
 };
+
+const isHoliday = (date) => {
+  if (!selectedCourse.value || !selectedCourse.value.holidays) return false;
+
+  return selectedCourse.value.holidays.some((holiday) => {
+    return moment(holiday.date).isSame(date, "day");
+  });
+};
+
 // Add any other reactive variables, computed properties or methods here.
 </script>
 
@@ -336,9 +347,15 @@ const getWeekStatus = (weekNumber) => {
                     <table class="table-auto w-full mt-1 text-p border">
                       <thead>
                         <tr class="text-left font-bold">
-                          <th class="border px-4 py-2"></th>
+                          <th class="border px-4 py-2 "></th>
                           <th
-                            class="border px-4 py-2"
+                            class="border py-2 px-4"
+                            :class="{
+                              'bg-gray-400 text-white text-center': isHoliday(
+                                weekDates[index]
+                              ),
+                            }"
+                            :key="index"
                             v-for="(day, index) in [
                               'Monday',
                               'Tuesday',
@@ -346,7 +363,6 @@ const getWeekStatus = (weekNumber) => {
                               'Thursday',
                               'Friday',
                             ]"
-                            :key="index"
                           >
                             {{ day }}
                             <span v-if="weekDates.length">{{
@@ -378,12 +394,20 @@ const getWeekStatus = (weekNumber) => {
                             </td>
                             <!-- Loop through each day of the week -->
                             <template v-for="dayWithDate in daysWithDates">
-                              <td class="border px-1 py-1">
+                              <td
+                                class="border px-1 py-1"
+                                :class="{
+                                  'bg-gray-400 text-white': isHoliday(
+                                    dayWithDate.date
+                                  ),
+                                }"
+                              >
                                 <template v-if="selectedCourse && selectedWeek">
                                   <!-- Check if the course is active during the selected week -->
                                   <div v-if="isCourseInSelectedWeek">
                                     <TeachingUnit
                                       :subjects="selectedCourse.subjects"
+                                      :holidays="selectedCourse.holidays"
                                       :default_room="selectedCourse.room_id"
                                       :rooms="rooms"
                                       :day="dayWithDate.day"

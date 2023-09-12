@@ -11,6 +11,7 @@ use App\Models\Course;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Conflict;
+use App\Models\Feiertag;
 use App\Models\Stundenplan;
 use Illuminate\Http\Request;
 use App\Models\CourseSubject;
@@ -28,41 +29,78 @@ class StundenplanController extends Controller
    * @return \Illuminate\Http\Response
    */
 
-  public function index()
-  {
-    $user = Auth::user();
-    $city_id = City::where('name', $user->ort)->value('id');
-    $courses = Course::whereHas('room.location', function ($query) use ($city_id) {
-      $query->where('city_id', $city_id);
+public function index()
+{
+    $currentUserCityId = $this->getCityIdFromUser(Auth::user());
+    $courses = $this->getCoursesForCity($currentUserCityId);
+    $rooms = $this->getRoomsForCity($currentUserCityId);
+    $weekNumbers = $this->getWeekNumbers();
+    
+    return inertia('Stundenplan/Index', [
+        'courses' => $courses, 
+        'weekNumbers' => $weekNumbers, 
+        'rooms' => $rooms,
+    ]);
+}
+
+protected function getCityIdFromUser($user)
+{
+    return City::where('name', $user->ort)->value('id');
+}
+
+protected function getCoursesForCity($cityId)
+{
+    $courses = Course::whereHas('room.location', function ($query) use ($cityId) {
+        $query->where('city_id', $cityId);
     })
-      ->with([
+    ->with([
         'grid.gridslots',
-        'room.location.city',
-        'subjects.teachers' => function ($query) use ($city_id) {
-          $query->whereHas('cities', function ($query) use ($city_id) {
-            $query->where('id', $city_id);
-          });
+        'room.location.city.bundesland',
+        'subjects.teachers' => function ($query) use ($cityId) {
+            $query->whereHas('cities', function ($query) use ($cityId) {
+                $query->where('id', $cityId);
+            });
         },
         'subjects.teachers.teacherNotAvailable'
-      ])
-      ->get();
+    ])
+    ->get();
 
-    $rooms = Room::whereHas('location', function ($query) use ($city_id) {
-      $query->where('city_id', $city_id);
+    return $this->addHolidaysToCourses($courses);
+}
+
+protected function addHolidaysToCourses($courses)
+{
+    return $courses->each(function ($course) {
+        $startDate = $course->start_date;
+        $endDate = $course->end_date;
+        $bundeslandId = $course->room->location->city->bundesland->id;
+
+        $course->holidays = Feiertag::where('bundesland_id', $bundeslandId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get();
+    });
+}
+
+protected function getRoomsForCity($cityId)
+{
+    return Room::whereHas('location', function ($query) use ($cityId) {
+        $query->where('city_id', $cityId);
     })->with('location')->get();
+}
 
+protected function getWeekNumbers()
+{
     $currentMonday = Carbon::now()->startOfWeek()->subWeeks(10);
     $endOfWeek = Carbon::now()->startOfWeek()->addWeek(10);
+    $mondays = collect();
 
-    $mondays = [];
     while ($currentMonday->lte($endOfWeek)) {
-      $mondays[] = $currentMonday->toDateString();
-      $currentMonday->addWeek();
+        $mondays->push($currentMonday->toDateString());
+        $currentMonday->addWeek();
     }
-    $weekNumbers = Week::whereIn('startDate', $mondays)->get();
 
-    return inertia('Stundenplan/Index', ['courses' => $courses, 'weekNumbers' => $weekNumbers, 'rooms' => $rooms,]);
-  }
+    return Week::whereIn('startDate', $mondays)->get();
+}
 
 
   /**
