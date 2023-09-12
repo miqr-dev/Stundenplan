@@ -21,7 +21,7 @@ class CreateSchedualDetailsTable extends Migration
       $table->time('end_time');
       $table->boolean('is_break')->default(false);
       $table->foreignId('subject_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
-      $table->foreignId('teacher_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
+      $table->foreignId('teacher_id')->constrained()->onUpdate('cascade')->onDelete('cascade')->nullable();
       $table->foreignId('room_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->timestamps();
     });

@@ -103,6 +103,7 @@ class CourseController extends Controller
     $city_id = $course->room->location->city->id;
 
     $course = $course->load([
+      'feriens',
       'template.subjects.teachers' => function ($query) use ($city_id) {
         $query->whereHas('cities', function ($query) use ($city_id) {
           $query->where('id', $city_id);

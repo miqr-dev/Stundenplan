@@ -9,7 +9,7 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   XMarkIcon,
-  SunIcon
+  SunIcon,
 } from "@heroicons/vue/20/solid";
 import axios from "axios";
 
@@ -171,10 +171,11 @@ const loadSavedData = () => {
   }
 };
 
-const isHoliday = computed(() => {
-  return props.holidays.some((holiday) => {
+const holidayName = computed(() => {
+  const holiday = props.holidays.find((holiday) => {
     return moment(holiday.date).isSame(props.date, "day");
   });
+  return holiday ? holiday.name : null;
 });
 
 async function initTeachingUnit() {
@@ -271,13 +272,12 @@ const closeAndEmit = async () => {
     <div v-if="isLoading" class="flex justify-center items-center">
       <div class="spinner"></div>
     </div>
-<div
-  class="flex items-center justify-center bg-gray-400 text-white p-2"
-  v-if="isHoliday"
->
-  <SunIcon class="h-6 w-6 text-white mr-2" />
-  <div class="font-semibold text-lg">Feiertag</div>
-</div>
+    <div
+      class="flex items-center justify-center bg-gray-400 text-white p-2"
+      v-if="holidayName"
+    >
+      <div class="font-semibold">{{ holidayName }}</div>
+    </div>
     <div v-else>
       <div v-if="teachingUnitData" class="bg-gray-100 p-2 rounded relative">
         <component

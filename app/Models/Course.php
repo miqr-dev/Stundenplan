@@ -67,4 +67,8 @@ class Course extends Model
   {
     return $this->hasOne(SchedualMaster::class);
   }
+  public function feriens()
+  {
+    return $this->hasMany(Ferien::class);
+  }
 }

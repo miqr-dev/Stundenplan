@@ -14,6 +14,8 @@ const props = defineProps({
   course: {},
 });
 
+const showLeaves = ref(false);
+
 const subjectDifference = computed(() => {
   const courseSubjectCount = props.course.subjects.length;
   const templateSubjectCount = props.course.template.subjects.length;
@@ -309,6 +311,123 @@ const showSubjects = ref(false);
                                     </ul>
                                   </li>
                                 </ul>
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right"
+                              >
+                                <button
+                                  type="button"
+                                  class="inline-block text-gray-500 hover:text-gray-700"
+                                >
+                                  <svg
+                                    class="inline-block h-6 w-6 fill-current"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      d="M12 6a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4zm-2 6a2 2 0 104 0 2 2 0 00-4 0z"
+                                    />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="container mx-auto">
+                  <div class="py-2">
+                    <div class="flex justify-between">
+                      <div class="flex self-center">
+                        <button
+                          class="text-2xl font-semibold leading-tight hover:underline"
+                          @click="showLeaves = !showLeaves"
+                        >
+                          Ferienzeitraum
+                        </button>
+                        <span class="ml-2 text-md text-blue-500 self-center"
+                          >({{ course.feriens.length }})</span
+                        >
+                      </div>
+
+                      <Link
+                        :href="
+                          route('ferien.create', {
+                            course: course.id,
+                          })
+                        "
+                        class="text-blue-500 text-p"
+                        >Neuer Ferienzeitraum</Link
+                      >
+                    </div>
+                    <div
+                      class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto"
+                      v-show="showLeaves"
+                    >
+                      <div
+                        class="inline-block min-w-full shadow-md rounded-lg overflow-auto h-72"
+                      >
+                        <table class="min-w-full leading-normal table">
+                          <thead>
+                            <tr>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                From
+                              </th>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                To
+                              </th>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                Status
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="ferien in course.feriens" :key="ferien.id">
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                <p class="text-gray-900 whitespace-no-wrap">
+                                  {{
+                                    moment(ferien.start_date).format("LL")
+                                  }}
+                                </p>
+                                <p class="text-gray-600 whitespace-no-wrap">
+                                  {{ moment(ferien.start_date).week() }}
+                                  &nbsp; KW
+                                </p>
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                <p class="text-gray-900 whitespace-no-wrap">
+                                  {{ moment(ferien.end_date).format("LL") }}
+                                </p>
+                                <p class="text-gray-600 whitespace-no-wrap">
+                                  {{ moment(ferien.end_date).week() }} &nbsp;
+                                  KW
+                                </p>
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                <span
+                                  class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
+                                >
+                                  <span
+                                    aria-hidden
+                                    class="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                                  ></span>
+                                  <span class="relative">Paid</span>
+                                </span>
                               </td>
                               <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right"

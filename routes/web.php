@@ -8,6 +8,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\GridController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\FerienController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\GridslotController;
@@ -56,6 +57,7 @@ Route::resource('template', TemplateController::class);
 Route::resource('course', CourseController::class);
 Route::resource('teacher', TeacherController::class);
 Route::resource('teacher-not-available', TeacherNotAvailableController::class);
+Route::resource('ferien', FerienController::class);
 
 Route::post('/stundenplan/check-teaching-unit', [StundenplanController::class, 'checkTeachingUnit']);
 Route::post('/stundenplan/check-teacher-conflicts', [StundenplanController::class, 'checkTeacherConflicts']);
