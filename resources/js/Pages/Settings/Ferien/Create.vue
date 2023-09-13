@@ -12,6 +12,7 @@ const props = defineProps({
 let form = useForm({
   course_id: props.course.id,
   ferienDate: [],
+  name: "",
 });
 
 let submit = () => {
@@ -46,6 +47,14 @@ let submit = () => {
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
               <form @submit.prevent="submit">
+                              <div class="mb-6">
+                  <SimpleInput
+                    v-model="form.name"
+                    label="Name"
+                    type="text"
+                    :error="form.errors.name"
+                  />
+                </div>
                 <div class="mb-6">
                   <label
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"

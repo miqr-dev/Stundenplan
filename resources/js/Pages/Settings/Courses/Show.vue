@@ -386,7 +386,7 @@ const showSubjects = ref(false);
                               <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                               >
-                                Status
+                                name
                               </th>
                             </tr>
                           </thead>
@@ -426,7 +426,7 @@ const showSubjects = ref(false);
                                     aria-hidden
                                     class="absolute inset-0 bg-green-200 opacity-50 rounded-full"
                                   ></span>
-                                  <span class="relative">Paid</span>
+                                  <span class="relative" v-if="ferien.name"> {{ ferien.name  }}</span>
                                 </span>
                               </td>
                               <td

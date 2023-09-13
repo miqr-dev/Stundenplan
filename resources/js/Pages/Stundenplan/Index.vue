@@ -207,6 +207,21 @@ const isHoliday = (date) => {
   });
 };
 
+const isFerien = (date) => {
+  console.log("Input date:", date);
+
+  if (!selectedCourse.value || !selectedCourse.value.feriens) return false;
+
+  return selectedCourse.value.feriens.some((ferien) => {
+    const startDate = moment(ferien.start_date).startOf('day');
+    const endDate = moment(ferien.end_date).startOf('day');
+    const checkDate = moment(date).startOf('day');
+    const isBetween = checkDate.isBetween(startDate, endDate, null, "[]");
+    return isBetween;
+  });
+};
+
+
 // Add any other reactive variables, computed properties or methods here.
 </script>
 
@@ -347,11 +362,14 @@ const isHoliday = (date) => {
                     <table class="table-auto w-full mt-1 text-p border">
                       <thead>
                         <tr class="text-left font-bold">
-                          <th class="border px-4 py-2 "></th>
+                          <th class="border px-4 py-2"></th>
                           <th
                             class="border py-2 px-4"
                             :class="{
                               'bg-gray-400 text-white text-center': isHoliday(
+                                weekDates[index]
+                              ),
+                              'bg-green-200 text-gray-600 text-center': isFerien(
                                 weekDates[index]
                               ),
                             }"
@@ -400,6 +418,8 @@ const isHoliday = (date) => {
                                   'bg-gray-400 text-white': isHoliday(
                                     dayWithDate.date
                                   ),
+                                  'bg-green-200 text-gray-600 text-center':
+                                    isFerien(dayWithDate.date),
                                 }"
                               >
                                 <template v-if="selectedCourse && selectedWeek">
@@ -408,6 +428,7 @@ const isHoliday = (date) => {
                                     <TeachingUnit
                                       :subjects="selectedCourse.subjects"
                                       :holidays="selectedCourse.holidays"
+                                      :feriens="selectedCourse.feriens"
                                       :default_room="selectedCourse.room_id"
                                       :rooms="rooms"
                                       :day="dayWithDate.day"

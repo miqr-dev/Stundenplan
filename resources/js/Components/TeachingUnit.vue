@@ -9,14 +9,14 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   XMarkIcon,
-  SunIcon,
 } from "@heroicons/vue/20/solid";
 import axios from "axios";
 
 // --------------------- Defining Props ------------------------
 const props = defineProps({
   subjects: { type: Array, required: true },
-  holidays: { type: Array, required: true },
+  holidays: { type: Array, required: false },
+  feriens: { type: Array, required: false },
   options2: { type: Array },
   rooms: { type: Array, required: true },
   day: { type: String, required: true },
@@ -178,6 +178,18 @@ const holidayName = computed(() => {
   return holiday ? holiday.name : null;
 });
 
+const ferienName = computed(() => {
+  if (!props.feriens || !Array.isArray(props.feriens)) return null;
+
+  const ferien = props.feriens.find((ferien) => {
+    const startDate = moment(ferien.start_date).startOf('day');;
+    const endDate = moment(ferien.end_date).startOf('day');;
+    const isBetween = moment(props.date).isBetween(startDate, endDate, null, "[]");
+    return isBetween;
+  });
+  return ferien ? ferien.name : null;
+});
+
 async function initTeachingUnit() {
   await checkTeachingUnit();
   isLoading.value = false;
@@ -268,15 +280,20 @@ const closeAndEmit = async () => {
 </script>
 
 <template>
-  <div>
     <div v-if="isLoading" class="flex justify-center items-center">
       <div class="spinner"></div>
     </div>
     <div
       class="flex items-center justify-center bg-gray-400 text-white p-2"
-      v-if="holidayName"
+      v-else-if="holidayName"
     >
       <div class="font-semibold">{{ holidayName }}</div>
+    </div>
+    <div
+      class="flex items-center justify-center bg-green-200 text-gray-600 p-2"
+      v-else-if="ferienName"
+    >
+      <div class="font-semibold">{{ ferienName }}</div>
     </div>
     <div v-else>
       <div v-if="teachingUnitData" class="bg-gray-100 p-2 rounded relative">
@@ -436,7 +453,7 @@ const closeAndEmit = async () => {
         </div>
       </div>
     </div>
-  </div>
+
   <div
     class="flex items-center justify-center bg-black bg-opacity-50 fixed inset-0 z-50"
     v-if="showConflictModal"

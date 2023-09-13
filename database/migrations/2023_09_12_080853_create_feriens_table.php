@@ -16,6 +16,7 @@ public function up()
     Schema::create('feriens', function (Blueprint $table) {
         $table->id();
         $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+        $table->string('name');
         $table->date('start_date');
         $table->date('end_date');
         $table->timestamps();

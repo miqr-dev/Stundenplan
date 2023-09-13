@@ -34,9 +34,11 @@ class FerienController extends Controller
       $request->validate([
       'course_id' => 'required',
       'ferienDate' => 'required',
+      'name' => 'required',
 
     ]);
       $away = new Ferien;
+      $away -> name = $request->name; 
       $away -> course_id = $request->course_id; 
       $away -> start_date = $request->ferienDate[0]; 
       $away -> end_date = $request->ferienDate[1]; 

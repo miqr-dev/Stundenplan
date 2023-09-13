@@ -8,6 +8,7 @@ use App\Models\Room;
 use App\Models\Week;
 use Inertia\Inertia;
 use App\Models\Course;
+use App\Models\Ferien;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Conflict;
@@ -56,12 +57,13 @@ protected function getCoursesForCity($cityId)
     ->with([
         'grid.gridslots',
         'room.location.city.bundesland',
+         'feriens',
         'subjects.teachers' => function ($query) use ($cityId) {
             $query->whereHas('cities', function ($query) use ($cityId) {
                 $query->where('id', $cityId);
             });
         },
-        'subjects.teachers.teacherNotAvailable'
+        'subjects.teachers.teacherNotAvailable',
     ])
     ->get();
 
