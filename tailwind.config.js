@@ -27,6 +27,9 @@ module.exports = {
               p:  ['16px', '29px'],
               ul: ['14px', '21px'],
             },
+            width: {
+              '192': '48rem',
+            },
         },
     },
 

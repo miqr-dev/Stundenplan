@@ -15,6 +15,7 @@ use App\Http\Controllers\GridslotController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\StundenplanController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TeacherNotAvailableController;
 
 Route::get('/', function () {
@@ -72,4 +73,8 @@ Route::get('teacher/{teacher}/not-available/create', [TeacherNotAvailableControl
 Route::get('grid/{grid}/gridslots/create', [GridslotController::class, 'create'])->name('gridslot.create');
 
 
+
+
+// Notification
+Route::get('/notifications', [NotificationController::class,'index']);
 require __DIR__.'/auth.php';

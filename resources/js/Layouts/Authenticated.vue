@@ -1,28 +1,75 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed, onBeforeUnmount } from "vue";
 import BreezeApplicationLogo from "@/Components/ApplicationLogo.vue";
 import BreezeDropdown from "@/Components/Dropdown.vue";
 import BreezeDropdownLink from "@/Components/DropdownLink.vue";
 import BreezeNavLink from "@/Components/NavLink.vue";
 import BreezeResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
-import Alert from "@/Components/Alert.vue"
+import Alert from "@/Components/Alert.vue";
+import axios from "axios";
+import { BellIcon } from "@heroicons/vue/20/solid";
 
 const showingNavigationDropdown = ref(false);
 const showAlert = ref(true);
+const notifications = ref([]);
+const notificationDropdown = ref(null);
+
+const fetchNotifications = async () => {
+  const response = await axios.get("/notifications");
+  notifications.value = response.data.notifications;
+};
+
+const showNotificationDropdown = ref(false);
+const handleClickOutside = (event) => {
+  if (
+    notificationDropdown.value &&
+    !notificationDropdown.value.contains(event.target)
+  ) {
+    showNotificationDropdown.value = false;
+  }
+};
+
+const notificationsCount = computed(() => {
+  return notifications.value.length;
+});
+
+onMounted(() => {
+  fetchNotifications();
+  document.addEventListener("mousedown", handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("mousedown", handleClickOutside);
+});
 </script>
 
 <template>
   <div>
     <div v-if="$page.props.flash.success" class="absolute top-8 right-10 z-10">
-      <Alert :show="showAlert" :on-dismiss="()=> showAlert = false" intent="success" :title="$page.props.flash.success"/>
-    </div> 
+      <Alert
+        :show="showAlert"
+        :on-dismiss="() => (showAlert = false)"
+        intent="success"
+        :title="$page.props.flash.success"
+      />
+    </div>
     <div v-if="$page.props.flash.error" class="absolute top-8 right-g10 z-10">
-      <Alert :show="showAlert" :on-dismiss="()=> showAlert = false" intent="danger" :title="$page.props.flash.error"/>
-    </div> 
+      <Alert
+        :show="showAlert"
+        :on-dismiss="() => (showAlert = false)"
+        intent="danger"
+        :title="$page.props.flash.error"
+      />
+    </div>
     <div v-if="$page.props.error" class="absolute top-8 right-10 z-10">
-      <Alert :show="showAlert" :on-dismiss="()=> showAlert = false" intent="danger" :title="$page.props.error"/>
-    </div> 
+      <Alert
+        :show="showAlert"
+        :on-dismiss="() => (showAlert = false)"
+        intent="danger"
+        :title="$page.props.error"
+      />
+    </div>
     <div class="min-h-screen bg-gray-100">
       <nav class="bg-white border-b border-gray-100">
         <!-- Primary Navigation Menu -->
@@ -69,6 +116,60 @@ const showAlert = ref(true);
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">
+              <div class="ml-3 relative">
+                <!-- Notification Icon -->
+                <div class="mr-3 relative">
+                  <button
+                    @click="
+                      showNotificationDropdown = !showNotificationDropdown
+                    "
+                    class="p-2 bg-white rounded-full"
+                  >
+                    <BellIcon class="h-5 w-5 text-gray-500" />
+                    <span
+                      class="absolute top-0 right-0 inline-block bg-yellow-500 text-white text-xs rounded-full h-4 w-4 text-center"
+                    >
+                      {{ notificationsCount }}
+                    </span>
+                  </button>
+                  <!-- Dropdown for Notifications -->
+<div
+  v-if="notifications.length > 0 && showNotificationDropdown"
+  ref="notificationDropdown"
+  class="absolute right-0 mt-2 w-192 rounded-md shadow-lg z-20"
+>
+  <div class="rounded-md bg-white shadow-xs grid grid-cols-2">
+    <!-- Notifications column -->
+    <div class="py-1">
+      <div class="px-4 py-2 font-bold text-white bg-gray-400">
+        Geplante Lehrkraft entfernt.
+      </div>
+      <div class="relative">
+        <!-- This container will hold the border and the notifications -->
+        <div class="border-r border-gray-300 mt-2 mb-2"> 
+          <a
+            v-for="notification in notifications"
+            :key="notification.id"
+            href="#"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <!-- Display your notification message here -->
+            <span v-html="notification.data.message"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- Others column -->
+    <div class="py-1">
+      <div class="px-4 py-2 font-bold text-white bg-gray-400">
+        Doppeltzuweisung
+      </div>
+      <!-- Add other items here -->
+    </div>
+  </div>
+</div>
+                </div>
+              </div>
               <!-- Settings Dropdown -->
               <div class="ml-3 relative">
                 <BreezeDropdown align="left" width="48">
@@ -202,3 +303,6 @@ const showAlert = ref(true);
     </div>
   </div>
 </template>
+
+
+
