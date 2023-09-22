@@ -95,7 +95,7 @@ class CourseController extends Controller
     }
     $course->subjects()->attach($subjects);
 
-    return redirect()->route('course.index')->with('success', 'Course created successfully.');
+    return redirect()->route('course.index')->with('success', 'Der Kurs wurde erfolgreich erstellt.');
   }
 
   public function show(Course $course)
@@ -177,12 +177,13 @@ public function update(Request $request, Course $course)
     }
     $course->subjects()->sync($subjectsData);
 
-    return redirect()->route('course.index')->with('success', 'Course updated successfully.');
+    return redirect()->route('course.index')->with('success', 'Der Kurs wurde erfolgreich aktualisiert.');
 }
 
-  public function destroy(Course $course)
-  {
+public function destroy(Course $course)
+{
+    $course->update(['grid_id' => null]);
     $course->delete();
-    return redirect()->route('course.index')->with('success', 'Course deleted successfully.');
-  }
+    return redirect()->route('course.index')->with('success', 'Der Kurs wurde erfolgreich gelöscht.');
+}
 }

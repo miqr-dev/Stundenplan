@@ -1,4 +1,3 @@
-<!-- DeleteButton.vue -->
 <script setup>
 import { ref } from 'vue';
 import ConfirmationModal from '@/Components/SimpleConfirmationModal.vue';
@@ -6,7 +5,7 @@ import ConfirmationModal from '@/Components/SimpleConfirmationModal.vue';
 const props = defineProps({
   buttonText: {
     type: String,
-    default: 'Delete',
+    default: 'Löschen',
   },
 });
 
@@ -35,8 +34,8 @@ const handleCancel = () => {
     </button>
     <ConfirmationModal
       :isVisible="showModal"
-      title="Delete Confirmation"
-      message="Are you sure you want to delete this item?"
+      title="Löschbestätigung"
+      message="Sind Sie sicher, dass Sie löschen möchten"
       @confirm="handleConfirm"
       @cancel="handleCancel"
     />

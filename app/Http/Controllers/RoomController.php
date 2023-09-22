@@ -31,7 +31,7 @@ class RoomController extends Controller
       'capacity' => 'required',
     ]);
     Room::create($attributes);
-    return redirect()->route('location.show', $request->location_id);
+    return redirect()->route('location.show', $request->location_id)->with('success', 'Der Raum wurde erfolgreich erstellt.');
   }
 
   public function show(Room $room)
@@ -56,12 +56,12 @@ class RoomController extends Controller
     ]);
 
     $room->update($attributes);
-    return redirect()->route('location.index');
+    return redirect()->route('location.index')->with('success', 'Der Raum wurde erfolgreich aktualisiert.');
   }
 
   public function destroy(Room $room)
   {
     $room->delete();
-    return redirect()->route('location.index');
+    return redirect()->route('location.index')->with('success', 'Der Raum wurde erfolgreich gelöscht.');
   }
 }

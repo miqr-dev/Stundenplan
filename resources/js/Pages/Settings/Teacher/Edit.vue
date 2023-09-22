@@ -41,27 +41,24 @@ const destroy = () => {
 };
 </script>
 
+
 <template>
-  <Head title="Teachers" />
+  <Head title="Lehrer" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
-      <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8 xl:px-12">
         <SettingsSubMenu></SettingsSubMenu>
       </div>
     </header>
     <div class="py-12">
-      <div class="max-w-14xl mx-auto sm:px-6 lg:px-8">
+      <div class="max-w-screen-xl mx-auto sm:px-6 lg:px-8 xl:px-12">
         <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
-          <div
-            class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
-          >
+          <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray w-full xl:w-3/4 lg:w-4/5 md:w-5/6 sm:w-full mx-auto">
             <div class="flex justify-between">
-              <h2 class="text-h2">Edit {{ form.name }}, {{ form.surname }}</h2>
+              <h2 class="text-h2">Bearbeiten {{ form.name }}, {{ form.surname }}</h2>
               <SimpleBack />
             </div>
-            <div
-              class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
-            >
+            <div class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg">
               <form @submit.prevent="update">
                 <div class="mb-6">
                   <SimpleInput
@@ -74,7 +71,7 @@ const destroy = () => {
                 <div class="mb-6">
                   <SimpleInput
                     v-model="form.surname"
-                    label="surname"
+                    label="Nachname"
                     type="text"
                     :error="form.errors.surname"
                   />
@@ -82,7 +79,7 @@ const destroy = () => {
                 <div class="mb-6">
                   <SimpleInput
                     v-model="form.maxhourweek"
-                    label="Max Hour / Week"
+                    label="Max. Stunden / Woche"
                     type="text"
                     :error="form.errors.maxhourweek"
                   />
@@ -90,27 +87,28 @@ const destroy = () => {
                 <div class="mb-6">
                   <SimpleInput
                     v-model="form.email"
-                    label="email"
+                    label="E-Mail"
                     type="text"
                     :error="form.errors.email"
                   />
                 </div>
-                <!-- implement the vue-swatch here -->
                 <SimpleItemSelector
                   v-model="form.subjects"
                   :items="props.subjects"
                   :searchable="true"
                   label="subject"
+                  displayLabel="Fach"
                 ></SimpleItemSelector>
                 <SimpleItemSelector
                   v-model="form.cities"
                   :items="props.cities"
                   :searchable="true"
                   label="city"
+                  displayLabel="Stadt"
                 ></SimpleItemSelector>
                 <div class="mb-1 flex justify-between">
-                  <SimpleDelete @click="destroy" buttonText="Delete Template" />
-                  <SimpleSubmit :processing="form.processing" />
+                  <SimpleDelete @click="destroy" buttonText="Dozent/in löschen" />
+                  <SimpleSubmit :processing="form.processing">Aktualisieren</SimpleSubmit>
                 </div>
               </form>
             </div>

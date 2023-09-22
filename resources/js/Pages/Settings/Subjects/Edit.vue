@@ -8,13 +8,13 @@ import SimpleItemSelector from "@/Components/SimpleItemSelector.vue";
 import { provide } from "vue";
 
 provide("parentComponent", "Create");
+
 const props = defineProps({
   subject: Object,
   templates: Array,
   subject_template: Array,
-  available_teachers: Array, // Add this line
+  available_teachers: Array,
 });
-
 
 const form = useForm({
   id: props.subject.id,
@@ -23,7 +23,7 @@ const form = useForm({
   default_soll: props.subject.default_soll,
   templates: props.subject.templates,
   subject_template: props.subject_template,
-  teachers: props.subject.teachers,  // Add this line
+  teachers: props.subject.teachers,
 });
 
 const update = () => {
@@ -36,7 +36,7 @@ const destroy = () => {
 </script>
 
 <template>
-  <Head title="Subjects" />
+  <Head title="Fächer" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
       <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -44,20 +44,18 @@ const destroy = () => {
       </div>
     </header>
     <div class="py-12">
-      <div class="max-w-14xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
+      <div class="min-w-full mx-auto sm:px-6 lg:px-8">
+        <div class="bg-gray-100 overflow-hidden rounded-lg">
           <div
-            class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
+            class="p-6 bg-gray-100 text-h2 xl:text-h1 lg:text-h2 md:text-h3 font-bold text-p-gray h-full w-full xl:w-2/3 lg:w-3/4 md:w-full shadow-md mx-auto"
           >
-            <div class="flex justify-between">
-              <h2 class="text-h2">Edit the subject</h2>
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-h2">Fach bearbeiten</h2>
               <SimpleBack />
             </div>
-            <div
-              class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
-            >
+            <div class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg">
               <form @submit.prevent="update">
-                <div class="mb-6">
+                <div class="mb-6 w-1/2">
                   <SimpleInput
                     v-model="form.name"
                     label="Name"
@@ -73,42 +71,35 @@ const destroy = () => {
                     :error="form.errors.default_soll"
                   />
                 </div>
-
-                <!-- implement the vue-swatch here -->
                 <div class="mb-6">
                   <label
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"
-                    for="maxhourweek"
                   >
-                    Color
+                    Farbe
                   </label>
                   <VSwatches
                     v-model="form.color"
                     swatches="text-advanced"
                   ></VSwatches>
-                  <div
-                    v-if="form.errors.color"
-                    v-text="form.errors.color"
-                    class="text-red-500 text-sm mt-1"
-                  ></div>
+                  <div v-if="form.errors.color" v-text="form.errors.color" class="text-red-500 text-sm mt-1"></div>
                 </div>
                 <SimpleItemSelector
                   v-model="form.templates"
                   :items="props.templates"
                   :searchable="true"
-                  label="template"
+                  label="Vorlage"
+                  displayLabel="Vorlage/-n"
                 ></SimpleItemSelector>
                 <SimpleItemSelector
                   v-model="form.teachers"
                   :items="props.available_teachers"
                   :searchable="true"
-                  label="teacher"
+                  label="Dozent"
+                  displayLabel="Dozent/en"
                 ></SimpleItemSelector>
-
-                <!-- implement the vue-swatch here -->
                 <div class="mb-1 flex justify-between">
-                  <SimpleDelete @click="destroy" buttonText="Delete Subject" />
-                  <SimpleSubmit :processing="form.processing" />
+                  <SimpleDelete @click="destroy" buttonText="Löschen" :processing="form.processing" />
+                  <SimpleSubmit :processing="form.processing">Aktualisieren</SimpleSubmit>
                 </div>
               </form>
             </div>

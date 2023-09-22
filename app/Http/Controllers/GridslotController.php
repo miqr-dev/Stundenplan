@@ -3,38 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grid;
+use Inertia\Inertia;
 use App\Models\Gridslot;
 use Illuminate\Http\Request;
 
 class GridslotController extends Controller
 {
-  /**
-   * Display a listing of the resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
   public function index()
   {
   }
-
-  /**
-   * Show the form for creating a new resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
   public function create(Grid $grid)
   {
     return inertia('Settings/Gridslots/Create', [
       'grid' => $grid
     ]);
   }
-
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\Response
-   */
   public function store(Request $request)
   {
     $validatedData = $request->validate([
@@ -65,7 +48,7 @@ class GridslotController extends Controller
         ->get();
 
       if ($overlappingSlots->count() > 0) {
-        $request->session()->flash('error', 'The new grid slot overlaps with an existing one.');
+        $request->session()->flash('error', 'Das neue Zeitfenster überschneidet sich mit einem bereits existierenden.');
         return redirect()->back();
       }
     }
@@ -83,35 +66,20 @@ class GridslotController extends Controller
       $gridSlot->save();
     }
 
-    $request->session()->flash('message', 'The grid slot(s) have been created.');
+    $request->session()->flash('message', 'Das/Die Zeitfenster wurde erfolgreich erstellt.');
     return redirect()->route('grid.index');
   }
-
-  /**
-   * Display the specified resource.
-   *
-   * @param  \App\Models\Gridslot  $gridslot
-   * @return \Illuminate\Http\Response
-   */
   public function show(Gridslot $gridslot)
   {
     //
   }
-
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  \App\Models\Gridslot  $gridslot
-   * @return \Illuminate\Http\Response
-   */
-  public function edit(Grid $grid)
-  {
+public function edit(Grid $grid) {
     $gridslots = $grid->gridslots()->get();
     return inertia('Settings/Gridslots/Edit', [
-      'grid' => $grid,
-      'gridslots' => $gridslots
+        'grid' => $grid,
+        'gridslots' => $gridslots
     ]);
-  }
+}
 
   public function update(Request $request, Grid $grid)
 {
@@ -132,15 +100,8 @@ class GridslotController extends Controller
         ]);
     }
 
-    return redirect()->route('grid.index')->with('success','Grid is updated successfully');
+    return redirect()->route('grid.index')->with('success','Das Zeitfenster wurde erfolgreich aktualisiert.');
 }
-
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  \App\Models\Gridslot  $gridslot
-   * @return \Illuminate\Http\Response
-   */
   public function destroy(Gridslot $gridslot)
   {
     //

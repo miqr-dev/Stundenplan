@@ -22,9 +22,8 @@ watch(search, debounce(function (value) {
 
 
 </script>
-
 <template>
-  <Head title="Courses" />
+  <Head title="Kurse" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -35,60 +34,32 @@ watch(search, debounce(function (value) {
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
-          <div
-            class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 mx-auto"
-          >
-            <div class="sm:flex flex items-center justify-between">
-              <h2 class="text-h2">Courses</h2>
-              <Link :href="route('course.create')" class="text-blue-500 text-p"
-                >Add a Course</Link
-              >
-              <input
-                v-model="search"
-                type="text"
-                placeholder="search..."
-                class="rounded-xl px-2"
-              />
+          <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full lg:w-1/2 md:w-3/4 sm:w-full w-full mx-auto">
+            <h2 class="text-h2 mb-4">Kurse</h2>
+            <div class="flex justify-between">
+              <Link :href="route('course.create')" class="text-blue-500 text-p">Neuen Kurs hinzufügen</Link>
+              <input v-model="search" type="text" placeholder="Suchen..." class="rounded-xl px-2">
             </div>
             <div class="flex flex-col mt-4">
               <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div
-                  class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"
-                >
-                  <div
-                    class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
-                  >
+                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                  <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200">
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr
-                          v-for="(course, key) in courses.data"
-                          :key="course.id"
-                        >
+                        <tr v-for="(course, key) in courses.data" :key="course.id">
                           <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                               <div>
                                 <div class="text-sm font-medium text-gray-900">
-                                  <Link
-                                    :href="
-                                      route('course.show', {
-                                        course: course.id,
-                                      })
-                                    "
-                                  >
-                                    {{ course.name }}</Link
-                                  >
+                                  <Link :href="route('course.show', { course: course.id })">
+                                    {{ course.name }}</Link>
                                 </div>
                               </div>
                             </div>
                           </td>
-                          <td
-                            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-                          >
-                            <Link
-                              :href="`/course/${course.id}/edit`"
-                              class="text-blue-600 hover:text-blue-900"
-                            >
-                              Edit
+                          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <Link :href="`/course/${course.id}/edit`" class="text-blue-600 hover:text-blue-900">
+                              Bearbeiten
                             </Link>
                           </td>
                         </tr>
@@ -96,7 +67,7 @@ watch(search, debounce(function (value) {
                     </table>
                   </div>
                   <!-- Paginator -->
-                  <Pagination :links="courses.links" class="mt-6" />
+                  <Pagination :links="courses.links" class="mt-6"/>
                 </div>
               </div>
             </div>

@@ -44,7 +44,7 @@ class FerienController extends Controller
       $away -> end_date = $request->ferienDate[1]; 
       $away ->save();
 
-      return redirect()->route('course.show',$request->course_id);
+      return redirect()->route('course.show',$request->course_id)->with('success','Die Ferien wurden erfolgreich erstellt.' );
     }
   public function show($id)
   {

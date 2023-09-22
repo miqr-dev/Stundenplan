@@ -4,53 +4,53 @@ import BreezeNavLink from "@/Components/NavLink.vue";
 
 <template>
   <nav class="bg-gray-100 border-b border-gray-100">
-    <!-- Secondary Navigation Menu -->
+    <!-- Sekundäres Navigationsmenü -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-around h-8">
         <div class="flex">
-          <!-- Navigation Links -->
+          <!-- Navigationslinks -->
           <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
             <BreezeNavLink
               :href="route('course.index')"
-              :active="route().current('course.*')"
+              :active="route().current('course.*') || route().current('ferien.*')"
             >
-              Courses
+              Kurse
             </BreezeNavLink>
             <BreezeNavLink
               :href="route('template.index')"
               :active="route().current('template.*')"
             >
-              Template
+              Vorlage
             </BreezeNavLink>
             <BreezeNavLink
               :href="route('subject.index')"
               :active="route().current('subject.*')"
             >
-              Subjects
+              Fächer
             </BreezeNavLink>
             <BreezeNavLink
               :href="route('location.index')"
               :active="route().current('location.*')"
             >
-              Locations
+              Standorte
             </BreezeNavLink>
             <BreezeNavLink
               :href="route('city.index')"
               :active="route().current('city.*')"
             >
-              Cities
+              Städte
             </BreezeNavLink>
             <BreezeNavLink
               :href="route('grid.index')"
               :active="route().current('grid.*')"
             >
-              Grid
+              Stundenraster
             </BreezeNavLink>
             <BreezeNavLink
               :href="route('teacher.index')"
               :active="route().current('teacher.*')"
             >
-              Teachers
+              Dozenten / innen
             </BreezeNavLink>
           </div>
         </div>

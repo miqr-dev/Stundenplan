@@ -17,6 +17,7 @@ const props = defineProps({
   modelValue: Array,
   itemName: String,
   errors: String,
+  displayLabel: String,
 });
 
 const filteredItems = computed(() => {
@@ -72,14 +73,14 @@ onBeforeUnmount(() => {
 <template>
   <div class="mb-6 flex w-full space-x-3">
     <div class="w-1/2">
-      <label class="block mb-2 text-xs font-bold text-gray-600 uppercase">{{
-        label
-      }}</label>
+      <label class="block mb-2 text-xs font-bold text-gray-600 uppercase">
+        {{ displayLabel || label }}
+      </label>
       <input
         type="text"
         v-model="search"
         class="border-gray-300 focus:ring-blue-500 focus:border-blue-500 block sm:text-sm border rounded-md mb-2 w-full"
-        placeholder="Search here"
+        placeholder="Suchen"
       />
       <div
         class="overflow-auto h-72 border-solid border-2 border-gray-300 rounded-xl px-4 py-2"
@@ -107,8 +108,9 @@ onBeforeUnmount(() => {
         v-if="modelValue.length > 0"
         class="block text-sm font-bold text-gray-600 uppercase mb-6 p-3"
       >
-        Included in
-        <span class="text-blue-500">({{ modelValue.length }})</span> {{ label }}
+        Ausgewähltes Element/e
+        <span class="text-blue-500">({{ modelValue.length }})</span>
+        {{ displayLabel }}
       </label>
       <div
         class="overflow-auto h-72 p-4 text-left flex flex-col item-container"
@@ -119,16 +121,16 @@ onBeforeUnmount(() => {
           class="inline text-sm font-bold text-gray-600 uppercase mb-6"
         >
           <span v-if="parentComponent === 'Edit'" class="text-red-300">
-            {{ itemName }} doesn't include in any {{ label }}
+            {{ itemName }} ist in keinem {{ label }} enthalten
           </span>
           <span
             v-else-if="parentComponent === 'Create'"
             class="text-center text-red-300"
           >
-            you can choose 1 or more, or you can decide later what to Choose
+            Sie können 1 oder mehr auswählen, oder Sie können später
+            entscheiden, was Sie wählen möchten
           </span>
         </label>
-
         <div v-else>
           <div
             v-for="(itemId, index) in modelValue"
@@ -153,7 +155,6 @@ onBeforeUnmount(() => {
               </button>
               <template v-if="dropdownIndex === index">
                 <div
-                  ref="dropdown"
                   class="absolute right-0 top-full mt-2 w-56 z-10 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
                 >
                   <div
@@ -179,9 +180,9 @@ onBeforeUnmount(() => {
                       <Link
                         class="block w-full text-left"
                         :href="`/${label}/${itemId}/edit`"
+                        >Bearbeiten
+                        <span class="capitalize">{{ label }}</span></Link
                       >
-                        Edit <span class="capitalize">{{ label }}</span>
-                      </Link>
                     </div>
                   </div>
                 </div>

@@ -10,7 +10,7 @@ const props = defineProps({
   teachers: {},
   filters: Object,
   cities: Array,
-  defaultCityId: Number,  
+  defaultCityId: Number,
 });
 
 let search = ref(props.filters.search);
@@ -19,40 +19,23 @@ watch(
   search,
   debounce(function (value) {
     let params = { search: value };
-    // If selectedCityId is not null, include it in the parameters
     if (selectedCityId.value !== null) {
       params.cityId = selectedCityId.value;
     }
-    router.get(
-      "/teacher",
-      params,
-      {
-        preserveState: true,
-        replace: true,
-      }
-    );
+    router.get("/teacher", params, {
+      preserveState: true,
+      replace: true,
+    });
   }, 500)
 );
 
-function viewAllTeachers() {
-  let params = { viewAll: true };
-  // Remove search when viewing all
-  if (router.search) {
-    delete router.search;
-    search.value = ""; // Clear the search box
-  }
-  router.get("/teacher", params, {
-    preserveState: true,
-    replace: true,
-  });
-}
-
-const selectedCityId = ref(props.filters.cityId || Number(props.defaultCityId) || null);
+const selectedCityId = ref(
+  props.filters.cityId || Number(props.defaultCityId) || null
+);
 
 function filterByCity(cityId) {
-  selectedCityId.value = cityId;  // Corrected this line
-  let params = { ...router.query, cityId }; // merge existing query parameters
-  // Don't delete params.search if you want to preserve it
+  selectedCityId.value = cityId;
+  let params = { ...router.query, cityId };
   router.get("/teacher", params, {
     preserveState: true,
     replace: true,
@@ -61,28 +44,39 @@ function filterByCity(cityId) {
 </script>
 
 <template>
-  <Head title="Teachers" />
-
+  <Head title="Dozenten" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
-      <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-screen-xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
         <SettingsSubMenu></SettingsSubMenu>
       </div>
     </header>
     <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+      <div class="max-w-screen-xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
-          <div
-            class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 mx-auto"
-          >
-            <h2 class="text-h2 mb-2">Teachers</h2>
+          <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-full sm:w-3/4 md:w-2/3 lg:w-3/5 xl:w-1/2 mx-auto">
+            <!-- Title -->
+            <h2 class="text-h2">Dozenten</h2>
+            <!-- Add Button and Search Box -->
+            <div class="sm:flex justify-between items-center mt-4">
+              <Link
+                :href="route('teacher.create')"
+                class="text-blue-500 text-p"
+              >
+                Dozent/in hinzufügen
+              </Link>
+              <div>
+                <input
+                  v-model="search"
+                  type="text"
+                  placeholder="Suche..."
+                  class="rounded-xl px-2"
+                />
+              </div>
+            </div>
 
-            <!-- <Link @click="viewAllTeachers" class="text-blue-500 text-p"
-                >View All</Link
-              > -->
-            <!-- Horizontal list of cities -->
-        <!-- Modified the Horizontal list of cities here -->
-            <div class="city-filters flex justify-between text-xs mb-4 w-full">
+            <!-- City Filters -->
+            <div class="city-filters flex justify-between text-xs mt-4">
               <span
                 v-for="city in cities"
                 :key="city.id"
@@ -95,17 +89,7 @@ function filterByCity(cityId) {
                 {{ city.name }}
               </span>
             </div>
-            <div class="sm:flex flex items-center justify-between">
-              <Link :href="route('teacher.create')" class="text-blue-500 text-p"
-                >Add a Teacher</Link
-              >
-              <input
-                v-model="search"
-                type="text"
-                placeholder="search..."
-                class="rounded-xl px-2"
-              />
-            </div>
+            <!-- Table and content below -->
             <div class="flex flex-col mt-4">
               <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div
@@ -131,10 +115,10 @@ function filterByCity(cityId) {
                                       })
                                     "
                                   >
-                                    {{ teacher.name }}&#44; &nbsp;{{
+                                    {{ teacher.name }}, &nbsp;{{
                                       teacher.surname
-                                    }}</Link
-                                  >
+                                    }}
+                                  </Link>
                                 </div>
                               </div>
                             </div>
@@ -146,14 +130,13 @@ function filterByCity(cityId) {
                               :href="`/teacher/${teacher.id}/edit`"
                               class="text-blue-600 hover:text-blue-900"
                             >
-                              Edit
+                              Bearbeiten
                             </Link>
                           </td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
-                  <!-- Paginator -->
                   <Pagination :links="teachers.links" class="mt-6" />
                 </div>
               </div>

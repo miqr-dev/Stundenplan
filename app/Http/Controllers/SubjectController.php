@@ -53,7 +53,7 @@ class SubjectController extends Controller
 
     $subject->templates()->attach($validated['templates']);
 
-    return redirect()->route('subject.index')->with('success', 'Subject created successfully.');
+    return redirect()->route('subject.index')->with('success', 'Das Fach wurde erfolgreich erstellt.');
   }
 
   // public function show($id)
@@ -180,13 +180,13 @@ class SubjectController extends Controller
     $subject->teachers()->sync($data['teachers']);
 
 
-    return redirect()->route('subject.index')->with('success', 'Subject updated successfully.');
+    return redirect()->route('subject.index')->with('success', 'Das Fach wurde erfolgreich aktualisiert.');
   }
 
   public function destroy(Subject $subject)
   {
     $subject->delete();
 
-    return redirect()->route('subject.index')->with('success', 'Subject deleted successfully.');
+    return redirect()->route('subject.index')->with('success', 'Das Fach wurde erfolgreich gelöscht.');
   }
 }

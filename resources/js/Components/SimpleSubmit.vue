@@ -19,6 +19,6 @@ const props = defineProps({
     }"
     :disabled="isProcessing"
   >
-    <slot>Submit</slot>
+    <slot>Einreichen</slot>
   </button>
 </template>

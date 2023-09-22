@@ -15,17 +15,17 @@ let form = useForm({
   id: props.room.id,
 });
 
-let update = () => {
+const update = () => {
   form.patch(`/room/${props.room.id}`);
 };
 
-let destroy = () => {
+const destroy = () => {
   form.delete(`/room/${props.room.id}`);
 };
 </script>
 
 <template>
-  <Head title="Rooms" />
+  <Head title="Räume" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -40,13 +40,12 @@ let destroy = () => {
             class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
           >
             <div class="flex justify-between">
-              <h2 class="text-h2">Edit the room name</h2>
+              <h2 class="text-h2">Raumname bearbeiten</h2>
               <a
                 href="#"
                 class="text-blue-500 text-p"
                 onclick="history.back();return false;"
-                >X</a
-              >
+              >X</a>
             </div>
             <div
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
@@ -63,7 +62,7 @@ let destroy = () => {
                 <div class="m-6">
                   <SimpleInput
                     v-model="form.room_number"
-                    label="Room Number"
+                    label="Raumnummer"
                     type="text"
                     :error="form.errors.room_number"
                   />
@@ -71,7 +70,7 @@ let destroy = () => {
                 <div class="m-6">
                   <SimpleInput
                     v-model="form.floor"
-                    label="Floor"
+                    label="Stockwerk"
                     type="text"
                     :error="form.errors.floor"
                   />
@@ -79,14 +78,14 @@ let destroy = () => {
                 <div class="m-6">
                   <SimpleInput
                     v-model="form.capacity"
-                    label="Capacity"
+                    label="Kapazität"
                     type="text"
                     :error="form.errors.capacity"
                   />
                 </div>
                 <div class="mb-1 flex justify-between">
-                  <SimpleDelete @click="destroy" buttonText="Delete Room" />
-                  <SimpleSubmit :processing="form.processing" Submit />
+                  <SimpleDelete @click="destroy" buttonText="Raum löschen" />
+                  <SimpleSubmit :processing="form.processing">Aktualisieren</SimpleSubmit>
                 </div>
               </form>
             </div>

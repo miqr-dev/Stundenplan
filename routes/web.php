@@ -67,10 +67,13 @@ Route::post('/stundenplan/{cityId}', [StundenplanController::class, 'updateCity'
 
 
 // Settings custom creates 
-Route::get('city/{city}/location/create', [LocationController::class, 'create'])->name('location.create');
+Route::get('city/{city}/location/create', [LocationController::class, 'create'])->name('city.location.create');
 Route::get('location/{location}/room/create', [RoomController::class, 'create'])->name('room.create');
 Route::get('teacher/{teacher}/not-available/create', [TeacherNotAvailableController::class, 'teacher_create'])->name('teacher.not-available.create');
 Route::get('grid/{grid}/gridslots/create', [GridslotController::class, 'create'])->name('gridslot.create');
+
+//Gridslot edit
+Route::get('grid/{grid}/gridslots/edit', [GridslotController::class, 'edit'])->name('gridslot.edit');
 
 
 

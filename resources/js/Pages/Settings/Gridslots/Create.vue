@@ -47,12 +47,12 @@ const calculateDuration = (index) => {
   const duration = moment.duration(end.diff(start));
   const hours = duration.hours();
   const minutes = duration.minutes();
-  return `${hours} hours ${minutes} minutes`;
+  return `${hours} stunden ${minutes} minuten`;
 };
 </script>
 
 <template>
-  <Head title="Locations" />
+  <Head title="Zeitfenster" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -68,7 +68,7 @@ const calculateDuration = (index) => {
           >
             <div class="flex justify-between">
               <h2 class="text-h2">
-                Add Gridslots
+                Zeitfenster hinzufügen
                 <span class="text-blue-500">
                   <Link :href="`/grid/${grid.id}`">{{ props.grid.name }}</Link>
                 </span>
@@ -120,7 +120,7 @@ const calculateDuration = (index) => {
                           @click="removeRow(index)"
                           v-if="startTimes.length > 1"
                         >
-                          Remove
+                           Entfernen
                         </button>
                       </div>
                     </div>
@@ -133,7 +133,7 @@ const calculateDuration = (index) => {
                     class="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50"
                     @click="addRow"
                   >
-                    Add Row
+                    Zeile hinzufügen
                   </button>
                 </div>
                 <div class="mt-3 text-right">
@@ -145,7 +145,7 @@ const calculateDuration = (index) => {
               <thead>
                 <tr class="text-left font-bold">
                   <th class="px-4 py-2">Zeitraum</th>
-                  <th class="px-4 py-2">Duration</th>
+                  <th class="px-4 py-2">Dauer</th>
                 </tr>
               </thead>
               <tbody>

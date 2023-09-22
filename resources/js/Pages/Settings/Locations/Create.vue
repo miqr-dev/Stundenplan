@@ -18,7 +18,7 @@ let submit = () => {
 </script>
 
 <template>
-  <Head title="Locations" />
+  <Head title="Standorte" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -26,37 +26,36 @@ let submit = () => {
         <SettingsSubMenu></SettingsSubMenu>
       </div>
     </header>
+
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
-          <div
-            class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
-          >
+          <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto">
             <div class="flex justify-between">
               <h2 class="text-h2">
-                Add a new Location in
-                <span class="text-blue-500"
-                  ><Link :href="`/city/${city.id}`">{{
-                    props.city.name
-                  }}</Link></span
-                >
+                Neuen Standort in 
+                <span class="text-blue-500">
+                  <Link :href="`/city/${city.id}`">{{ props.city.name }}</Link>
+                </span>
+                hinzufügen
               </h2>
-<SimpleBack />
+              <SimpleBack />
             </div>
-            <div
-              class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
-            >
+
+            <div class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg">
               <form @submit.prevent="submit">
                 <div class="mb-6">
                   <SimpleInput
                     v-model="form.name"
                     label="Name"
+                    name="name"
                     type="text"
                     :error="form.errors.name"
                   />
                 </div>
+
                 <div class="mb-1 text-right">
-                  <SimpleSubmit :processing="form.processing" Submit />
+                  <SimpleSubmit :processing="form.processing">Einreichen</SimpleSubmit>
                 </div>
               </form>
             </div>

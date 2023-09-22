@@ -46,7 +46,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
-    <div v-if="$page.props.flash.success" class="absolute top-8 right-10 z-10">
+    <div v-if="$page.props.flash.success" class="absolute top-12 right-10 z-10">
       <Alert
         :show="showAlert"
         :on-dismiss="() => (showAlert = false)"
@@ -54,7 +54,7 @@ onBeforeUnmount(() => {
         :title="$page.props.flash.success"
       />
     </div>
-    <div v-if="$page.props.flash.error" class="absolute top-8 right-g10 z-10">
+    <div v-if="$page.props.flash.error" class="absolute top-12 right-10 z-10">
       <Alert
         :show="showAlert"
         :on-dismiss="() => (showAlert = false)"
@@ -62,7 +62,7 @@ onBeforeUnmount(() => {
         :title="$page.props.flash.error"
       />
     </div>
-    <div v-if="$page.props.error" class="absolute top-8 right-10 z-10">
+    <div v-if="$page.props.error" class="absolute top-12 right-10 z-10">
       <Alert
         :show="showAlert"
         :on-dismiss="() => (showAlert = false)"
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
                     route().current('teacher-not-available.*')
                   "
                 >
-                  Settings
+                  Einstellungen
                 </BreezeNavLink>
               </div>
             </div>

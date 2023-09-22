@@ -10,7 +10,7 @@ class City extends Model
 {
   use HasFactory, SoftDeletes;
 
-  protected $fillable = ['name'];
+  protected $fillable = ['name','bundesland_id'];
 
   public function locations()
   {

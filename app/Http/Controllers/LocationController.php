@@ -30,7 +30,7 @@ class LocationController extends Controller
       'name' => 'required|min:3',
     ]);
     Location::create($attributes);
-    return redirect()->route('city.show',$request->city_id);
+    return redirect()->route('city.show',$request->city_id)->with('success', 'Der Standort wurde erfolgreich erstellt.');
   }
 
   public function show(Location $location)
@@ -54,13 +54,13 @@ class LocationController extends Controller
     ]);
 
     $location->update($attributes);
-    return redirect()->route('location.index');
+    return redirect()->route('location.index')->with('success', 'Der Standort wurde erfolgreich aktualisiert.');
   }
 
 
   public function destroy(Location $location)
   {
     $location->delete();
-    return redirect()->route('location.index');
+    return redirect()->route('location.index')->with('success', 'Der Standort wurde erfolgreich gelöscht.');
   }
 }

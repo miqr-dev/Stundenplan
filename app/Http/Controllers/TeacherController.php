@@ -85,7 +85,7 @@ class TeacherController extends Controller
     $teacher->cities()->attach($validated['cities']);
     $teacher->subjects()->attach($validated['subjects']);
 
-    return redirect()->route('teacher.index')->with('success', 'Teacher created successfully.');
+    return redirect()->route('teacher.index')->with('success', 'Dozent/in wurde erfolgreich erstellt.');
   }
 
   public function show(Teacher $teacher)
@@ -128,10 +128,6 @@ class TeacherController extends Controller
       'maxhourweek' => 'required',
       'color' => 'required',
       'email' => 'required|email',
-      // 'cities' => 'required|array|min:1',
-      // 'cities.*' => 'required|exists:cities,id',
-      // 'subjects' => 'required|array|min:1',
-      // 'subjects.*' => 'required|exists:subjects,id',
       'cities' => '',
       'cities.*' => '',
       'subjects' => '',
@@ -149,13 +145,13 @@ class TeacherController extends Controller
     $teacher->subjects()->sync($data['subjects']);
 
 
-    return redirect()->route('teacher.index')->with('success', 'Teacher updated successfully.');
+    return redirect()->route('teacher.index')->with('success', 'Dozent/in wurde erfolgreich aktualisiert.');
   }
 
   public function destroy($id)
   {
     $teacher = Teacher::with(['teacherNotAvailable', 'cities', 'subjects'])->findOrFail($id);
     $teacher->delete();
-    return redirect()->route('teacher.index')->with('success', 'Teacher deleted successfully.');
+    return redirect()->route('teacher.index')->with('success', 'Dozent/in wurde erfolgreich gelöscht.');
   }
 }

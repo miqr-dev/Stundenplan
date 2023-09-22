@@ -26,7 +26,7 @@ const getTemplateName = (templateId) => {
 </script>
 
 <template>
-  <Head title="Subjects" />
+  <Head title="Fächer" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
       <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -40,7 +40,7 @@ const getTemplateName = (templateId) => {
             class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 shadow-md mx-auto"
           >
             <div class="flex justify-between">
-              <h2 class="text-h2">Add a new Subject</h2>
+              <h2 class="text-h2">Ein neues Fach hinzufügen</h2>
               <SimpleBack />
             </div>
             <div
@@ -61,7 +61,7 @@ const getTemplateName = (templateId) => {
                     label="Soll Stunden"
                     type="text"
                     :error="form.errors.default_soll"
-                    helpText="You have to set a default Soll hours for the Subject, you can customize in Template later."
+                    helpText="Sie müssen für das Fach eine Standard Soll-Stundenanzahl festlegen, die Sie später im Template anpassen können."
                   />
                 </div>
                 <div class="mb-6">
@@ -69,7 +69,7 @@ const getTemplateName = (templateId) => {
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"
                     for="maxhourweek"
                   >
-                    Color
+                    Farbe
                   </label>
                   <VSwatches v-model="form.color" swatches="text-advanced" />
                   <div
@@ -78,16 +78,16 @@ const getTemplateName = (templateId) => {
                     class="text-red-500 text-sm mt-1"
                   ></div>
                 </div>
-                <div class="mb-6"></div>
                 <SimpleItemSelector
                   v-model="form.templates"
                   :items="props.templates"
                   :get-item-name="getTemplateName"
                   label="template"
+                  displayLabel="Vorlage/-n"
                 ></SimpleItemSelector>
 
                 <div class="mb-1 text-right">
-                  <SimpleSubmit :processing="form.processing" Submit />
+                  <SimpleSubmit :processing="form.processing" Einreichen />
                 </div>
               </form>
             </div>

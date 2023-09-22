@@ -1,27 +1,29 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 
 const props = defineProps({
-  location: {},
+  grid: Object,
 });
 
-let form = useForm({
-  location_id: props.location.id,
-  name: "",
-  room_number: "",
-  floor: "",
-  capacity: "",
+const form = useForm({
+  id: props.grid.id,
+  name: props.grid.name,
+  description: props.grid.description
 });
 
-let submit = () => {
-  form.post("/room");
+const update = () => {
+  form.patch(`/grid/${props.grid.id}`);
+};
+
+const destroy = () => {
+  form.delete(`/grid/${props.grid.id}`);
 };
 </script>
 
 <template>
-  <Head title="Raum" />
+  <Head title="Stundenraster" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -34,11 +36,11 @@ let submit = () => {
         <div class="bg-gray-100 overflow-hidden sm:rounded-lg">
           <div class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-full sm:w-3/4 md:w-2/3 lg:w-3/5 xl:w-1/2 shadow-md mx-auto">
             <div class="flex justify-between">
-              <h2 class="text-h2">Einen neuen Raum hinzufügen</h2>
-              <Link :href="route('location.index')" class="text-blue-500 text-p">X</Link>
+              <h2 class="text-h2">Stundenraster bearbeiten</h2>
+              <SimpleBack />
             </div>
             <div class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg">
-              <form @submit.prevent="submit">
+              <form @submit.prevent="update">
                 <div class="mb-6">
                   <SimpleInput
                     v-model="form.name"
@@ -49,30 +51,15 @@ let submit = () => {
                 </div>
                 <div class="mb-6">
                   <SimpleInput
-                    v-model="form.room_number"
-                    label="Raumnummer"
+                    v-model="form.description"
+                    label="Beschreibung"
                     type="text"
-                    :error="form.errors.room_number"
+                    :error="form.errors.description"
                   />
                 </div>
-                <div class="mb-6">
-                  <SimpleInput
-                    v-model="form.floor"
-                    label="Etage"
-                    type="text"
-                    :error="form.errors.floor"
-                  />
-                </div>
-                <div class="mb-6">
-                  <SimpleInput
-                    v-model="form.capacity"
-                    label="Kapazität"
-                    type="text"
-                    :error="form.errors.capacity"
-                  />
-                </div>
-                <div class="mb-1 text-right">
-                  <SimpleSubmit :processing="form.processing">Einreichen</SimpleSubmit>
+                <div class="mb-1 flex justify-between">
+                  <SimpleDelete @click="destroy" buttonText="Stundenraster löschen" />
+                  <SimpleSubmit :processing="form.processing">Aktualisieren</SimpleSubmit> 
                 </div>
               </form>
             </div>

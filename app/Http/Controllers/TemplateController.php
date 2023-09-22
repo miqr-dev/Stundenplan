@@ -59,7 +59,7 @@ public function store(Request $request)
         $template->subjects()->attach($subject->id, ['soll' => $subject->default_soll]);
     }
 
-    return redirect()->route('template.index')->with('success', 'Template created successfully.');
+    return redirect()->route('template.index')->with('success', 'Die Vorlage wurde erfolgreich erstellt.');
 }
 
 
@@ -103,13 +103,13 @@ public function update(Request $request, Template $template)
 
     $template->subjects()->sync($data['subjects']);
 
-    return redirect()->route('template.index')->with('success', 'Template updated successfully.');
+    return redirect()->route('template.index')->with('success', 'Die Vorlage wurde erfolgreich aktualisiert.');
 }
 
   public function destroy(Template $template)
   {
     $template->delete();
 
-    return redirect()->route('template.index')->with('success', 'Template deleted successfully.');
+    return redirect()->route('template.index')->with('success', 'Die Vorlage wurde erfolgreich gelöscht.');
   }
 }

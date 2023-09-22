@@ -1,8 +1,7 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
-import { Head } from "@inertiajs/vue3";
-import { Link } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 const props = defineProps({
   grids: {},
@@ -10,7 +9,7 @@ const props = defineProps({
 
 </script>
 <template>
-  <Head title="Grid " />
+  <Head title="Stundenraster" />
 
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
@@ -25,10 +24,8 @@ const props = defineProps({
             class="p-6 bg-gray-100 text-h2 font-bold text-p-gray h-full w-1/2 mx-auto"
           >
             <div class="sm:flex justify-between">
-              <h2 class="text-h2">Grids</h2>
-              <Link :href="route('grid.create')" class="text-blue-500 text-p"
-                >Add a Grid</Link
-              >
+              <h2 class="text-h2">Stundenraster</h2>
+              <Link :href="route('grid.create')" class="text-blue-500 text-p">Stundenraster hinzufügen</Link>
             </div>
             <div class="flex flex-col mt-4">
               <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -45,9 +42,7 @@ const props = defineProps({
                             <div class="flex items-center">
                               <div>
                                 <div class="text-sm font-medium text-gray-900">
-                                  <Link :href="route('grid.show',{grid: grid.id})">
-                                    {{ grid.name }}</Link
-                                  >
+                                  <Link :href="route('grid.show',{grid: grid.id})">{{ grid.name }}</Link>
                                 </div>
                               </div>
                             </div>
@@ -55,22 +50,7 @@ const props = defineProps({
                           <td
                             class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                           >
-                            <Link
-                              :href="`/grid/${grid.id}/edit`"
-                              class="text-blue-600 hover:text-blue-900"
-                            >
-                              Edit
-                            </Link>
-                          </td>
-                          <td
-                            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-                          >
-                            <Link
-                              :href="`/gridslot/${grid.id}/edit`"
-                              class="text-blue-600 hover:text-blue-900"
-                            >
-                              Edit slots
-                            </Link>
+                            <Link :href="`/grid/${grid.id}/edit`" class="text-blue-600 hover:text-blue-900">Bearbeiten</Link>
                           </td>
                         </tr>
                       </tbody>
@@ -85,5 +65,3 @@ const props = defineProps({
     </div>
   </BreezeAuthenticatedLayout>
 </template>
-
-

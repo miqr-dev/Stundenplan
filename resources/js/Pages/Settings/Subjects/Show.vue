@@ -12,14 +12,10 @@ const props = defineProps({
 
 const subject = props.subject;
 
-const submit = async (id) => {
-  await router.delete(route("subject.destroy", { subject: id }));
-  router.push(route("subject.index"));
-};
 </script>
 
 <template>
-  <Head title="Subject Show" />
+  <Head title="Fach Anzeigen" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
       <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -47,7 +43,7 @@ const submit = async (id) => {
                     class="block mb-2 text-xs font-bold text-gray-600 uppercase"
                     for="maxhourweek"
                   >
-                    Color
+                    Farbe
                   </label>
                   <VSwatches
                     v-model="subject.color"
@@ -72,7 +68,7 @@ const submit = async (id) => {
                 <label
                   class="block mb-2 text-xs font-bold text-gray-600 uppercase mt-4"
                 >
-                  Templates:
+                  Vorlagen:
                 </label>
                 <div v-if="subject.templates.length">
                   <div v-for="template in subject.templates" :key="template.id">
@@ -80,13 +76,13 @@ const submit = async (id) => {
                   </div>
                 </div>
                 <div v-else>
-                  <p>this Subject is not yet in any Template</p>
+                  <p>Dieses Fach ist noch in keiner Vorlage enthalten.</p>
                 </div>
               </div>
               <div class="mb-6">
                 <label
                   class="font-bold block mb-2 text-gray-600 text-xs uppercase mt-4"
-                  >Teachers:</label
+                  >Lehrer:</label
                 >
                 <div v-if="teachers.length">
                   <div
@@ -107,7 +103,7 @@ const submit = async (id) => {
                   </div>
                 </div>
                 <div v-else>
-                  <p>No teachers available for this subject in your city.</p>
+                  <p>Keine Lehrer für dieses Fach in Ihrer Stadt verfügbar.</p>
                 </div>
               </div>
             </div>

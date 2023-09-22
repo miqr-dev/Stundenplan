@@ -43,7 +43,7 @@ const showSubjects = ref(false);
 </script>
 
 <template>
-  <Head title="Course Show" />
+  <Head title="Kurs Anzeigen" />
   <BreezeAuthenticatedLayout>
     <header class="bg-gray-100 shadow">
       <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
@@ -72,11 +72,11 @@ const showSubjects = ref(false);
                 >
                   <CheckBadgeIcon
                     v-if="course.active"
-                    v-tooltip="'Active'"
+                    v-tooltip="'Aktiv'"
                     class="h-6 w-6"
                   />
                   <XCircleIcon
-                    v-tooltip="'Inactive'"
+                    v-tooltip="'Inaktiv'"
                     v-if="!course.active"
                     class="h-6 w-6"
                   />
@@ -194,7 +194,7 @@ const showSubjects = ref(false);
                           class="text-2xl font-semibold leading-tight hover:underline"
                           @click="showSubjects = !showSubjects"
                         >
-                          Subjects
+                          Fächer
                         </button>
                         <span class="ml-2 text-md text-blue-500 self-center"
                           >({{ course.subjects.length }})</span
@@ -220,13 +220,13 @@ const showSubjects = ref(false);
                         >Add Leave</Link> -->
                     </div>
                     <p>
-                      This course is using
+                      Dieser Kurs verwendet die
                       <span class="text-blue-500"
                         ><Link :href="`/template/${course.template.id}`">{{
                           course.template.name
                         }}</Link></span
                       >
-                      Template
+                      Vorlage
                     </p>
                     <div
                       class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto"
@@ -254,7 +254,7 @@ const showSubjects = ref(false);
                               <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                               >
-                                Teachers
+                                Dozent/in
                               </th>
                             </tr>
                           </thead>
