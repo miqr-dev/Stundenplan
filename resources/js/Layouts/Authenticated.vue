@@ -42,6 +42,17 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener("mousedown", handleClickOutside);
 });
+
+const markAsRead = async (notificationId) => {
+  try {
+    await axios.post(`/notifications/${notificationId}/mark-as-read`);
+    notifications.value = notifications.value.filter(
+      (notification) => notification.id !== notificationId
+    );
+  } catch (error) {
+    console.error("Error marking notification as read", error);
+  }
+};
 </script>
 
 <template>
@@ -133,41 +144,49 @@ onBeforeUnmount(() => {
                     </span>
                   </button>
                   <!-- Dropdown for Notifications -->
-<div
-  v-if="notifications.length > 0 && showNotificationDropdown"
-  ref="notificationDropdown"
-  class="absolute right-0 mt-2 w-192 rounded-md shadow-lg z-20"
->
-  <div class="rounded-md bg-white shadow-xs grid grid-cols-2">
-    <!-- Notifications column -->
-    <div class="py-1">
-      <div class="px-4 py-2 font-bold text-white bg-gray-400">
-        Geplante Lehrkraft entfernt.
-      </div>
-      <div class="relative">
-        <!-- This container will hold the border and the notifications -->
-        <div class="border-r border-gray-300 mt-2 mb-2"> 
-          <a
-            v-for="notification in notifications"
-            :key="notification.id"
-            href="#"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          >
-            <!-- Display your notification message here -->
-            <span v-html="notification.data.message"></span>
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- Others column -->
-    <div class="py-1">
-      <div class="px-4 py-2 font-bold text-white bg-gray-400">
-        Doppeltzuweisung
-      </div>
-      <!-- Add other items here -->
-    </div>
-  </div>
-</div>
+                  <div
+                    v-if="notifications.length > 0 && showNotificationDropdown"
+                    ref="notificationDropdown"
+                    class="absolute right-0 mt-2 w-192 rounded-md shadow-lg z-20"
+                  >
+                    <div class="rounded-md bg-white shadow-xs grid grid-cols-2">
+                      <!-- Notifications column -->
+                      <div class="py-1">
+                        <div class="px-4 py-2 font-bold text-white bg-gray-400">
+                          Geplante Lehrkraft entfernt.
+                        </div>
+                        <div class="relative">
+                          <!-- This container will hold the border and the notifications -->
+                          <div
+                            v-for="notification in notifications"
+                            :key="notification.id"
+                            class="relative"
+                          >
+                            <a
+                              href="#"
+                              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              <!-- Display your notification message here -->
+                              <span v-html="notification.data.message"></span>
+                            </a>
+                            <button
+                              @click.prevent="markAsRead(notification.id)"
+                              class="absolute top-0 right-0 mt-2 mr-2 px-2 py-1 text-xs bg-blue-500 text-white rounded"
+                            >
+                              Mark as Read
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Others column -->
+                      <div class="py-1">
+                        <div class="px-4 py-2 font-bold text-white bg-gray-400">
+                          Doppeltzuweisung
+                        </div>
+                        <!-- Add other items here -->
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <!-- Settings Dropdown -->
@@ -303,6 +322,3 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
-
-
-

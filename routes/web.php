@@ -14,6 +14,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\GridslotController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\PraktikumController;
 use App\Http\Controllers\StundenplanController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TeacherNotAvailableController;
@@ -59,6 +60,7 @@ Route::resource('course', CourseController::class);
 Route::resource('teacher', TeacherController::class);
 Route::resource('teacher-not-available', TeacherNotAvailableController::class);
 Route::resource('ferien', FerienController::class);
+Route::resource('praktikum', PraktikumController::class);
 
 Route::post('/stundenplan/check-teaching-unit', [StundenplanController::class, 'checkTeachingUnit']);
 Route::post('/stundenplan/check-teacher-conflicts', [StundenplanController::class, 'checkTeacherConflicts']);
@@ -76,8 +78,10 @@ Route::get('grid/{grid}/gridslots/create', [GridslotController::class, 'create']
 Route::get('grid/{grid}/gridslots/edit', [GridslotController::class, 'edit'])->name('gridslot.edit');
 
 
-
-
 // Notification
 Route::get('/notifications', [NotificationController::class,'index']);
+Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead']);
+
+
+
 require __DIR__.'/auth.php';

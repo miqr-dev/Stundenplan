@@ -54,12 +54,12 @@ class TeacherNotAvailableController extends Controller
       'subject',
       'teacher',
       'room',
-      'schedualMaster.course' // Assuming you have a course relation in your SchedualMaster model
+      'schedualMaster.course',
     ])
       ->whereIn('id', $affectedSchedules->pluck('id'))
       ->get();
     foreach ($affectedSchedulesWithRelations as $affectedSchedule) {
-      Notification::send(Auth::user(), new AffectedSchedulesNotification($affectedSchedule));
+      Notification::send(Auth::user(), new AffectedSchedulesNotification($affectedSchedule,'ferien'));
     }
 
     foreach ($affectedSchedules as $schedualDetail) {

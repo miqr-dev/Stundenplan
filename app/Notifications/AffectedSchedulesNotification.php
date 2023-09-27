@@ -12,11 +12,13 @@ class AffectedSchedulesNotification extends Notification
   use Queueable;
 
   private $affectedSchedule;
+  private $reason;
 
 
-  public function __construct($affectedSchedulesWithRelations)
+  public function __construct($affectedSchedulesWithRelations, $reason)
   {
     $this->affectedSchedule = $affectedSchedulesWithRelations;
+    $this->reason = $reason;
   }
 
   public function via($notifiable)
@@ -35,38 +37,43 @@ class AffectedSchedulesNotification extends Notification
   //   return $message->action('View Schedule', url('/schedule'))
   //     ->line('Thank you for using our application!');
   // }
-  public function toArray($notifiable)
-  {
+public function toArray($notifiable)
+{
     $formattedStartTime = $this->formatTime($this->affectedSchedule->start_time);
     $formattedEndTime = $this->formatTime($this->affectedSchedule->end_time);
-
-    $teacherName = $this->formatTeacherName($this->affectedSchedule->teacher->surname, $this->affectedSchedule->teacher->name);
-
+    
+    $teacherName = ''; // Default to empty string
+    if($this->affectedSchedule->teacher && ($this->affectedSchedule->teacher->surname || $this->affectedSchedule->teacher->name)) {
+        $teacherName = $this->formatTeacherName($this->affectedSchedule->teacher->surname, $this->affectedSchedule->teacher->name);
+    }
+    
     $message = sprintf(
-      "Urlaub am: %s<br>"
-        . "Lehrer: %s<br>"
-        . "Kurs: %s<br>"
-        . "Fach: %s<br>"
-        . "Zeit: %s-%s",
-      $this->styleText($this->affectedSchedule->schedualMaster->date, 'orange', 'bold'),
-      $this->styleText($teacherName, 'blue', 'bold'),
-      optional($this->affectedSchedule->schedualMaster->course)->name,
-      optional($this->affectedSchedule->subject)->name,
-      $formattedStartTime,
-      $formattedEndTime
+        "Am: %s<br>"
+            . "Grund: %s<br>"
+            . "Lehrer: %s<br>"
+            . "Kurs: %s<br>"
+            . "Fach: %s<br>"
+            . "Zeit: %s-%s<br>",
+        $this->styleText($this->affectedSchedule->schedualMaster->date, 'orange', 'bold'),
+        $this->styleText($this->reason, 'green', 'bold'),
+        $this->styleText($teacherName, 'blue', 'bold'), // Use the optionally assigned teacher name
+        optional($this->affectedSchedule->schedualMaster->course)->name,
+        optional($this->affectedSchedule->subject)->name,
+        $formattedStartTime,
+        $formattedEndTime
     );
-
+    
     return [
-      'message' => $message,
-      'Day' => $this->affectedSchedule->schedualMaster->date,
-      'Start Time' => $formattedStartTime,
-      'End Time' => $formattedEndTime,
-      'Course' => optional($this->affectedSchedule->schedualMaster->course)->name,
-      'Subject' => optional($this->affectedSchedule->subject)->name,
-      'Teacher' => $teacherName,
-      'Room' => optional($this->affectedSchedule->room)->name,
+        'message' => $message,
+        'Day' => $this->affectedSchedule->schedualMaster->date,
+        'Start Time' => $formattedStartTime,
+        'End Time' => $formattedEndTime,
+        'Course' => optional($this->affectedSchedule->schedualMaster->course)->name,
+        'Subject' => optional($this->affectedSchedule->subject)->name,
+        'Teacher' => $teacherName, // Pass the optionally assigned teacher name
+        'Room' => optional($this->affectedSchedule->room)->name,
     ];
-  }
+}
 
   private function formatTime($time)
   {

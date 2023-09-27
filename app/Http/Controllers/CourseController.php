@@ -7,7 +7,7 @@ use App\Models\Grid;
 use App\Models\Room;
 use Inertia\Inertia;
 use App\Models\Course;
-use App\Models\Location;
+//use App\Models\Location;
 use App\Models\Template;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
@@ -104,6 +104,7 @@ class CourseController extends Controller
 
     $course = $course->load([
       'feriens',
+      'praktikums',
       'template.subjects.teachers' => function ($query) use ($city_id) {
         $query->whereHas('cities', function ($query) use ($city_id) {
           $query->where('id', $city_id);

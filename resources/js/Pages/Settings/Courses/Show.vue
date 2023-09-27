@@ -1,6 +1,6 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Link, Head } from "@inertiajs/vue3";
+import { Link, Head, router } from "@inertiajs/vue3";
 import SettingsSubMenu from "@/Components/SettingsSubMenu.vue";
 import { ref, computed } from "vue";
 import moment from "moment";
@@ -8,16 +8,18 @@ import { VSwatches } from "vue3-swatches";
 import "vue3-swatches/dist/style.css";
 import { CheckBadgeIcon, XCircleIcon } from "@heroicons/vue/20/solid";
 import "floating-vue/dist/style.css";
-import { VTooltip } from "floating-vue";
+// import { VTooltip } from "floating-vue";
 
 const props = defineProps({
   course: {},
 });
 
 const showLeaves = ref(false);
+const showSubjects = ref(false);
+const showPraktikums = ref(false);
 
 const subjectDifference = computed(() => {
-  const courseSubjectCount = props.course.subjects.length;
+  // const courseSubjectCount = props.course.subjects.length;
   const templateSubjectCount = props.course.template.subjects.length;
   const templateName = props.course.template.name;
 
@@ -39,7 +41,9 @@ const subjectDifference = computed(() => {
   return { message: "", failedSubjects: "" };
 });
 
-const showSubjects = ref(false);
+const navigateToPraktikum = (id) => {
+  router.visit(route("praktikum.edit", id));
+};
 </script>
 
 <template>
@@ -114,7 +118,7 @@ const showSubjects = ref(false);
                     class="block mb-1 text-xs font-bold text-green-600 uppercase"
                     for="label"
                   >
-                    Start on
+                    Beginnt am
                   </label>
                   <div class="flex items-stretch">
                     <div class="whitespace-no-wrap text-p-gray">
@@ -130,7 +134,7 @@ const showSubjects = ref(false);
                     class="block mb-2 text-xs font-bold text-orange-600 uppercase"
                     for="label"
                   >
-                    Finish on
+                    Endet am
                   </label>
                   <div class="flex items-stretch">
                     <div class="whitespace-no-wrap text-p-gray">
@@ -376,12 +380,12 @@ const showSubjects = ref(false);
                               <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                               >
-                                From
+                                Von
                               </th>
                               <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                               >
-                                To
+                                Bis
                               </th>
                               <th
                                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
@@ -391,14 +395,15 @@ const showSubjects = ref(false);
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="ferien in course.feriens" :key="ferien.id">
+                            <tr
+                              v-for="ferien in course.feriens"
+                              :key="ferien.id"
+                            >
                               <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
                               >
                                 <p class="text-gray-900 whitespace-no-wrap">
-                                  {{
-                                    moment(ferien.start_date).format("LL")
-                                  }}
+                                  {{ moment(ferien.start_date).format("LL") }}
                                 </p>
                                 <p class="text-gray-600 whitespace-no-wrap">
                                   {{ moment(ferien.start_date).week() }}
@@ -412,8 +417,7 @@ const showSubjects = ref(false);
                                   {{ moment(ferien.end_date).format("LL") }}
                                 </p>
                                 <p class="text-gray-600 whitespace-no-wrap">
-                                  {{ moment(ferien.end_date).week() }} &nbsp;
-                                  KW
+                                  {{ moment(ferien.end_date).week() }} &nbsp; KW
                                 </p>
                               </td>
                               <td
@@ -426,7 +430,9 @@ const showSubjects = ref(false);
                                     aria-hidden
                                     class="absolute inset-0 bg-green-200 opacity-50 rounded-full"
                                   ></span>
-                                  <span class="relative" v-if="ferien.name"> {{ ferien.name  }}</span>
+                                  <span class="relative" v-if="ferien.name">
+                                    {{ ferien.name }}</span
+                                  >
                                 </span>
                               </td>
                               <td
@@ -445,6 +451,125 @@ const showSubjects = ref(false);
                                     />
                                   </svg>
                                 </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="container mx-auto">
+                  <div class="py-2">
+                    <div class="flex justify-between">
+                      <div class="flex self-center">
+                        <button
+                          class="text-2xl font-semibold leading-tight hover:underline"
+                          @click="showPraktikums = !showPraktikums"
+                        >
+                          Praktikum
+                        </button>
+                        <span class="ml-2 text-md text-blue-500 self-center"
+                          >({{ course.praktikums.length }})</span
+                        >
+                      </div>
+
+                      <Link
+                        :href="
+                          route('praktikum.create', {
+                            course: course.id,
+                          })
+                        "
+                        class="text-blue-500 text-p"
+                        >Neues Praktikum</Link
+                      >
+                    </div>
+                    <div
+                      class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto"
+                      v-show="showPraktikums"
+                    >
+                      <div
+                        class="inline-block min-w-full shadow-md rounded-lg overflow-auto h-72"
+                      >
+                        <table class="min-w-full leading-normal table">
+                          <thead>
+                            <tr>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                Von
+                              </th>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                Bis
+                              </th>
+                              <th
+                                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                              >
+                                Tage
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="praktikum in course.praktikums"
+                              :key="praktikum.id"
+                              @click="navigateToPraktikum(praktikum.id)"
+                              class="cursor-pointer hover:bg-gray-100"
+                              role="button"
+                              tabindex="0"
+                            >
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                <p class="text-gray-900 whitespace-no-wrap">
+                                  {{
+                                    moment(praktikum.start_date).format("LL")
+                                  }}
+                                </p>
+                                <p class="text-gray-600 whitespace-no-wrap">
+                                  {{ moment(praktikum.start_date).week() }}
+                                  &nbsp; KW
+                                </p>
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                <p class="text-gray-900 whitespace-no-wrap">
+                                  {{ moment(praktikum.end_date).format("LL") }}
+                                </p>
+                                <p class="text-gray-600 whitespace-no-wrap">
+                                  {{ moment(praktikum.end_date).week() }}
+                                  &nbsp; KW
+                                </p>
+                              </td>
+                              <td
+                                class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                              >
+                                <span
+                                  class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
+                                >
+                                  <span
+                                    aria-hidden
+                                    class="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                                  ></span>
+                                  <span
+                                    class="relative"
+                                    v-if="
+                                      praktikum.repeat_days &&
+                                      praktikum.repeat_days.length
+                                    "
+                                  >
+                                    {{
+                                      JSON.parse(praktikum.repeat_days).join(
+                                        ", "
+                                      )
+                                    }}
+                                  </span>
+                                </span>
                               </td>
                             </tr>
                           </tbody>

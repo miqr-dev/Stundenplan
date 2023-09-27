@@ -134,13 +134,12 @@ const weekDates = computed(() => {
 });
 
 const daysWithDates = computed(() => {
-  const result = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
+  const result = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'].map(
     (day, index) => ({
       day,
       date: weekDates.value[index],
     })
   );
-  console.log("Computed daysWithDates:", result); // Add this line for debugging
   return result;
 });
 
@@ -199,6 +198,24 @@ const getWeekStatus = (weekNumber) => {
   }
 };
 
+const isPraktikum = (date) => {
+  if (!selectedCourse.value || !selectedCourse.value.praktikums) {
+    return false;
+  }
+  return selectedCourse.value.praktikums.some((praktikum) => {
+    const startDate = moment(praktikum.start_date).startOf("day");
+    const endDate = moment(praktikum.end_date).startOf("day");
+    const checkDate = moment(date).startOf("day");
+
+    if (!checkDate.isBetween(startDate, endDate, null, "[]")) {
+      return false;
+    }
+    const dayOfWeek = checkDate.format("dddd");
+    const isDayIncluded = praktikum.repeat_days.includes(dayOfWeek);
+    return isDayIncluded;
+  });
+};
+
 const isHoliday = (date) => {
   if (!selectedCourse.value || !selectedCourse.value.holidays) return false;
 
@@ -208,19 +225,18 @@ const isHoliday = (date) => {
 };
 
 const isFerien = (date) => {
-  console.log("Input date:", date);
+  // console.log("Input date:", date);
 
   if (!selectedCourse.value || !selectedCourse.value.feriens) return false;
 
   return selectedCourse.value.feriens.some((ferien) => {
-    const startDate = moment(ferien.start_date).startOf('day');
-    const endDate = moment(ferien.end_date).startOf('day');
-    const checkDate = moment(date).startOf('day');
+    const startDate = moment(ferien.start_date).startOf("day");
+    const endDate = moment(ferien.end_date).startOf("day");
+    const checkDate = moment(date).startOf("day");
     const isBetween = checkDate.isBetween(startDate, endDate, null, "[]");
     return isBetween;
   });
 };
-
 
 // Add any other reactive variables, computed properties or methods here.
 </script>
@@ -369,17 +385,18 @@ const isFerien = (date) => {
                               'bg-gray-400 text-white text-center': isHoliday(
                                 weekDates[index]
                               ),
-                              'bg-green-200 text-gray-600 text-center': isFerien(
-                                weekDates[index]
-                              ),
+                              'bg-green-200 text-gray-600 text-center':
+                                isFerien(weekDates[index]),
+                              'bg-red-200 text-gray-600 text-center':
+                                isPraktikum(weekDates[index]),
                             }"
                             :key="index"
                             v-for="(day, index) in [
-                              'Monday',
-                              'Tuesday',
-                              'Wednesday',
-                              'Thursday',
-                              'Friday',
+                              'Montag',
+                              'Dienstag',
+                              'Mittwoch',
+                              'Donnerstag',
+                              'Freitag',
                             ]"
                           >
                             {{ day }}
@@ -420,12 +437,15 @@ const isFerien = (date) => {
                                   ),
                                   'bg-green-200 text-gray-600 text-center':
                                     isFerien(dayWithDate.date),
+                                  'bg-red-200 text-gray-600 text-center':
+                                    isPraktikum(dayWithDate.date),
                                 }"
                               >
                                 <template v-if="selectedCourse && selectedWeek">
                                   <!-- Check if the course is active during the selected week -->
                                   <div v-if="isCourseInSelectedWeek">
                                     <TeachingUnit
+                                      :praktikums="selectedCourse.praktikums"
                                       :subjects="selectedCourse.subjects"
                                       :holidays="selectedCourse.holidays"
                                       :feriens="selectedCourse.feriens"

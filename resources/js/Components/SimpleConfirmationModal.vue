@@ -41,8 +41,8 @@ const confirm = (event) => {
             <p class="text-sm text-gray-500">{{ message }}</p>
           </div>
           <div class="mt-6 flex justify-end">
-            <button @click.prevent="cancel" class="px-4 py-2 text-sm text-gray-500 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
-            <button @click="confirm" class="ml-3 px-4 py-2 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">Confirm</button>
+            <button @click.prevent="cancel" class="px-4 py-2 text-sm text-gray-500 bg-gray-200 rounded-md hover:bg-gray-300">Abbrechen</button>
+            <button @click="confirm" class="ml-3 px-4 py-2 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">Bestätigen</button>
           </div>
         </div>
       </div>

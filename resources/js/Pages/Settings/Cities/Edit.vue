@@ -15,12 +15,10 @@ const form = useForm({
 });
 
 const update = () => {
-  console.log("you are in patch");
   form.patch(route("city.update", form.id));
 };
 
 const destroy = () => {
-  console.log("you are here too");
   form.delete(route("city.destroy", form.id));
 };
 </script>

@@ -71,4 +71,9 @@ class Course extends Model
   {
     return $this->hasMany(Ferien::class);
   }
+
+  public function praktikums()
+  {
+    return $this->hasMany(Praktikum::class);
+  }
 }
