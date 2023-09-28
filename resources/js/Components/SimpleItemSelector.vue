@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, inject } from "vue";
-import { EllipsisHorizontalIcon } from "@heroicons/vue/20/solid";
+import {ChevronDoubleRightIcon, ChevronDoubleLeftIcon, EllipsisHorizontalIcon} from "@heroicons/vue/20/solid";
 import { Link } from "@inertiajs/vue3";
 import SollValuesComponent from "@/Components/SollValuesComponent.vue";
 
@@ -28,6 +28,16 @@ const filteredItems = computed(() => {
     item.name.toLowerCase().includes(search.value.toLowerCase())
   );
 });
+
+const addAll = () => {
+  const newValue = props.items.map(item => item.id);
+  emit("update:modelValue", newValue);
+}
+
+const removeAll = () => {
+  props.modelValue = [];
+  emit("update:modelValue", []);
+};
 
 const getDefaultSollValue = (itemId) => {
   const item = props.items.find((item) => item.id === itemId);
@@ -102,6 +112,14 @@ onBeforeUnmount(() => {
         v-text="errors"
         class="text-red-500 text-sm mt-1"
       ></div>
+    </div>
+    <div class="flex flex-col justify-center items-center space-y-2">
+<button @click.prevent="addAll" class="bg-lime-700 text-white p-2 rounded inline-flex items-center">
+  <ChevronDoubleRightIcon class="h-4 w-4" />
+</button>
+<button @click.prevent="removeAll" class="bg-amber-700 text-white p-2 rounded inline-flex items-center">
+  <ChevronDoubleLeftIcon class="h-4 w-4" />
+</button>
     </div>
     <div class="w-1/2">
       <label
@@ -221,5 +239,18 @@ onBeforeUnmount(() => {
 .flex-grow {
   display: flex;
   justify-content: space-between;
+}
+
+.btn {
+  background-color: #4caf50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
 }
 </style>

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\GridController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\TodoController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\FerienController;
 use App\Http\Controllers\SubjectController;
@@ -34,7 +35,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
-        'subjects' => Subject::all()
+        'todos' => auth()->user()->todos
     ]);
     })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -81,6 +82,9 @@ Route::get('grid/{grid}/gridslots/edit', [GridslotController::class, 'edit'])->n
 // Notification
 Route::get('/notifications', [NotificationController::class,'index']);
 Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead']);
+
+//Todo
+Route::resource('todos', TodoController::class);
 
 
 

@@ -17,6 +17,7 @@ const props = defineProps({
 const form = useForm({
   name: "",
   surname: "",
+  title: "",
   maxhourweek: "",
   color: "",
   email: "",
@@ -47,21 +48,52 @@ const form = useForm({
               class="bg-gray-100 p-5 rounded-xl mx-auto text-p font-bold space-y-2 mt-5 shadow-sm sm:rounded-lg"
             >
               <form @submit.prevent="form.post('/teacher')">
-                <div class="mb-6">
-                  <SimpleInput
-                    v-model="form.name"
-                    label="Name"
-                    type="text"
-                    :error="form.errors.name"
-                  />
-                </div>
-                <div class="mb-6">
-                  <SimpleInput
-                    v-model="form.surname"
-                    label="Surname"
-                    type="text"
-                    :error="form.errors.surname"
-                  />
+                <div class="mb-6 flex items-center space-x-2">
+                  <!-- space-x-2 for spacing between flex items -->
+                  <!-- Title Select Dropdown -->
+                  <div class="w-24">
+                    <!-- You can set the width value according to your need -->
+                    <label
+                      class="block mb-2 text-xs font-bold text-gray-600 uppercase"
+                      for="title"
+                    >
+                      Title
+                    </label>
+                    <select
+                      v-model="form.title"
+                      class="form-input w-full"
+                      id="title"
+                    >
+                      <option value="Frau">Frau</option>
+                      <option value="Herr">Herr</option>
+                      <!-- ... other options ... -->
+                    </select>
+                    <div
+                      v-if="form.errors.title"
+                      v-text="form.errors.title"
+                      class="text-red-500 text-sm mt-1"
+                    ></div>
+                  </div>
+
+                  <!-- Name Input -->
+                  <div class="flex-1">
+                    <SimpleInput
+                      v-model="form.name"
+                      label="Name"
+                      type="text"
+                      :error="form.errors.name"
+                    />
+                  </div>
+
+                  <!-- Surname Input -->
+                  <div class="flex-1">
+                    <SimpleInput
+                      v-model="form.surname"
+                      label="Surname"
+                      type="text"
+                      :error="form.errors.surname"
+                    />
+                  </div>
                 </div>
 
                 <div class="mb-6">
@@ -119,7 +151,6 @@ const form = useForm({
     </div>
   </BreezeAuthenticatedLayout>
 </template>
-
 
 <style scoped>
 :deep(.vue-swatches__row) {

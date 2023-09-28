@@ -13,46 +13,50 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements LdapAuthenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, AuthenticatesWithLdap, SoftDeletes;
+  use HasApiTokens, HasFactory, Notifiable, AuthenticatesWithLdap, SoftDeletes;
 
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array<int, string>
+   */
+  protected $fillable = [
+    'name',
+    'email',
+    'password',
+  ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+  /**
+   * The attributes that should be hidden for serialization.
+   *
+   * @var array<int, string>
+   */
+  protected $hidden = [
+    'password',
+    'remember_token',
+  ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+  /**
+   * The attributes that should be cast.
+   *
+   * @var array<string, string>
+   */
+  protected $casts = [
+    'email_verified_at' => 'datetime',
+  ];
 
-    public function grids()
-    {
-      return $this->hasMany(Grid::class);
-    }
+  public function grids()
+  {
+    return $this->hasMany(Grid::class);
+  }
 
-    public function conflicts()
-{
+  public function conflicts()
+  {
     return $this->hasMany(Conflict::class);
-}
+  }
+  public function todos()
+  {
+    return $this->hasMany(Todo::class);
+  }
 }

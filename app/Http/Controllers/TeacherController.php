@@ -39,6 +39,7 @@ class TeacherController extends Controller
           'id' => $teacher->id,
           'name' => $teacher->name,
           'surname' => $teacher->surname,
+          'title' => $teacher->title,
           'color' => $teacher->color,
         ]),
       'filters' => request()->only(['search', 'viewAll']),
@@ -63,6 +64,7 @@ class TeacherController extends Controller
     $validated = $request->validate([
       'name' => 'required',
       'surname' => 'required',
+      'title' => 'required',
       'maxhourweek' => 'required',
       'color' => 'required',
       'email' => 'required|email|unique:teachers',
@@ -78,6 +80,7 @@ class TeacherController extends Controller
     $teacher = Teacher::create([
       'name' => $validated['name'],
       'surname' => $validated['surname'],
+      'title' => $validated['title'],
       'maxhourweek' => $validated['maxhourweek'],
       'color' => $validated['color'],
       'email' => $validated['email'],
@@ -106,6 +109,7 @@ class TeacherController extends Controller
         'id' => $teacher->id,
         'name' => $teacher->name,
         'surname' => $teacher->surname,
+        'title' => $teacher->title,
         'maxhourweek' => $teacher->maxhourweek,
         'email' => $teacher->email,
         'color' => $teacher->color,
@@ -125,6 +129,7 @@ class TeacherController extends Controller
     $data = $request->validate([
       'name' => 'required',
       'surname' => 'required',
+      'title' => 'required',
       'maxhourweek' => 'required',
       'color' => 'required',
       'email' => 'required|email',
@@ -136,6 +141,7 @@ class TeacherController extends Controller
     $teacher->update([
       'name' => $data['name'],
       'surname' => $data['surname'],
+      'title' => $data['title'],
       'maxhourweek' => $data['maxhourweek'],
       'color' => $data['color'],
       'email' => $data['email'],
