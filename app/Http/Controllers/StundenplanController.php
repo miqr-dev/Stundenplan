@@ -351,7 +351,28 @@ class StundenplanController extends Controller
     ]);
   }
 
+  public function teacherList(Request $request)
+  {
+    $teacher_id = $request->input('teacher_id');
+    $selectedWeek = $request->input('selectedWeek');
+    $course_id = $request->input('course_id');
 
+    // Fetching the SchedualMaster entries for the selected course and week
+    $schedualMasters = SchedualMaster::where('course_id', $course_id)
+      ->where('calendar_week', $selectedWeek)
+      ->get();
+
+    // Fetching the SchedualDetail entries for the selected teacher from the fetched SchedualMaster entries
+    $busySlots = SchedualDetail::whereIn('schedual_master_id', $schedualMasters->pluck('id'))
+      ->where('teacher_id', $teacher_id)
+      ->with([
+        'schedualMaster',
+        'subject:id,name' // Select only id (for the relationship to work) and name
+      ])
+      ->get();
+
+    return response()->json(['busySlots' => $busySlots]);
+  }
 
 
 

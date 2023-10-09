@@ -155,24 +155,9 @@ const remainingWeeks = computed(() => {
 
 const subjectsWithRequiredHours = computed(() => {
   return subjects.value.map((subject) => {
-    // Log initial subject data
-    // console.log(`Calculating for subject: ${subject.name}`);
-    // console.log(`Initial Soll: ${subject.pivot.soll}`);
-    // console.log(`Initial Ist: ${subject.pivot.ist}`);
-
-    // Calculate and log remaining Soll
     const remainingSoll = subject.pivot.soll - subject.pivot.ist;
-    // console.log(`Remaining Soll: ${remainingSoll}`);
-
-    // Log remaining weeks
-    // console.log(`Remaining Weeks: ${remainingWeeks.value}`);
-
-    // Calculate and log requiredHoursPerWeek
     const requiredHoursPerWeek =
       remainingWeeks.value > 0 ? remainingSoll / remainingWeeks.value : 0;
-    // console.log(`Required Hours Per Week: ${requiredHoursPerWeek}`);
-
-    // Return new subject object with added requiredHoursPerWeek
     return {
       ...subject,
       requiredHoursPerWeek: requiredHoursPerWeek.toFixed(2),

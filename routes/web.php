@@ -83,6 +83,10 @@ Route::get('grid/{grid}/gridslots/edit', [GridslotController::class, 'edit'])->n
 Route::get('/notifications', [NotificationController::class,'index']);
 Route::post('/notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead']);
 
+
+//TeacherList
+Route::post('/teacherList',[StundenplanController::class, 'teacherList']);
+
 //Todo
 Route::resource('todos', TodoController::class);
 

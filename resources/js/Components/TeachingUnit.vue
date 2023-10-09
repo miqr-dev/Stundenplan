@@ -97,6 +97,34 @@ const isCurrentTeacherOnLeave = computed(() => {
   return isTeacherOnLeave(teachingUnitData.value.teacher);
 });
 
+const sortedSubjects = computed(() => {
+  return [...props.subjects].sort((a, b) => {
+    const nameA = a.name.toUpperCase(); // Ignore case
+    const nameB = b.name.toUpperCase(); // Ignore case
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0; // names are equal
+  });
+});
+
+const sortedTeachers = computed(() => {
+  // Assuming selectedOption1 holds the selected subject object
+  const selectedSubjectId = selectedOption1.value?.id; // Access the id of the selected subject
+  
+  if (!selectedSubjectId) return [];
+  
+  const selectedSubject = sortedSubjects.value.find(subject => subject.id === selectedSubjectId);
+  
+  if (!selectedSubject || !selectedSubject.teachers) return [];
+  
+  return [...selectedSubject.teachers].sort((a, b) => {
+    const nameA = a.surname.toUpperCase(); // Ignore case
+    const nameB = b.surname.toUpperCase(); // Ignore case
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0; // names are equal
+  });
+});
 // ----------------- Defining Helper Functions -----------------------
 const checkTeachingUnit = async () => {
   // set teachingUnitData to null
@@ -196,20 +224,20 @@ const ferienName = computed(() => {
 
 const praktikumName = computed(() => {
   if (!props.praktikums || !Array.isArray(props.praktikums)) return null;
-  
-  const checkedDate = moment(props.date).startOf('day');
-  const dayOfWeek = checkedDate.format('dddd');
-  
-  const foundPraktikum = props.praktikums.find(praktikum => {
-    const startDate = moment(praktikum.start_date).startOf('day');
-    const endDate = moment(praktikum.end_date).startOf('day');
-    
-    const isBetween = checkedDate.isBetween(startDate, endDate, null, '[]');
+
+  const checkedDate = moment(props.date).startOf("day");
+  const dayOfWeek = checkedDate.format("dddd");
+
+  const foundPraktikum = props.praktikums.find((praktikum) => {
+    const startDate = moment(praktikum.start_date).startOf("day");
+    const endDate = moment(praktikum.end_date).startOf("day");
+
+    const isBetween = checkedDate.isBetween(startDate, endDate, null, "[]");
     const isDayIncluded = praktikum.repeat_days.includes(dayOfWeek);
-    
+
     return isBetween && isDayIncluded;
   });
-  
+
   return foundPraktikum ? foundPraktikum.name : null;
 });
 
@@ -336,8 +364,8 @@ const closeAndEmit = async () => {
           class="mb-0"
           :class="{ 'text-red-500 underline': isCurrentTeacherOnLeave }"
         >
-          {{ teachingUnitData.teacher.surname }},
-          {{ teachingUnitData.teacher.name }}
+          {{ teachingUnitData.teacher.title }}
+          {{ teachingUnitData.teacher.surname }}
         </p>
         <UserIcon
           class="h-5 w-5 mr-2"
@@ -406,9 +434,9 @@ const closeAndEmit = async () => {
 
         <div class="space-y-4 flex flex-col">
           <select v-model="selectedOption1">
-            <option disabled value="">Select Option 1</option>
+            <option value="" disabled>Select Option 1</option>
             <option value="">Select Later</option>
-            <option v-for="option in subjects" :value="option">
+            <option :value="option" v-for="option in sortedSubjects">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
@@ -429,16 +457,16 @@ const closeAndEmit = async () => {
             <option disabled value="">Select Option 2</option>
             <option value="">Select Later</option>
             <option
-              v-for="option in selectedOption1.teachers"
-              :value="option"
+              v-for="teacher in sortedTeachers"
+              :value="teacher"
               :class="[
-                isTeacherOnLeave(option)
+                isTeacherOnLeave(teacher)
                   ? 'text-orange-500 cursor-not-allowed'
                   : 'text-green-500',
               ]"
-              :disabled="isTeacherOnLeave(option)"
+              :disabled="isTeacherOnLeave(teacher)"
             >
-              {{ option.surname }}, {{ option.name }}
+              {{ teacher.surname }}, {{ teacher.name }}
             </option>
           </select>
 

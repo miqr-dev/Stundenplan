@@ -1,10 +1,11 @@
 <script setup>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import { ref, computed, watch, defineEmits } from "vue";
 import moment from "moment";
 import TeachingUnit from "@/Components/TeachingUnit.vue";
 import Sidebar from "@/Components/Sidebar.vue";
+import TeacherList from "@/Components/TeacherList.vue";
 import { useForm } from "@inertiajs/vue3";
 import { FaceFrownIcon } from "@heroicons/vue/20/solid";
 
@@ -83,6 +84,11 @@ const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
 };
 
+const isTeacherList = ref(false);
+const toggleTeacherList = () => {
+  isTeacherList.value = !isTeacherList.value;
+};
+
 const handleSelection = (data) => {
   const { date, gridSlotItem, selectedOptions } = data;
 
@@ -134,12 +140,16 @@ const weekDates = computed(() => {
 });
 
 const daysWithDates = computed(() => {
-  const result = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'].map(
-    (day, index) => ({
-      day,
-      date: weekDates.value[index],
-    })
-  );
+  const result = [
+    "Montag",
+    "Dienstag",
+    "Mittwoch",
+    "Donnerstag",
+    "Freitag",
+  ].map((day, index) => ({
+    day,
+    date: weekDates.value[index],
+  }));
   return result;
 });
 
@@ -362,6 +372,13 @@ const isFerien = (date) => {
                   </div>
                 </div>
                 <div class="flex items-center space-x-4">
+                  <button
+                    @click="toggleTeacherList"
+                    v-if="selectedCourse && selectedWeek"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  >
+                    Show Teachers
+                  </button>
                   <FaceFrownIcon class="self-center text-red-400 h-8 w-8" />
                   <button
                     @click="toggleSidebar"
@@ -481,6 +498,13 @@ const isFerien = (date) => {
                 </div>
               </div>
             </div>
+            <TeacherList
+              :isTeacherList="isTeacherList"
+              :toggleTeacherList="toggleTeacherList"
+              :course="selectedCourse"
+              :daysWithDates="daysWithDates"
+              :selectedWeek="selectedWeek"
+            />
           </div>
         </div>
       </div>
